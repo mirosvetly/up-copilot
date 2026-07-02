@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0}
+  body{background:#141414;color:#fafafa;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  *{box-sizing:border-box}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:6px;border:2px solid #141414}
+  ::-webkit-scrollbar-thumb:hover{background:#3a3a3a}
+  textarea{font-family:'Geist',ui-sans-serif,system-ui,sans-serif}
+  textarea::placeholder{color:#525252}
+  input::placeholder{color:#525252}
+  @keyframes ucSpin{to{transform:rotate(360deg)}}
+  @keyframes ucToast{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+  @keyframes ucPulse{0%,100%{opacity:.55}50%{opacity:1}}
+  @keyframes ucFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+
+<div style="display:flex;height:100vh;width:100%;overflow:hidden;background:#141414;color:#fafafa">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside style="width:212px;flex:none;height:100%;display:flex;flex-direction:column;background:#181818;border-right:1px solid #404040">
+    <div style="display:flex;align-items:center;gap:10px;padding:18px 16px 16px">
+      <span style="width:30px;height:30px;border-radius:8px;background:rgba(182,208,134,0.14);display:flex;align-items:center;justify-content:center;flex:none">{{ brandIcon }}</span>
+      <div style="line-height:1.2;min-width:0">
+        <div style="font-size:14px;font-weight:600;white-space:nowrap">Upwork Copilot</div>
+        <div style="font-size:11px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">v0.4 · local</div>
+      </div>
+    </div>
+
+    <nav style="flex:1;padding:6px 12px;display:flex;flex-direction:column;gap:3px">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="5">
+        <button onClick="{{ item.onClick }}" style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;border:none;text-align:left;width:100%;font-size:13.5px;font-weight:500;background:{{ item.bg }};color:{{ item.color }};cursor:{{ item.cursor }};opacity:{{ item.opacity }};transition:background .12s,color .12s" style-hover="{{ item.hoverStyle }}">
+          <span style="display:inline-flex;flex:none">{{ item.icon }}</span>
+          <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ item.label }}</span>
+          <sc-if value="{{ item.showBadge }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#a3a3a3;background:#262626;padding:1px 6px;border-radius:20px">{{ item.badge }}</span></sc-if>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="border-top:1px solid #404040;padding:12px 12px 14px">
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 8px">
+        <span style="width:30px;height:30px;border-radius:20px;background:#262626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:none;color:#d4d4d4">DM</span>
+        <span style="flex:1;min-width:0">
+          <span style="display:block;font-size:13px;font-weight:500">Denis M.</span>
+          <span style="display:block;font-size:11px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">Python · MT5 · WebRTC</span>
+        </span>
+        <span style="width:7px;height:7px;border-radius:20px;background:#4ade80;flex:none" title="Скрапер активен"></span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main style="flex:1;min-width:0;height:100%;display:flex;flex-direction:column;overflow:hidden">
+
+    <!-- ========== FEED ========== -->
+    <sc-if value="{{ isFeed }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;height:100%;min-height:0">
+      <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
+        <span style="display:inline-flex">{{ icoBrief }}</span>
+        <div style="font-size:15px;font-weight:600">Лента вакансий</div>
+        <div style="width:1px;height:18px;background:#404040"></div>
+        <div style="font-size:12px;color:#a3a3a3">Upwork · Python / Trading / WebRTC</div>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;gap:8px;height:34px;padding:0 11px;border-radius:9px;background:#0a0a0a;border:1px solid #404040;width:230px">
+          <span style="display:inline-flex">{{ icoSearch }}</span>
+          <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="Фильтр по навыку…" style="flex:1;background:transparent;border:none;outline:none;color:#fafafa;font-size:13px;min-width:0"/>
+        </div>
+        <div style="display:flex;background:#0a0a0a;border:1px solid #404040;border-radius:9px;padding:2px;gap:2px">
+          <button onClick="{{ onSortFresh }}" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;background:{{ sortFreshBg }};color:{{ sortFreshColor }}">{{ icoClockSm }}Свежесть</button>
+          <button onClick="{{ onSortScore }}" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;background:{{ sortScoreBg }};color:{{ sortScoreColor }}">{{ icoZapSm }}Score</button>
+        </div>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow:auto">
+        <div style="display:flex;gap:24px;padding:20px 24px 40px;max-width:1240px;margin:0 auto;align-items:flex-start">
+
+          <!-- feed column -->
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#a3a3a3;padding:0 2px 2px">
+              <span><span style="color:#fafafa;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ visibleCount }}</span> вакансий в очереди на ревью</span>
+              <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
+              <span>обновлено <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#d4d4d4">только что</span></span>
+              <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
+              <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:20px;background:#4ade80;animation:ucPulse 2s infinite"></span>авто-скрапинг</span>
+            </div>
+
+            <sc-for list="{{ jobs }}" as="job" hint-placeholder-count="4">
+              <div style="position:relative;background:#171717;border:1px solid {{ job.cardBorder }};border-radius:14px;overflow:hidden;opacity:{{ job.cardOpacity }};box-shadow:{{ job.cardGlow }};transition:opacity .2s,border-color .2s">
+                <!-- aging bar -->
+                <div style="height:4px;width:100%;background:#232323">
+                  <div style="height:100%;width:{{ job.barPct }}%;background:{{ job.freshColor }};transition:width .3s"></div>
+                </div>
+                <div style="padding:15px 18px 16px">
+                  <!-- top row: freshness hero + score -->
+                  <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:11px">
+                    <div style="display:flex;flex-direction:column;gap:5px;flex:none">
+                      <div style="display:flex;align-items:center;gap:7px">
+                        <span style="display:inline-flex">{{ job.freshIcon }}</span>
+                        <span style="font-size:20px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.freshColor }};line-height:1;letter-spacing:-0.02em">{{ job.ageBig }}</span>
+                      </div>
+                      <span style="display:inline-flex;align-items:center;align-self:flex-start;gap:5px;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:20px;color:{{ job.freshColor }};background:{{ job.freshSoft }}">{{ job.freshLabel }}</span>
+                    </div>
+                    <div style="flex:1;min-width:0;padding-top:1px">
+                      <div onClick="{{ job.onOpen }}" style="font-size:15.5px;font-weight:600;line-height:1.35;cursor:pointer;color:#fafafa" style-hover="color:#b6d086">{{ job.title }}</div>
+                      <div style="font-size:12px;color:#737373;margin-top:3px;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.postedText }}</div>
+                    </div>
+                    <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                      <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:9px;background:{{ job.scoreSoft }};border:1px solid {{ job.scoreBorder }}">
+                        <span style="width:7px;height:7px;border-radius:20px;background:{{ job.scoreColor }}"></span>
+                        <span style="font-size:15px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.scoreColor }};line-height:1">{{ job.score }}</span>
+                      </div>
+                      <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">score</span>
+                    </div>
+                  </div>
+
+                  <!-- tags -->
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+                    <sc-for list="{{ job.tags }}" as="tag" hint-placeholder-count="3">
+                      <span style="font-size:11.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:6px;background:{{ tag.bg }};border:1px solid {{ tag.border }};color:{{ tag.color }}">{{ tag.label }}</span>
+                    </sc-for>
+                  </div>
+
+                  <!-- meta row -->
+                  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:11px 0 0;border-top:1px solid #262626">
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#fafafa">{{ job.icoBudget }}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
+                    <sc-if value="{{ job.verified }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#4ade80">{{ icoVerified }}Оплата подтверждена</span></sc-if>
+                    <sc-if value="{{ job.unverified }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#f87171">{{ icoUnverified }}Оплата не подтверждена</span></sc-if>
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{{ job.icoHire }}Нанимает <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.hireColor }};font-weight:600">{{ job.hireRate }}%</span></span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{{ job.icoUsers }}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#d4d4d4">{{ job.proposals }}</span> откликов</span>
+                  </div>
+
+                  <!-- actions -->
+                  <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
+                    <sc-if value="{{ job.isNew }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;align-items:center;gap:9px;width:100%">
+                        <button onClick="{{ job.onApprove }}" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 18px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13.5px;font-weight:600;cursor:pointer;transition:background .15s" style-hover="background:#a5c076">{{ icoCheck }}Одобрить</button>
+                        <button onClick="{{ job.onSkip }}" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:13.5px;font-weight:500;cursor:pointer;transition:background .15s,color .15s" style-hover="background:#1a1a1a;color:#fafafa">{{ icoX }}Пропустить</button>
+                        <div style="flex:1"></div>
+                        <button onClick="{{ job.onOpen }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:none;border-radius:9px;background:transparent;color:#a3a3a3;font-size:13px;font-weight:500;cursor:pointer" style-hover="color:#fafafa">Открыть {{ icoArrow }}</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ job.isApproved }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:10px;width:100%">
+                        <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;font-size:13px;font-weight:600">{{ icoCircleCheck }}В очереди на отправку</span>
+                        <button onClick="{{ job.onUndo }}" style="height:36px;padding:0 12px;border:none;border-radius:9px;background:transparent;color:#737373;font-size:12.5px;cursor:pointer" style-hover="color:#fafafa">Отменить</button>
+                        <div style="flex:1"></div>
+                        <button onClick="{{ job.onOpen }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#1a1a1a">Открыть детально {{ icoArrow }}</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ job.isSkipped }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:10px;width:100%">
+                        <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#737373">{{ icoX }}Пропущено</span>
+                        <button onClick="{{ job.onUndo }}" style="height:34px;padding:0 12px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:12.5px;cursor:pointer" style-hover="background:#1a1a1a;color:#fafafa">Вернуть в ленту</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ job.isSent }}" hint-placeholder-val="{{ false }}">
+                      <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.3);color:#b6d086;font-size:13px;font-weight:600">{{ icoSend }}Отправлено вручную</span>
+                    </sc-if>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+
+            <sc-if value="{{ feedEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:60px 20px;color:#737373;font-size:13px">Ничего не найдено по фильтру «{{ query }}»</div>
+            </sc-if>
+          </div>
+
+          <!-- right rail -->
+          <div style="width:284px;flex:none;display:flex;flex-direction:column;gap:14px;position:sticky;top:0">
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                <span style="display:inline-flex">{{ icoInboxSm }}</span>
+                <span style="font-size:13px;font-weight:600">Очередь на отправку</span>
+                <div style="flex:1"></div>
+                <span style="font-size:11px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#b6d086;background:rgba(182,208,134,0.12);padding:1px 7px;border-radius:20px">{{ counts.approved }}</span>
+              </div>
+              <sc-if value="{{ hasQueue }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ queue }}" as="q" hint-placeholder-count="1">
+                    <div onClick="{{ q.onOpen }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:#0a0a0a;border:1px solid #262626;cursor:pointer" style-hover="border-color:#404040">
+                      <span style="width:6px;height:6px;border-radius:20px;background:#4ade80;flex:none"></span>
+                      <span style="flex:1;min-width:0;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.short }}</span>
+                      <span style="font-size:10.5px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;flex:none">{{ q.ageBig }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ queueEmpty }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:12px;color:#737373;line-height:1.5;padding:4px 2px">Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на Upwork.</div>
+              </sc-if>
+            </div>
+
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Свежесть публикации</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#d4d4d4"><span style="width:9px;height:9px;border-radius:20px;background:#b6d086;flex:none"></span>Свежая <span style="color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;margin-left:auto">&lt; 15 мин</span></div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#d4d4d4"><span style="width:9px;height:9px;border-radius:20px;background:#f59e0b;flex:none"></span>Стареет <span style="color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;margin-left:auto">15–45 мин</span></div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#d4d4d4"><span style="width:9px;height:9px;border-radius:20px;background:#737373;flex:none"></span>Устарела <span style="color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;margin-left:auto">&gt; 45 мин</span></div>
+              </div>
+              <div style="height:1px;background:#262626;margin:14px 0"></div>
+              <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Score</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#d4d4d4"><span style="width:9px;height:9px;border-radius:20px;background:#4ade80;flex:none"></span>Высокий <span style="color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;margin-left:auto">&gt; 75</span></div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#d4d4d4"><span style="width:9px;height:9px;border-radius:20px;background:#facc15;flex:none"></span>Средний <span style="color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;margin-left:auto">50–75</span></div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#d4d4d4"><span style="width:9px;height:9px;border-radius:20px;background:#737373;flex:none"></span>Низкий <span style="color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;margin-left:auto">&lt; 50</span></div>
+              </div>
+            </div>
+
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Сегодня</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">47</div><div style="font-size:11px;color:#737373">найдено</div></div>
+                <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#b6d086">{{ counts.approved }}</div><div style="font-size:11px;color:#737373">одобрено</div></div>
+                <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ counts.sent }}</div><div style="font-size:11px;color:#737373">отправлено</div></div>
+                <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#737373">{{ counts.skipped }}</div><div style="font-size:11px;color:#737373">пропущено</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ========== DETAIL ========== -->
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;height:100%;min-height:0">
+      <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
+        <button onClick="{{ onBack }}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 8px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#d4d4d4;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#1a1a1a;color:#fafafa">{{ icoBack }}Лента</button>
+        <div style="width:1px;height:18px;background:#404040"></div>
+        <div style="font-size:12px;color:#a3a3a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ dJob.title }}</div>
+        <div style="flex:1"></div>
+        <button onClick="{{ onOpenUpwork }}" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#1a1a1a">{{ icoArrow }}Открыть на Upwork</button>
+        <sc-if value="{{ dJob.isSent }}" hint-placeholder-val="{{ false }}">
+          <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#b6d086;font-size:13px;font-weight:600">{{ icoCircleCheck }}Отправлено вручную</span>
+        </sc-if>
+        <sc-if value="{{ dJob.notSent }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onMarkSent }}" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#a5c076">{{ icoSend }}Отметить как отправлено</button>
+        </sc-if>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow:auto">
+        <div style="display:flex;gap:24px;padding:24px;max-width:1240px;margin:0 auto;align-items:flex-start">
+
+          <!-- main column -->
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:18px">
+
+            <!-- title block -->
+            <div>
+              <div style="display:flex;align-items:flex-start;gap:16px">
+                <div style="flex:1;min-width:0">
+                  <h1 style="font-size:23px;font-weight:700;line-height:1.25;letter-spacing:-0.01em">{{ dJob.title }}</h1>
+                  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:12px">
+                    <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600">{{ dJob.icoBudget }}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ dJob.budget }}</span></span>
+                    <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:{{ dJob.freshColor }}">{{ dJob.freshIcon }}{{ dJob.postedText }}</span>
+                    <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
+                    <span style="font-size:13px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ dJob.proposals }} откликов</span>
+                  </div>
+                </div>
+                <div style="flex:none;text-align:center;background:#171717;border:1px solid {{ dJob.scoreBorder }};border-radius:14px;padding:12px 18px;min-width:96px">
+                  <div style="font-size:34px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ dJob.scoreColor }};line-height:1">{{ dJob.score }}</div>
+                  <div style="font-size:10px;color:#737373;letter-spacing:.08em;text-transform:uppercase;margin-top:3px">match score</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px">
+                <sc-for list="{{ dJob.tags }}" as="tag" hint-placeholder-count="4">
+                  <span style="font-size:11.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:6px;background:{{ tag.bg }};border:1px solid {{ tag.border }};color:{{ tag.color }}">{{ tag.label }}</span>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- why fits -->
+            <div style="background:rgba(182,208,134,0.05);border:1px solid rgba(182,208,134,0.22);border-radius:14px;padding:18px 20px">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+                <span style="display:inline-flex">{{ icoSparkles }}</span>
+                <span style="font-size:14px;font-weight:600">Почему подходит</span>
+                <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace">LLM-скоринг · gpt-4o</span>
+                <div style="flex:1"></div>
+                <span style="font-size:12px;color:#a3a3a3">итог <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ dJob.scoreColor }};font-weight:700">{{ dJob.score }}/100</span></span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <sc-for list="{{ dJob.reasons }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:flex-start;gap:11px">
+                    <span style="flex:none;margin-top:1px">{{ r.icon }}</span>
+                    <span style="flex:1;font-size:13px;line-height:1.5;color:#d4d4d4">{{ r.text }}</span>
+                    <span style="flex:none;font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ r.wColor }};background:{{ r.wBg }};padding:2px 8px;border-radius:6px">{{ r.w }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- description -->
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Описание вакансии</div>
+              <p style="font-size:14px;line-height:1.65;color:#d4d4d4;white-space:pre-wrap">{{ dJob.description }}</p>
+            </div>
+
+            <!-- cover letter -->
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                <span style="font-size:14px;font-weight:600">Черновик cover letter</span>
+                <div style="flex:1"></div>
+                <div style="display:flex;background:#0a0a0a;border:1px solid #404040;border-radius:8px;padding:2px;gap:2px">
+                  <button onClick="{{ onPreview }}" style="height:26px;padding:0 11px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;background:{{ previewBg }};color:{{ previewColor }}">Подсветка</button>
+                  <button onClick="{{ onEdit }}" style="height:26px;padding:0 11px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;background:{{ editBg }};color:{{ editColor }}">Редактировать</button>
+                </div>
+                <button onClick="{{ onRegen }}" style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid #404040;border-radius:8px;background:#0a0a0a;color:#d4d4d4;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="background:#1a1a1a;color:#fafafa">{{ regenIcon }}Перегенерировать</button>
+              </div>
+              <div style="font-size:12px;color:#737373;margin-bottom:14px">Подсвеченные фрагменты взяты из твоих GitHub-проектов — редактируй перед отправкой.</div>
+
+              <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:14px;line-height:1.7;color:#e5e5e5;white-space:pre-wrap;background:#0a0a0a;border:1px solid #262626;border-radius:10px;padding:16px">
+                  <sc-for list="{{ dJob.coverSegs }}" as="seg" hint-placeholder-count="4"><span style="background:{{ seg.bg }};border-bottom:{{ seg.border }};border-radius:{{ seg.radius }};padding:{{ seg.pad }};color:{{ seg.color }}" title="{{ seg.title }}">{{ seg.t }}</span></sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+                <textarea value="{{ coverText }}" onInput="{{ onCoverChange }}" style="width:100%;height:230px;resize:vertical;background:#0a0a0a;border:1px solid #404040;border-radius:10px;padding:16px;color:#e5e5e5;font-size:14px;line-height:1.7;outline:none"></textarea>
+              </sc-if>
+
+              <!-- github legend -->
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid #262626">
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#737373">{{ icoGithubSm }}Источники:</span>
+                <sc-for list="{{ dJob.legend }}" as="lg" hint-placeholder-count="2">
+                  <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#d4d4d4"><span style="width:10px;height:10px;border-radius:3px;background:{{ lg.color }};flex:none"></span><span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ lg.label }}</span></span>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- screening -->
+            <sc-if value="{{ dJob.hasScreening }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+                <span style="font-size:14px;font-weight:600">Ответы на вопросы клиента</span>
+                <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ dJob.screeningCount }}</span>
+              </div>
+              <div style="font-size:12px;color:#737373;margin-bottom:16px">Черновики ответов сгенерированы автоматически — проверь и поправь.</div>
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <sc-for list="{{ dJob.screening }}" as="q" hint-placeholder-count="2">
+                  <div>
+                    <div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:8px">
+                      <span style="flex:none;width:20px;height:20px;border-radius:6px;background:#262626;color:#a3a3a3;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ q.num }}</span>
+                      <span style="flex:1;font-size:13px;font-weight:500;line-height:1.5;color:#fafafa">{{ q.q }}</span>
+                    </div>
+                    <textarea value="{{ q.a }}" onInput="{{ q.onChange }}" style="width:100%;height:74px;resize:vertical;background:#0a0a0a;border:1px solid #404040;border-radius:10px;padding:11px 13px;color:#d4d4d4;font-size:13px;line-height:1.55;outline:none;margin-left:29px;width:calc(100% - 29px)"></textarea>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            </sc-if>
+          </div>
+
+          <!-- client risk card -->
+          <div style="width:300px;flex:none;position:sticky;top:0;display:flex;flex-direction:column;gap:14px">
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;overflow:hidden">
+              <div style="padding:15px 18px;border-bottom:1px solid #262626;display:flex;align-items:center;gap:9px">
+                <span style="display:inline-flex">{{ icoUsersSm }}</span>
+                <span style="font-size:13px;font-weight:600">Карточка клиента</span>
+              </div>
+              <!-- risk banner -->
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:{{ dJob.client.riskBg }}">
+                <span style="display:inline-flex">{{ dJob.client.riskIcon }}</span>
+                <span style="font-size:14px;font-weight:700;color:{{ dJob.client.riskColor }}">{{ dJob.client.riskLabel }}</span>
+                <div style="flex:1"></div>
+                <span style="font-size:11px;color:#a3a3a3">визитка риска</span>
+              </div>
+              <div style="padding:16px 18px;display:flex;flex-direction:column;gap:0">
+                <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
+                  <span style="display:inline-flex;flex:none">{{ dJob.client.payIcon }}</span>
+                  <span style="flex:1;font-size:13px;color:#a3a3a3">Оплата</span>
+                  <span style="font-size:13px;font-weight:600;color:{{ dJob.client.payColor }}">{{ dJob.client.payText }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
+                  <span style="display:inline-flex;flex:none">{{ icoWalletSm }}</span>
+                  <span style="flex:1;font-size:13px;color:#a3a3a3">Всего потрачено</span>
+                  <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ dJob.client.spent }}</span>
+                </div>
+                <div style="padding:10px 0;border-bottom:1px solid #1f1f1f">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
+                    <span style="display:inline-flex;flex:none">{{ icoHireSm }}</span>
+                    <span style="flex:1;font-size:13px;color:#a3a3a3">Hire rate</span>
+                    <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ dJob.client.hireColor }}">{{ dJob.client.hireRate }}%</span>
+                  </div>
+                  <div style="height:5px;border-radius:20px;background:#262626;overflow:hidden"><div style="height:100%;width:{{ dJob.client.hireRate }}%;background:{{ dJob.client.hireColor }}"></div></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
+                  <span style="display:inline-flex;flex:none">{{ icoPinSm }}</span>
+                  <span style="flex:1;font-size:13px;color:#a3a3a3">Страна</span>
+                  <span style="font-size:13px;font-weight:500">{{ dJob.client.country }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
+                  <span style="display:inline-flex;flex:none">{{ icoStarSm }}</span>
+                  <span style="flex:1;font-size:13px;color:#a3a3a3">Рейтинг</span>
+                  <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ dJob.client.ratingText }}</span>
+                </div>
+                <div style="display:flex;gap:10px;padding:12px 0 2px">
+                  <div style="flex:1;background:#0a0a0a;border:1px solid #262626;border-radius:9px;padding:9px 11px">
+                    <div style="font-size:16px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ dJob.client.jobs }}</div>
+                    <div style="font-size:10.5px;color:#737373;margin-top:1px">вакансий</div>
+                  </div>
+                  <div style="flex:1;background:#0a0a0a;border:1px solid #262626;border-radius:9px;padding:9px 11px">
+                    <div style="font-size:16px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ dJob.client.hires }}</div>
+                    <div style="font-size:10.5px;color:#737373;margin-top:1px">наймов</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;padding-top:12px;font-size:11px;color:#737373">{{ icoClockTiny }}На Upwork с {{ dJob.client.memberSince }}</div>
+              </div>
+            </div>
+
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px 18px">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Статус в трекере</div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:9px;height:9px;border-radius:20px;background:{{ dJob.statusColor }};flex:none"></span>
+                <span style="font-size:14px;font-weight:600;color:{{ dJob.statusColor }}">{{ dJob.statusLabel }}</span>
+              </div>
+              <div style="font-size:12px;color:#737373;line-height:1.5;margin-top:8px">{{ dJob.statusHint }}</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ========== ANALYTICS ========== -->
+    <sc-if value="{{ isAnalytics }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;height:100%;min-height:0">
+      <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
+        <span style="display:inline-flex">{{ icoChart }}</span>
+        <div style="font-size:15px;font-weight:600">Аналитика</div>
+        <div style="width:1px;height:18px;background:#404040"></div>
+        <div style="font-size:12px;color:#a3a3a3">Последние 30 дней · часовой пояс MSK</div>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow:auto">
+        <div style="padding:24px;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+
+          <!-- stat cards -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="5">
+              <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px 18px">
+                <div style="font-size:12px;color:#a3a3a3;margin-bottom:10px">{{ s.label }}</div>
+                <div style="display:flex;align-items:baseline;gap:8px">
+                  <span style="font-size:26px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ s.value }}</span>
+                  <span style="display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:600;color:{{ s.deltaColor }}">{{ s.deltaIcon }}{{ s.delta }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- funnel + keywords -->
+          <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:20px;align-items:start">
+            <!-- funnel -->
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+                <span style="display:inline-flex">{{ icoFilter }}</span>
+                <span style="font-size:14px;font-weight:600">Воронка</span>
+              </div>
+              <div style="font-size:12px;color:#737373;margin-bottom:18px">найдено → скоринг → черновик → одобрено → отправлено → интервью → найм</div>
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <sc-for list="{{ funnel }}" as="f" hint-placeholder-count="7">
+                  <div onMouseEnter="{{ f.onEnter }}" onMouseMove="{{ onTipMove }}" onMouseLeave="{{ onTipHide }}" style="display:flex;align-items:center;gap:14px;cursor:default">
+                    <span style="width:104px;flex:none;font-size:12.5px;color:#d4d4d4">{{ f.label }}</span>
+                    <div style="flex:1;height:30px;background:#0a0a0a;border-radius:7px;overflow:hidden;position:relative">
+                      <div style="height:100%;width:{{ f.pct }}%;background:{{ f.color }};border-radius:7px;transition:width .4s;display:flex;align-items:center;padding-left:11px">
+                        <span style="font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ f.textColor }}">{{ f.count }}</span>
+                      </div>
+                    </div>
+                    <span style="width:52px;flex:none;text-align:right;font-size:11.5px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#737373">{{ f.conv }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- keywords -->
+            <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+                <span style="display:inline-flex">{{ icoZapSm2 }}</span>
+                <span style="font-size:14px;font-weight:600">Конверсия по ключевым словам</span>
+              </div>
+              <div style="font-size:12px;color:#737373;margin-bottom:18px">доля откликов, дошедших до интервью</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ keywords }}" as="k" hint-placeholder-count="6">
+                  <div onMouseEnter="{{ k.onEnter }}" onMouseMove="{{ onTipMove }}" onMouseLeave="{{ onTipHide }}" style="cursor:default">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                      <span style="flex:1;font-size:12.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ k.kw }}</span>
+                      <span style="font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ k.color }}">{{ k.conv }}%</span>
+                      <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:52px;text-align:right">n={{ k.n }}</span>
+                    </div>
+                    <div style="height:8px;background:#0a0a0a;border-radius:20px;overflow:hidden"><div style="height:100%;width:{{ k.barW }}%;background:{{ k.color }};border-radius:20px;transition:width .4s"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <!-- heatmap -->
+          <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+              <span style="display:inline-flex">{{ icoActivity }}</span>
+              <span style="font-size:14px;font-weight:600">Когда публикуются лучшие вакансии</span>
+              <div style="flex:1"></div>
+              <span style="font-size:11.5px;color:#737373">кол-во вакансий score &gt; 75, по 3-часовым окнам</span>
+            </div>
+            <div style="font-size:12px;color:#b6d086;margin-bottom:18px;display:flex;align-items:center;gap:7px">{{ icoZapSm3 }}Лучшее окно: Вт–Чт, 12:00–15:00 MSK (утро в США) — планируй ревью на это время</div>
+
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <!-- hour axis -->
+              <div style="display:grid;grid-template-columns:38px repeat(8,1fr);gap:5px;align-items:center">
+                <span></span>
+                <sc-for list="{{ heat.buckets }}" as="b" hint-placeholder-count="8"><span style="font-size:10.5px;color:#737373;text-align:center;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ b }}</span></sc-for>
+              </div>
+              <sc-for list="{{ heat.rows }}" as="row" hint-placeholder-count="7">
+                <div style="display:grid;grid-template-columns:38px repeat(8,1fr);gap:5px;align-items:center">
+                  <span style="font-size:11.5px;color:#a3a3a3;font-weight:500">{{ row.day }}</span>
+                  <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="8">
+                    <div onMouseEnter="{{ c.onEnter }}" onMouseMove="{{ onTipMove }}" onMouseLeave="{{ onTipHide }}" style="height:30px;border-radius:6px;background:{{ c.bg }};border:1px solid {{ c.border }};display:flex;align-items:center;justify-content:center;cursor:default">
+                      <span style="font-size:11px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ c.textColor }}">{{ c.text }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:16px;font-size:11px;color:#737373">
+              <span>меньше</span>
+              <div style="display:flex;gap:3px">
+                <span style="width:16px;height:11px;border-radius:3px;background:rgba(182,208,134,0.1)"></span>
+                <span style="width:16px;height:11px;border-radius:3px;background:rgba(182,208,134,0.3)"></span>
+                <span style="width:16px;height:11px;border-radius:3px;background:rgba(182,208,134,0.55)"></span>
+                <span style="width:16px;height:11px;border-radius:3px;background:rgba(182,208,134,0.8)"></span>
+                <span style="width:16px;height:11px;border-radius:3px;background:rgba(182,208,134,1)"></span>
+              </div>
+              <span>больше</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+  </main>
+
+  <!-- ============ TOAST ============ -->
+  <sc-if value="{{ toast.show }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:#1f1f1f;border:1px solid #404040;border-radius:11px;padding:11px 16px;box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:100;animation:ucToast .22s ease">
+      <span style="display:inline-flex">{{ toast.icon }}</span>
+      <span style="font-size:13px;font-weight:500;color:#fafafa">{{ toast.text }}</span>
+    </div>
+  </sc-if>
+
+  <!-- ============ TOOLTIP ============ -->
+  <sc-if value="{{ tip.show }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:{{ tip.x }}px;top:{{ tip.y }}px;transform:translate(-50%,calc(-100% - 12px));pointer-events:none;z-index:200;background:#1f1f1f;border:1px solid #404040;border-radius:9px;padding:9px 12px;box-shadow:0 8px 24px rgba(0,0,0,0.5);white-space:nowrap">
+      <div style="font-size:12px;font-weight:600;color:#fafafa;margin-bottom:3px">{{ tip.title }}</div>
+      <sc-for list="{{ tip.lines }}" as="ln" hint-placeholder-count="2"><div style="font-size:11.5px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ ln }}</div></sc-for>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;freshWindowMin&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:60,&quot;min&quot;:30,&quot;max&quot;:180,&quot;step&quot;:15,&quot;unit&quot;:&quot; мин&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Поведение&quot;,&quot;label&quot;:&quot;Окно свежести (полоса устаревания)&quot;}}">
+const ICONS = {
+  "shield-check":'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  "search":'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  "layout-grid":'<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  "bar-chart":'<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+  "inbox":'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  "github":'<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>',
+  "sliders":'<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
+  "chevron-left":'<path d="m15 18-6-6 6-6"/>',
+  "clock":'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  "check":'<path d="M20 6 9 17l-5-5"/>',
+  "x":'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  "arrow-up-right":'<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
+  "star":'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  "refresh":'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  "send":'<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
+  "wallet":'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  "map-pin":'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  "trending-up":'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  "trending-down":'<polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>',
+  "sparkles":'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>',
+  "zap":'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  "briefcase":'<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>',
+  "filter":'<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+  "circle-check":'<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  "alert-triangle":'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  "dollar":'<line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  "activity":'<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
+  "users":'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  "clock-tiny":'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+};
+
+function ic(name, size, color, filled) {
+  return React.createElement('svg', {
+    key: name + size + (color||''), width: size || 16, height: size || 16, viewBox: '0 0 24 24',
+    fill: filled ? (color || 'currentColor') : 'none', stroke: filled ? 'none' : (color || 'currentColor'),
+    strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round',
+    style: { flex: 'none', display: 'block' },
+    dangerouslySetInnerHTML: { __html: ICONS[name] || '' },
+  });
+}
+
+const LEGEND = {
+  "django-trade-api": { label: "django-trade-api", color: "#b6d086" },
+  "mt5-ea-toolkit":   { label: "mt5-ea-toolkit",   color: "#60a5fa" },
+  "webrtc-signal":    { label: "webrtc-signal",    color: "#c084fc" },
+};
+const MY_SKILLS = ["Django","DRF","Python","PostgreSQL","Celery","FastAPI","MQL5","MetaTrader 5","MT5","WebRTC","WebSocket","Algo Trading","Node.js","React"];
+
+const JOBS = [
+  {
+    id: "j1", title: "Senior Django Developer for FinTech Trading API Platform",
+    score: 88, budgetType: "hourly", budget: "$45–65/hr", ageMin: 4, proposals: "< 5",
+    verified: true, hireRate: 82,
+    tags: ["Django","DRF","PostgreSQL","Celery","REST API","Fintech"],
+    description: "We're a US-based fintech building a trading & market-data platform and need an experienced Django engineer to own our REST API. You'll design and ship endpoints for order management, positions and account data, wire up token auth + rate limiting, and offload heavy work to Celery. Experience integrating brokerage or market-data feeds (Interactive Brokers, Alpaca, MetaTrader) is a big plus. Clean, tested code and clear async communication required. Long-term, 30+ hrs/week.",
+    reasons: [
+      { text: "Стек совпадает: Django · DRF · PostgreSQL · Celery — 4 из 4 ключевых навыка", w: "+26" },
+      { text: "Совпадение с проектом django-trade-api в портфолио (order management API)", w: "+18" },
+      { text: "Проверенная оплата, hire rate 82%, потрачено $210K+", w: "+18" },
+      { text: "Свежая публикация (4 мин), меньше 5 откликов — низкая конкуренция", w: "+14" },
+      { text: "Ставка $45–65/час выше твоей планки $40/час", w: "+12" },
+    ],
+    coverV0: [
+      { t: "Hi — I build production Django/DRF backends and this FinTech trading API is squarely in my wheelhouse.\n\n" },
+      { t: "I recently shipped a trading-data REST API on Django + DRF + PostgreSQL + Celery", src: "django-trade-api" },
+      { t: " that serves ~2M requests/day with token auth, throttling and idempotent webhooks.\n\n" },
+      { t: "For the market-data side, I've written MetaTrader 5 bridges and Expert Advisors", src: "mt5-ea-toolkit" },
+      { t: " so I'm comfortable normalizing broker feeds and handling reconnection and reconciliation.\n\n" },
+      { t: "I can start this week and overlap 4+ hours with US Eastern. Happy to walk through the repos on a quick call.\n\nBest,\nDenis" },
+    ],
+    coverV1: [
+      { t: "Hello! Owning a fintech trading API end-to-end is exactly the kind of work I take on.\n\n" },
+      { t: "My django-trade-api project already covers order management, positions and account endpoints with DRF + Celery", src: "django-trade-api" },
+      { t: ", so I can move fast on your core surface.\n\n" },
+      { t: "I've also built MT5 broker bridges", src: "mt5-ea-toolkit" },
+      { t: ", which means market-data feed quirks won't surprise me. Tested code and clear async updates as standard.\n\nBest,\nDenis" },
+    ],
+    screening: [
+      { q: "How many years of experience do you have with Django REST Framework?", a: "6 years. I've shipped 4 production DRF APIs, the most recent handling ~2M requests/day with token auth, throttling and Celery-backed async tasks." },
+      { q: "Have you integrated third-party trading or market-data APIs before?", a: "Yes — Alpaca and two brokerage/market-data feeds, including MetaTrader 5 bridges. I handle idempotency, webhook verification and reconciliation." },
+      { q: "What is your weekly availability and timezone overlap?", a: "30–35 hrs/week, with 4+ hours overlapping US Eastern for standups and pairing." },
+    ],
+    client: { verified: true, spent: "$210K+", hireRate: 82, country: "United States", rating: 4.9, jobs: 143, hires: 118, memberSince: "мая 2016", risk: "low" },
+  },
+  {
+    id: "j2", title: "MetaTrader 5 Expert Advisor — Custom Trading Bot (MQL5)",
+    score: 91, budgetType: "fixed", budget: "$2,500 fixed", ageMin: 11, proposals: "5–10",
+    verified: true, hireRate: 74,
+    tags: ["MQL5","MetaTrader 5","Algo Trading","Backtesting"],
+    description: "Looking for an MQL5 developer to build a custom MetaTrader 5 Expert Advisor from an existing strategy spec (trend + mean-reversion, multi-symbol). Must handle position sizing, trailing stops, a news filter and a settings panel. Deliverables: compiled EA, source, and a short Loom walkthrough. Backtesting on provided tick data required.",
+    reasons: [
+      { text: "MQL5 / MetaTrader 5 — прямое совпадение основного навыка", w: "+30" },
+      { text: "Совпадение с проектом mt5-ea-toolkit (position sizing, trailing, news filter)", w: "+22" },
+      { text: "Фиксированный бюджет $2,500 при ~3–4 днях работы", w: "+16" },
+      { text: "Проверенная оплата, hire rate 74%", w: "+13" },
+      { text: "Чёткое ТЗ и тик-данные приложены — низкий риск скоупа", w: "+10" },
+    ],
+    coverV0: [
+      { t: "Hi — I build MetaTrader 5 Expert Advisors in MQL5 and your spec (trend + mean-reversion, multi-symbol) is exactly what I do.\n\n" },
+      { t: "I maintain an MT5 EA toolkit with position sizing, trailing stops and a news filter", src: "mt5-ea-toolkit" },
+      { t: " so most of your building blocks already exist and I can adapt them to your strategy quickly.\n\n" },
+      { t: "I'll deliver the compiled EA, clean source, and a Loom walkthrough, with in-sample/out-of-sample backtests on your tick data.\n\nBest,\nDenis" },
+    ],
+    coverV1: [
+      { t: "Hello! MQL5 EAs are my core work, and a multi-symbol trend + mean-reversion bot is a great fit.\n\n" },
+      { t: "My mt5-ea-toolkit already implements position sizing, trailing stops and a news filter", src: "mt5-ea-toolkit" },
+      { t: ", so I can focus time on your strategy logic rather than plumbing. Compiled EA, source and a Loom walkthrough included, with backtests on your tick data.\n\nBest,\nDenis" },
+    ],
+    screening: [
+      { q: "Can you share MT5/MQL5 code samples?", a: "Yes — I can share a private repo with two EAs and a backtest report on a call." },
+      { q: "Will you backtest on our provided tick data?", a: "Yes. I'll run in-sample and out-of-sample tests and share the report plus the exact settings used." },
+    ],
+    client: { verified: true, spent: "$38K", hireRate: 74, country: "United Kingdom", rating: 4.8, jobs: 52, hires: 31, memberSince: "фев 2019", risk: "low" },
+  },
+  {
+    id: "j3", title: "WebRTC Video Chat Integration for Telehealth App",
+    score: 63, budgetType: "hourly", budget: "$30–50/hr", ageMin: 26, proposals: "10–15",
+    verified: true, hireRate: 45,
+    tags: ["WebRTC","JavaScript","WebSocket","React","Node.js"],
+    description: "Our telehealth web app needs reliable 1:1 video visits. Integrate WebRTC (open to mediasoup or another SFU) into our React frontend and Node backend, with a signaling server, TURN fallback, screen-share and basic call-quality stats. HIPAA-aware handling is a plus.",
+    reasons: [
+      { text: "WebRTC — совпадение навыка, есть проект webrtc-signal", w: "+22" },
+      { text: "Фронт React / бэк Node — совпадает частично", w: "+12" },
+      { text: "Проверенная оплата, но hire rate 45% — осторожно", w: "+6" },
+      { text: "HIPAA-требования могут расширить скоуп", w: "−4", neg: true },
+      { text: "3 открытых вакансии у клиента — возможен «прозвон» рынка", w: "−6", neg: true },
+    ],
+    coverV0: [
+      { t: "Hi — I've built WebRTC video into production apps and can integrate reliable 1:1 visits into your React/Node stack.\n\n" },
+      { t: "I have a WebRTC signaling + SFU starter with TURN fallback and screen-share", src: "webrtc-signal" },
+      { t: " that maps directly onto your telehealth requirements, and I'm mindful of HIPAA-aware handling (no PHI in logs, encrypted transport).\n\nBest,\nDenis" },
+    ],
+    coverV1: [
+      { t: "Hello! Reliable 1:1 telehealth video is very doable in your React/Node setup.\n\n" },
+      { t: "My webrtc-signal starter already handles signaling, TURN fallback, screen-share and call-quality stats", src: "webrtc-signal" },
+      { t: ", so I can get a working call path up fast and then harden it for HIPAA-aware use.\n\nBest,\nDenis" },
+    ],
+    screening: [
+      { q: "Have you shipped WebRTC to production?", a: "Yes, two apps — one 1:1 telehealth-style, one small-group. Both with a signaling server and TURN fallback." },
+      { q: "Are you familiar with HIPAA requirements?", a: "I follow HIPAA-aware practices — no PHI in logs, encrypted transport and at-rest. I'm not a compliance officer but can work to your BAA." },
+    ],
+    client: { verified: true, spent: "$6.2K", hireRate: 45, country: "Canada", rating: 4.4, jobs: 19, hires: 7, memberSince: "окт 2022", risk: "med" },
+  },
+  {
+    id: "j4", title: "Fix bugs on existing WordPress site (menu, form, speed)",
+    score: 34, budgetType: "hourly", budget: "$15/hr", ageMin: 158, proposals: "20+",
+    verified: false, hireRate: 20,
+    tags: ["WordPress","PHP","CSS"],
+    description: "Need someone to fix a few bugs on my WordPress site — the menu isn't responsive, the contact form isn't sending, and pages load slowly. Should be quick for the right person. Low budget, ongoing work possible if things go well.",
+    reasons: [
+      { text: "Стек не совпадает: PHP / WordPress вместо Python", w: "−18", neg: true },
+      { text: "Оплата не подтверждена, потрачено $0", w: "−14", neg: true },
+      { text: "Бюджет $15/час ниже твоей планки", w: "−10", neg: true },
+      { text: "Расплывчатое ТЗ («should be quick»)", w: "−8", neg: true },
+      { text: "Аккаунт клиента создан в этом месяце", w: "−6", neg: true },
+    ],
+    coverV0: [
+      { t: "Hi — I can take a look at the responsive menu, contact form and load-time issues on your WordPress site.\n\nMy core stack is Python/Django rather than PHP, but these are common fixes I can handle. Note my rate is above the posted budget.\n\nBest,\nDenis" },
+    ],
+    coverV1: [
+      { t: "Hello — happy to review the menu, form and speed issues.\n\nHeads up: WordPress/PHP isn't my main stack, so I'd scope this carefully before committing.\n\nBest,\nDenis" },
+    ],
+    screening: [
+      { q: "Can you start today?", a: "I can take a look this week and give you a quick scope." },
+    ],
+    client: { verified: false, spent: "$0", hireRate: 20, country: "India", rating: 0, jobs: 5, hires: 1, memberSince: "июня 2026", risk: "high" },
+  },
+];
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const answers = {};
+    JOBS.forEach(j => (j.screening || []).forEach((q, i) => { answers[j.id + ":" + i] = q.a; }));
+    this.state = {
+      screen: "feed", selectedId: "j1",
+      statuses: {}, sortMode: "fresh", query: "",
+      coverMode: "preview", coverVer: {}, coverEdited: {}, answers,
+      toast: { show: false }, tip: { show: false, x: 0, y: 0, title: "", lines: [] },
+    };
+    this.toastTimer = null;
+  }
+
+  freshWindow() { return this.props.freshWindowMin ?? 60; }
+
+  showToast(text, icon, color) {
+    clearTimeout(this.toastTimer);
+    this.setState({ toast: { show: true, text, icon: ic(icon, 16, color) } });
+    this.toastTimer = setTimeout(() => this.setState({ toast: { show: false } }), 2600);
+  }
+  setStatus(id, s) { this.setState(st => ({ statuses: { ...st.statuses, [id]: s } })); }
+
+  ageParts(m) {
+    if (m < 60) return { big: m + "м", text: m + " мин назад" };
+    const h = Math.floor(m / 60), mm = m % 60;
+    return { big: h + "ч" + (mm ? " " + mm + "м" : ""), text: h + " ч " + mm + " мин назад" };
+  }
+  freshMeta(m) {
+    if (m <= 15) return { label: "Свежая", color: "#b6d086", soft: "rgba(182,208,134,0.14)" };
+    if (m <= 45) return { label: "Стареет", color: "#f59e0b", soft: "rgba(245,158,11,0.14)" };
+    return { label: "Устарела", color: "#737373", soft: "rgba(115,115,115,0.16)" };
+  }
+  scoreMeta(s) {
+    if (s > 75) return { color: "#4ade80", soft: "rgba(74,222,128,0.1)", border: "rgba(74,222,128,0.3)" };
+    if (s >= 50) return { color: "#facc15", soft: "rgba(250,204,21,0.1)", border: "rgba(250,204,21,0.3)" };
+    return { color: "#8a8a8a", soft: "rgba(138,138,138,0.1)", border: "rgba(138,138,138,0.28)" };
+  }
+  hireColor(h) { return h >= 70 ? "#4ade80" : h >= 40 ? "#f59e0b" : "#f87171"; }
+  riskMeta(r) {
+    if (r === "low") return { label: "Низкий риск", color: "#4ade80", bg: "rgba(74,222,128,0.08)", icon: ic("shield-check", 17, "#4ade80") };
+    if (r === "med") return { label: "Средний риск", color: "#f59e0b", bg: "rgba(245,158,11,0.08)", icon: ic("alert-triangle", 17, "#f59e0b") };
+    return { label: "Высокий риск", color: "#f87171", bg: "rgba(248,113,113,0.08)", icon: ic("alert-triangle", 17, "#f87171") };
+  }
+  makeTags(tags) {
+    return tags.map(t => {
+      const mine = MY_SKILLS.includes(t);
+      return mine
+        ? { label: t, bg: "rgba(182,208,134,0.1)", border: "rgba(182,208,134,0.28)", color: "#c5dc9f" }
+        : { label: t, bg: "#1f1f1f", border: "#303030", color: "#a3a3a3" };
+    });
+  }
+
+  statusOf(id) { return this.state.statuses[id] || "new"; }
+
+  deriveJob(j) {
+    const status = this.statusOf(j.id);
+    const a = this.ageParts(j.ageMin), fm = this.freshMeta(j.ageMin), sm = this.scoreMeta(j.score);
+    const barPct = Math.max(2, Math.min(100, (1 - j.ageMin / this.freshWindow()) * 100));
+    return {
+      ...j, status,
+      ageBig: a.big, postedText: a.text,
+      freshLabel: fm.label, freshColor: fm.color, freshSoft: fm.soft,
+      freshIcon: ic("clock", 15, fm.color),
+      barPct: Math.round(barPct),
+      scoreColor: sm.color, scoreSoft: sm.soft, scoreBorder: sm.border,
+      tags: this.makeTags(j.tags),
+      icoBudget: ic("dollar", 14, "#b6d086"),
+      icoHire: ic("trending-up", 13, "#737373"),
+      icoUsers: ic("users", 13, "#737373"),
+      hireColor: this.hireColor(j.hireRate),
+      unverified: !j.verified, verified: j.verified,
+      isNew: status === "new", isApproved: status === "approved", isSkipped: status === "skipped", isSent: status === "sent",
+      cardBorder: status === "approved" ? "rgba(74,222,128,0.4)" : status === "sent" ? "rgba(182,208,134,0.4)" : "#404040",
+      cardOpacity: status === "skipped" ? 0.42 : 1,
+      cardGlow: (j.ageMin <= 15 && status === "new") ? "0 0 0 1px rgba(182,208,134,0.12)" : "none",
+      onApprove: () => { this.setStatus(j.id, "approved"); this.showToast("Одобрено — в очереди на отправку", "check", "#4ade80"); },
+      onSkip: () => { this.setStatus(j.id, "skipped"); this.showToast("Пропущено", "x", "#a3a3a3"); },
+      onUndo: () => this.setStatus(j.id, "new"),
+      onOpen: () => this.setState({ screen: "detail", selectedId: j.id }),
+    };
+  }
+
+  deriveDetail(j) {
+    const base = this.deriveJob(j);
+    const ver = this.state.coverVer[j.id] || 0;
+    const segs = ver === 0 ? j.coverV0 : j.coverV1;
+    const edited = this.state.coverEdited[j.id];
+    const coverText = edited != null ? edited : segs.map(s => s.t).join("");
+    const coverSegs = (edited != null)
+      ? [{ t: coverText, bg: "transparent", border: "none", radius: "0", pad: "0", color: "#e5e5e5", title: "" }]
+      : segs.map(s => {
+          if (!s.src) return { t: s.t, bg: "transparent", border: "none", radius: "0", pad: "0", color: "#e5e5e5", title: "" };
+          const lg = LEGEND[s.src];
+          return { t: s.t, bg: lg.color + "22", border: "1.5px solid " + lg.color, radius: "3px", pad: "1px 2px", color: "#f0f0f0", title: "Взято из " + lg.label };
+        });
+    const usedSrcs = [...new Set(j.coverV0.concat(j.coverV1).filter(s => s.src).map(s => s.src))];
+    const reasons = j.reasons.map(r => ({
+      text: r.text, w: r.w,
+      icon: r.neg ? ic("x", 15, "#f87171") : ic("check", 15, "#4ade80"),
+      wColor: r.neg ? "#f87171" : "#4ade80",
+      wBg: r.neg ? "rgba(248,113,113,0.12)" : "rgba(74,222,128,0.12)",
+    }));
+    const c = j.client, rm = this.riskMeta(c.risk);
+    const statusMap = {
+      new: { label: "Новая — на ревью", color: "#a3a3a3", hint: "Ещё не одобрена. Просмотри и одобри или пропусти." },
+      approved: { label: "Одобрено", color: "#4ade80", hint: "В очереди на ручную отправку. Открой на Upwork и отправь." },
+      skipped: { label: "Пропущено", color: "#737373", hint: "Исключена из ленты. Можно вернуть." },
+      sent: { label: "Отправлено вручную", color: "#b6d086", hint: "Отмечено как отправленное. Жди ответа клиента." },
+    };
+    const st = statusMap[base.status];
+    return {
+      ...base,
+      description: j.description,
+      reasons, coverSegs, coverText,
+      legend: usedSrcs.map(s => LEGEND[s]),
+      hasScreening: (j.screening || []).length > 0,
+      screeningCount: (j.screening || []).length + " вопроса",
+      screening: (j.screening || []).map((q, i) => ({
+        num: i + 1, q: q.q, a: this.state.answers[j.id + ":" + i],
+        onChange: (e) => { const v = e.target.value; this.setState(s => ({ answers: { ...s.answers, [j.id + ":" + i]: v } })); },
+      })),
+      notSent: base.status !== "sent", 
+      statusLabel: st.label, statusColor: st.color, statusHint: st.hint,
+      client: {
+        spent: c.spent, hireRate: c.hireRate, hireColor: this.hireColor(c.hireRate),
+        country: c.country, jobs: c.jobs, hires: c.hires, memberSince: c.memberSince,
+        ratingText: c.rating > 0 ? c.rating.toFixed(1) + " ★" : "нет отзывов",
+        riskLabel: rm.label, riskColor: rm.color, riskBg: rm.bg, riskIcon: rm.icon,
+        payText: c.verified ? "Подтверждена" : "Не подтверждена",
+        payColor: c.verified ? "#4ade80" : "#f87171",
+        payIcon: c.verified ? ic("circle-check", 16, "#4ade80") : ic("alert-triangle", 16, "#f87171"),
+      },
+    };
+  }
+
+  // ---- charts ----
+  setTip(title, lines, e) { this.setState({ tip: { show: true, title, lines, x: e.clientX, y: e.clientY } }); }
+
+  buildFunnel() {
+    const steps = [
+      { label: "Найдено", count: 1240 }, { label: "Прошло скоринг", count: 312 },
+      { label: "Черновик готов", count: 210 }, { label: "Одобрено", count: 96 },
+      { label: "Отправлено", count: 71 }, { label: "Интервью", count: 18 }, { label: "Найм", count: 6 },
+    ];
+    const total = steps[0].count;
+    return steps.map((s, i) => {
+      const prev = i === 0 ? s.count : steps[i - 1].count;
+      const pctPrev = Math.round(s.count / prev * 100);
+      const pctTot = Math.round(s.count / total * 100);
+      const shade = 0.9 - i * 0.1;
+      const color = `rgba(182,208,134,${Math.max(0.28, shade)})`;
+      return {
+        label: s.label, count: s.count, pct: Math.max(6, Math.round(s.count / total * 100)),
+        conv: i === 0 ? "100%" : pctPrev + "%",
+        color, textColor: i < 4 ? "#171717" : "#dfe9c9",
+        onEnter: (e) => this.setTip(s.label, [s.count + " вакансий", (i === 0 ? "100" : pctPrev) + "% от предыдущего", pctTot + "% от найденных"], e),
+      };
+    });
+  }
+
+  buildKeywords() {
+    const data = [
+      { kw: "MQL5 / MT5", conv: 41, n: 22 }, { kw: "Algo Trading", conv: 38, n: 16 },
+      { kw: "Django / DRF", conv: 34, n: 41 }, { kw: "FastAPI", conv: 30, n: 12 },
+      { kw: "Python", conv: 28, n: 53 }, { kw: "WebRTC", conv: 22, n: 18 },
+      { kw: "WordPress", conv: 6, n: 9 },
+    ];
+    const max = Math.max(...data.map(d => d.conv));
+    return data.map(d => ({
+      kw: d.kw, conv: d.conv, n: d.n, barW: Math.round(d.conv / max * 100),
+      color: d.conv >= 30 ? "#4ade80" : d.conv >= 15 ? "#facc15" : "#8a8a8a",
+      onEnter: (e) => this.setTip(d.kw, [d.n + " откликов отправлено", d.conv + "% дошли до интервью"], e),
+    }));
+  }
+
+  buildHeat() {
+    const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+    const buckets = ["00", "03", "06", "09", "12", "15", "18", "21"];
+    const M = [
+      [1,0,2,9,14,11,6,3],[2,1,3,12,16,13,7,4],[1,1,4,11,15,12,8,3],
+      [2,0,3,13,17,14,6,4],[1,1,2,10,12,9,5,2],[0,0,1,4,6,5,3,1],[0,0,1,3,5,4,2,1],
+    ];
+    const max = 17;
+    const rows = days.map((day, di) => ({
+      day,
+      cells: M[di].map((v, ci) => {
+        const alpha = v === 0 ? 0.05 : 0.1 + 0.9 * (v / max);
+        const avg = v === 0 ? 0 : 68 + Math.round(v / 2);
+        return {
+          text: v >= 8 ? String(v) : "",
+          bg: `rgba(182,208,134,${alpha.toFixed(3)})`,
+          border: v >= 12 ? "1px solid rgba(182,208,134,0.5)" : "1px solid transparent",
+          textColor: v >= 12 ? "#171717" : "#c5dc9f",
+          onEnter: (e) => this.setTip(day + " " + buckets[ci] + ":00–" + (buckets[ci] === "21" ? "24" : buckets[(ci + 1)]) + ":00", [v + " вакансий score>75", v === 0 ? "—" : "ср. score " + avg], e),
+        };
+      }),
+    }));
+    return { days, buckets, rows };
+  }
+
+  navItem(key, label, icon, opts) {
+    opts = opts || {};
+    const activeKey = this.state.screen === "detail" ? "feed" : this.state.screen;
+    const on = activeKey === key && !opts.disabled;
+    return {
+      label, badge: opts.badge, showBadge: !!opts.badge,
+      icon: ic(icon, 16, on ? "#fafafa" : opts.disabled ? "#525252" : "#a3a3a3"),
+      onClick: opts.disabled ? () => {} : () => this.setState({ screen: key }),
+      bg: on ? "#262626" : "transparent",
+      color: on ? "#fafafa" : opts.disabled ? "#525252" : "#a3a3a3",
+      cursor: opts.disabled ? "not-allowed" : "pointer",
+      opacity: opts.disabled ? 0.55 : 1,
+      hoverStyle: on || opts.disabled ? "" : "background:rgba(38,38,38,0.5);color:#fafafa",
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    // feed jobs: filter + sort
+    let list = JOBS.map(j => this.deriveJob(j));
+    const q = s.query.trim().toLowerCase();
+    if (q) list = list.filter(j => (j.title + " " + j.tags.map(t => t.label).join(" ")).toLowerCase().includes(q));
+    list.sort((a, b) => {
+      const ao = a.status === "skipped" ? 1 : 0, bo = b.status === "skipped" ? 1 : 0;
+      if (ao !== bo) return ao - bo;
+      return s.sortMode === "score" ? b.score - a.score : a.ageMin - b.ageMin;
+    });
+    const counts = { new: 0, approved: 0, sent: 0, skipped: 0 };
+    JOBS.forEach(j => { const st = this.statusOf(j.id); counts[st] = (counts[st] || 0) + 1; });
+    const queue = JOBS.filter(j => this.statusOf(j.id) === "approved").map(j => {
+      const a = this.ageParts(j.ageMin);
+      return { short: j.title.length > 34 ? j.title.slice(0, 34) + "…" : j.title, ageBig: a.big, onOpen: () => this.setState({ screen: "detail", selectedId: j.id }) };
+    });
+
+    const dJob = this.deriveDetail(JOBS.find(j => j.id === s.selectedId) || JOBS[0]);
+
+    const stats = [
+      { label: "Найдено (30д)", value: "1240", delta: "+12%", up: true },
+      { label: "Отправлено", value: "71", delta: "+8%", up: true },
+      { label: "Ответ клиента", value: "25%", delta: "+4%", up: true },
+      { label: "Найм", value: "6", delta: "+2", up: true },
+      { label: "Ср. score одобр.", value: "81", delta: "−1", up: false },
+    ].map(x => ({ ...x, deltaColor: x.up ? "#4ade80" : "#f87171", deltaIcon: ic(x.up ? "trending-up" : "trending-down", 12, x.up ? "#4ade80" : "#f87171") }));
+
+    const seg = (active) => active
+      ? { bg: "#b6d086", color: "#171717" }
+      : { bg: "transparent", color: "#a3a3a3" };
+    const sf = seg(s.sortMode === "fresh"), ss = seg(s.sortMode === "score");
+    const pv = seg(s.coverMode === "preview"), ed = seg(s.coverMode === "edit");
+
+    return {
+      isFeed: s.screen === "feed", isDetail: s.screen === "detail", isAnalytics: s.screen === "analytics",
+      brandIcon: ic("shield-check", 18, "#b6d086"),
+      nav: [
+        this.navItem("feed", "Лента вакансий", "layout-grid", {}),
+        this.navItem("analytics", "Аналитика", "bar-chart", {}),
+        this.navItem("sent", "Отправленные", "inbox", { disabled: true, badge: "71" }),
+        this.navItem("sources", "GitHub-источники", "github", { disabled: true }),
+        this.navItem("settings", "Настройки", "sliders", { disabled: true }),
+      ],
+      // feed
+      jobs: list, visibleCount: list.filter(j => j.status !== "skipped").length,
+      counts, queue, hasQueue: queue.length > 0, queueEmpty: queue.length === 0,
+      feedEmpty: list.length === 0, query: s.query,
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      onSortFresh: () => this.setState({ sortMode: "fresh" }), onSortScore: () => this.setState({ sortMode: "score" }),
+      sortFreshBg: sf.bg, sortFreshColor: sf.color, sortScoreBg: ss.bg, sortScoreColor: ss.color,
+      icoBrief: ic("briefcase", 17, "#b6d086"), icoSearch: ic("search", 15, "#737373"),
+      icoClockSm: ic("clock", 13, s.sortMode === "fresh" ? "#171717" : "#a3a3a3"),
+      icoZapSm: ic("zap", 13, s.sortMode === "score" ? "#171717" : "#a3a3a3"),
+      icoInboxSm: ic("inbox", 15, "#b6d086"),
+      icoVerified: ic("circle-check", 13, "#4ade80"), icoUnverified: ic("alert-triangle", 13, "#f87171"),
+      icoCheck: ic("check", 16, "#171717"), icoX: ic("x", 15, "currentColor"),
+      icoArrow: ic("arrow-up-right", 14, "currentColor"), icoCircleCheck: ic("circle-check", 15, "#4ade80"),
+      icoSend: ic("send", 14, "#b6d086"),
+      // detail
+      dJob, onBack: () => this.setState({ screen: "feed" }),
+      onOpenUpwork: () => this.showToast("Открываю вакансию на Upwork в новой вкладке…", "arrow-up-right", "#a3a3a3"),
+      onMarkSent: () => { this.setStatus(dJob.id, "sent"); this.showToast("Отмечено как отправлено вручную", "send", "#b6d086"); },
+      icoBack: ic("chevron-left", 16, "currentColor"),
+      icoSparkles: ic("sparkles", 16, "#b6d086"),
+      icoGithubSm: ic("github", 13, "#737373"),
+      icoUsersSm: ic("users", 15, "#a3a3a3"), icoWalletSm: ic("wallet", 15, "#737373"),
+      icoHireSm: ic("trending-up", 15, "#737373"), icoPinSm: ic("map-pin", 15, "#737373"),
+      icoStarSm: ic("star", 15, "#facc15", true), icoClockTiny: ic("clock", 12, "#525252"),
+      isPreview: s.coverMode === "preview", isEdit: s.coverMode === "edit",
+      coverText: dJob.coverText,
+      onPreview: () => this.setState({ coverMode: "preview" }), onEdit: () => this.setState({ coverMode: "edit" }),
+      previewBg: pv.bg, previewColor: pv.color, editBg: ed.bg, editColor: ed.color,
+      onRegen: () => { this.setState(st => ({ coverVer: { ...st.coverVer, [dJob.id]: (st.coverVer[dJob.id] || 0) ? 0 : 1 }, coverEdited: { ...st.coverEdited, [dJob.id]: null } })); this.showToast("Черновик перегенерирован", "refresh", "#b6d086"); },
+      regenIcon: ic("refresh", 14, "currentColor"),
+      onCoverChange: (e) => { const v = e.target.value; this.setState(st => ({ coverEdited: { ...st.coverEdited, [dJob.id]: v } })); },
+      // analytics
+      icoChart: ic("bar-chart", 17, "#b6d086"), icoFilter: ic("filter", 16, "#b6d086"),
+      icoZapSm2: ic("zap", 16, "#b6d086"), icoZapSm3: ic("zap", 13, "#b6d086"), icoActivity: ic("activity", 16, "#b6d086"),
+      stats, funnel: this.buildFunnel(), keywords: this.buildKeywords(), heat: this.buildHeat(),
+      onTipMove: (e) => { if (this.state.tip.show) this.setState(st => ({ tip: { ...st.tip, x: e.clientX, y: e.clientY } })); },
+      onTipHide: () => this.setState(st => ({ tip: { ...st.tip, show: false } })),
+      tip: s.tip, toast: s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
