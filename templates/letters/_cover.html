@@ -1,0 +1,40 @@
+{% load icons %}
+<div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+    <span style="font-size:14px;font-weight:600">Черновик cover letter</span>
+    <div style="flex:1"></div>
+    {% if cover %}
+      <div style="display:flex;background:#0a0a0a;border:1px solid #404040;border-radius:8px;padding:2px;gap:2px">
+        <a href="?edit=0" style="height:26px;display:inline-flex;align-items:center;padding:0 11px;border-radius:6px;font-size:12px;font-weight:500;background:{% if not cover.edit %}#b6d086{% else %}transparent{% endif %};color:{% if not cover.edit %}#171717{% else %}#a3a3a3{% endif %}">Подсветка</a>
+        <a href="?edit=1" style="height:26px;display:inline-flex;align-items:center;padding:0 11px;border-radius:6px;font-size:12px;font-weight:500;background:{% if cover.edit %}#b6d086{% else %}transparent{% endif %};color:{% if cover.edit %}#171717{% else %}#a3a3a3{% endif %}">Редактировать</a>
+      </div>
+    {% endif %}
+    <form method="post" action="{% url 'letters:generate' pk %}">{% csrf_token %}
+      <button style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid #404040;border-radius:8px;background:#0a0a0a;color:#d4d4d4;font-size:12.5px;font-weight:500;cursor:pointer">{% icon "refresh" 14 %}{% if cover %}Перегенерировать{% else %}Сгенерировать{% endif %}</button>
+    </form>
+  </div>
+
+  {% if cover %}
+    <div style="font-size:12px;color:#737373;margin-bottom:14px">Подсвеченные фрагменты взяты из твоих GitHub-проектов — редактируй перед отправкой. <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">v{{ cover.version }} · {{ cover.model_name }}</span></div>
+
+    {% if cover.edit %}
+      <form method="post" action="{% url 'letters:save' pk %}">{% csrf_token %}
+        <textarea name="body" style="width:100%;height:230px;resize:vertical;background:#0a0a0a;border:1px solid #404040;border-radius:10px;padding:16px;color:#e5e5e5;font-size:14px;line-height:1.7;outline:none">{{ cover.body }}</textarea>
+        <div style="margin-top:10px"><button style="height:32px;padding:0 16px;border:none;border-radius:8px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">Сохранить</button></div>
+      </form>
+    {% else %}
+      <div style="font-size:14px;line-height:1.7;color:#e5e5e5;white-space:pre-wrap;background:#0a0a0a;border:1px solid #262626;border-radius:10px;padding:16px">{% for seg in cover.segments %}<span style="background:{{ seg.bg }};border-bottom:{{ seg.border }};border-radius:{{ seg.radius }};padding:{{ seg.pad }};color:{{ seg.color }}" title="{{ seg.title }}">{{ seg.t }}</span>{% endfor %}</div>
+    {% endif %}
+
+    {% if cover.legend %}
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid #262626">
+      <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#737373">{% icon "github" 13 "#737373" %}Источники:</span>
+      {% for lg in cover.legend %}
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#d4d4d4"><span style="width:10px;height:10px;border-radius:3px;background:{{ lg.color }};flex:none"></span><span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ lg.label }}</span></span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% else %}
+    <div style="font-size:12px;color:#737373;line-height:1.5">Черновик ещё не сгенерирован — нажми «Сгенерировать».</div>
+  {% endif %}
+</div>

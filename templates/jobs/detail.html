@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load icons %}
+{% block title %}{{ job.title }} · Upwork Copilot{% endblock %}
+{% block main %}
+<div style="display:flex;flex-direction:column;height:100%;min-height:0">
+
+  <!-- header -->
+  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
+    <a href="{% url 'jobs:feed' %}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 8px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#d4d4d4;font-size:13px;font-weight:500">{% icon "chevron-left" 16 %}Лента</a>
+    <div style="width:1px;height:18px;background:#404040"></div>
+    <div style="font-size:12px;color:#a3a3a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px">{{ job.title }}</div>
+    <div style="flex:1"></div>
+    <a href="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% icon "arrow-up-right" 14 %}Открыть на Upwork</a>
+    {% if job.is_sent %}
+      <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#b6d086;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#b6d086" %}Отправлено вручную</span>
+    {% else %}
+      <form method="post" action="{% url 'jobs:job_action' pk 'mark_sent' %}"><input type="hidden" name="next" value="/job/{{ pk }}/">{% csrf_token %}
+        <button style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">{% icon "send" 14 "#171717" %}Отметить как отправлено</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div style="flex:1;min-height:0;overflow:auto">
+    <div style="display:flex;gap:24px;padding:24px;max-width:1240px;margin:0 auto;align-items:flex-start">
+
+      <!-- main column -->
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:18px">
+
+        <!-- title block -->
+        <div>
+          <div style="display:flex;align-items:flex-start;gap:16px">
+            <div style="flex:1;min-width:0">
+              <h1 style="font-size:23px;font-weight:700;line-height:1.25;letter-spacing:-0.01em">{{ job.title }}</h1>
+              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:12px">
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600">{% icon "dollar" 14 "#b6d086" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
+                <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:{{ job.fresh_color }}">{% icon "clock" 14 job.fresh_color %}{{ job.posted_text }}</span>
+                {% if job.proposals %}<span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
+                <span style="font-size:13px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.proposals }} откликов</span>{% endif %}
+              </div>
+            </div>
+            <div style="flex:none;text-align:center;background:#171717;border:1px solid {{ job.score_border }};border-radius:11px;padding:8px 12px;min-width:74px">
+              <div style="font-size:24px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};line-height:1">{{ job.score_display }}</div>
+              <div style="font-size:9px;color:#737373;letter-spacing:.06em;text-transform:uppercase;margin-top:2px">match score</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px">
+            {% for tag in job.tags %}
+            <span style="font-size:11.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:6px;{% if tag.mine %}background:rgba(182,208,134,0.1);border:1px solid rgba(182,208,134,0.28);color:#c5dc9f{% else %}background:#1f1f1f;border:1px solid #303030;color:#a3a3a3{% endif %}">{{ tag.label }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- why fits -->
+        {% if job.reasons %}
+        <div style="background:rgba(182,208,134,0.05);border:1px solid rgba(182,208,134,0.22);border-radius:14px;padding:18px 20px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+            <span style="display:inline-flex">{% icon "sparkles" 16 "#b6d086" %}</span>
+            <span style="font-size:14px;font-weight:600">Почему подходит</span>
+            <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace">скоринг · {{ job.model_name }}</span>
+            <div style="flex:1"></div>
+            <span style="font-size:12px;color:#a3a3a3">итог <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};font-weight:700">{{ job.score_display }}/100</span></span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            {% for r in job.reasons %}
+            <div style="display:flex;align-items:flex-start;gap:11px">
+              <span style="flex:none;margin-top:1px">{% if r.neg %}{% icon "x" 15 "#f87171" %}{% else %}{% icon "check" 15 "#4ade80" %}{% endif %}</span>
+              <span style="flex:1;font-size:13px;line-height:1.5;color:#d4d4d4">{{ r.text }}</span>
+              <span style="flex:none;font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{% if r.neg %}#f87171{% else %}#4ade80{% endif %};background:{% if r.neg %}rgba(248,113,113,0.12){% else %}rgba(74,222,128,0.12){% endif %};padding:2px 8px;border-radius:6px">{{ r.w }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- description -->
+        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Описание вакансии</div>
+          <p style="font-size:14px;line-height:1.65;color:#d4d4d4;white-space:pre-wrap;margin:0">{{ job.description }}</p>
+        </div>
+
+        <!-- cover letter -->
+        {% include "letters/_cover.html" %}
+
+        <!-- screening -->
+        {% include "screening/_screening.html" %}
+      </div>
+
+      <!-- right column -->
+      <div style="width:300px;flex:none;display:flex;flex-direction:column;gap:14px">
+        {% if job.client_card %}{% with c=job.client_card %}
+        <div style="background:#171717;border:1px solid #404040;border-radius:14px;overflow:hidden">
+          <div style="padding:15px 18px;border-bottom:1px solid #262626;display:flex;align-items:center;gap:9px">
+            <span style="display:inline-flex">{% icon "users" 15 "#a3a3a3" %}</span>
+            <span style="font-size:13px;font-weight:600">Карточка клиента</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:{{ c.risk_bg }}">
+            <span style="display:inline-flex">{% icon c.risk_icon 17 c.risk_color %}</span>
+            <span style="font-size:14px;font-weight:700;color:{{ c.risk_color }}">{{ c.risk_label }}</span>
+            <div style="flex:1"></div>
+            <span style="font-size:11px;color:#a3a3a3">визитка риска</span>
+          </div>
+          <div style="padding:16px 18px">
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
+              <span style="display:inline-flex;flex:none">{% if c.verified %}{% icon "circle-check" 16 "#4ade80" %}{% else %}{% icon "alert-triangle" 16 "#f87171" %}{% endif %}</span>
+              <span style="flex:1;font-size:13px;color:#a3a3a3">Оплата</span>
+              <span style="font-size:13px;font-weight:600;color:{{ c.pay_color }}">{{ c.pay_text }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
+              <span style="display:inline-flex;flex:none">{% icon "wallet" 15 "#737373" %}</span>
+              <span style="flex:1;font-size:13px;color:#a3a3a3">Всего потрачено</span>
+              <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.spent }}</span>
+            </div>
+            <div style="padding:10px 0;border-bottom:1px solid #1f1f1f">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
+                <span style="display:inline-flex;flex:none">{% icon "trending-up" 15 "#737373" %}</span>
+                <span style="flex:1;font-size:13px;color:#a3a3a3">Hire rate</span>
+                <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ c.hire_color }}">{{ c.hire_rate }}%</span>
+              </div>
+              <div style="height:5px;border-radius:20px;background:#262626;overflow:hidden"><div style="height:100%;width:{{ c.hire_rate }}%;background:{{ c.hire_color }}"></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
+              <span style="display:inline-flex;flex:none">{% icon "map-pin" 15 "#737373" %}</span>
+              <span style="flex:1;font-size:13px;color:#a3a3a3">Страна</span>
+              <span style="font-size:13px;font-weight:500">{{ c.country }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
+              <span style="display:inline-flex;flex:none">{% icon "star" 15 "#facc15" %}</span>
+              <span style="flex:1;font-size:13px;color:#a3a3a3">Рейтинг</span>
+              <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.rating_text }}</span>
+            </div>
+            <div style="display:flex;gap:10px;padding:12px 0 2px">
+              <div style="flex:1;background:#0a0a0a;border:1px solid #262626;border-radius:9px;padding:9px 11px">
+                <div style="font-size:16px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.jobs }}</div>
+                <div style="font-size:10.5px;color:#737373;margin-top:1px">вакансий</div>
+              </div>
+              <div style="flex:1;background:#0a0a0a;border:1px solid #262626;border-radius:9px;padding:9px 11px">
+                <div style="font-size:16px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.hires }}</div>
+                <div style="font-size:10.5px;color:#737373;margin-top:1px">наймов</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding-top:12px;font-size:11px;color:#737373">{% icon "clock" 12 "#525252" %}На Upwork с {{ c.member_since }}</div>
+          </div>
+        </div>
+        {% endwith %}{% endif %}
+
+        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px 18px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Статус в трекере</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:9px;height:9px;border-radius:20px;background:{{ job.status_color }};flex:none"></span>
+            <span style="font-size:14px;font-weight:600;color:{{ job.status_color }}">{{ job.status_label }}</span>
+          </div>
+          <div style="font-size:12px;color:#737373;line-height:1.5;margin-top:8px">{{ job.status_hint }}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

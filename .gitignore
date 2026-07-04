@@ -1,1 +1,7 @@
 .claude/worktrees/
+.env
+db.sqlite3
+*.pyc
+__pycache__/
+.venv/
+staticfiles/

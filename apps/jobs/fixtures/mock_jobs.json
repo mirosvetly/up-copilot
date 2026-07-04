@@ -1,0 +1,110 @@
+[
+  {
+    "job_id": "mock-j1",
+    "title": "Senior Django Developer for FinTech Trading API Platform",
+    "description": "We're a US-based fintech building a trading & market-data platform and need an experienced Django engineer to own our REST API. You'll design and ship endpoints for order management, positions and account data, wire up token auth + rate limiting, and offload heavy work to Celery. Experience integrating brokerage or market-data feeds (Interactive Brokers, Alpaca, MetaTrader) is a big plus. Clean, tested code and clear async communication required. Long-term, 30+ hrs/week.",
+    "skills": ["Django", "DRF", "PostgreSQL", "Celery", "REST API", "Fintech"],
+    "budget_type": "hourly",
+    "budget_min": "45",
+    "budget_max": "65",
+    "currency": "USD",
+    "proposals_bucket": "< 5",
+    "age_min": 4,
+    "screening_questions": [
+      "How many years of experience do you have with Django REST Framework?",
+      "Have you integrated third-party trading or market-data APIs before?",
+      "What is your weekly availability and timezone overlap?"
+    ],
+    "client": {
+      "upwork_client_id": "client-j1",
+      "verified_payment": true,
+      "hire_rate": 82,
+      "total_spent": "210000",
+      "country": "United States",
+      "avg_rating": "4.9",
+      "total_jobs": 143,
+      "total_hires": 118,
+      "member_since": "2016-05-01"
+    }
+  },
+  {
+    "job_id": "mock-j2",
+    "title": "MetaTrader 5 Expert Advisor — Custom Trading Bot (MQL5)",
+    "description": "Looking for an MQL5 developer to build a custom MetaTrader 5 Expert Advisor from an existing strategy spec (trend + mean-reversion, multi-symbol). Must handle position sizing, trailing stops, a news filter and a settings panel. Deliverables: compiled EA, source, and a short Loom walkthrough. Backtesting on provided tick data required.",
+    "skills": ["MQL5", "MetaTrader 5", "Algo Trading", "Backtesting"],
+    "budget_type": "fixed",
+    "budget_min": "2500",
+    "budget_max": null,
+    "currency": "USD",
+    "proposals_bucket": "5-10",
+    "age_min": 11,
+    "screening_questions": [
+      "Can you share MT5/MQL5 code samples?",
+      "Will you backtest on our provided tick data?"
+    ],
+    "client": {
+      "upwork_client_id": "client-j2",
+      "verified_payment": true,
+      "hire_rate": 74,
+      "total_spent": "38000",
+      "country": "United Kingdom",
+      "avg_rating": "4.8",
+      "total_jobs": 52,
+      "total_hires": 31,
+      "member_since": "2019-02-01"
+    }
+  },
+  {
+    "job_id": "mock-j3",
+    "title": "WebRTC Video Chat Integration for Telehealth App",
+    "description": "Our telehealth web app needs reliable 1:1 video visits. Integrate WebRTC (open to mediasoup or another SFU) into our React frontend and Node backend, with a signaling server, TURN fallback, screen-share and basic call-quality stats. HIPAA-aware handling is a plus.",
+    "skills": ["WebRTC", "JavaScript", "WebSocket", "React", "Node.js"],
+    "budget_type": "hourly",
+    "budget_min": "30",
+    "budget_max": "50",
+    "currency": "USD",
+    "proposals_bucket": "10-15",
+    "age_min": 26,
+    "screening_questions": [
+      "Have you shipped WebRTC to production?",
+      "Are you familiar with HIPAA requirements?"
+    ],
+    "client": {
+      "upwork_client_id": "client-j3",
+      "verified_payment": true,
+      "hire_rate": 45,
+      "total_spent": "6200",
+      "country": "Canada",
+      "avg_rating": "4.4",
+      "total_jobs": 19,
+      "total_hires": 7,
+      "member_since": "2022-10-01"
+    }
+  },
+  {
+    "job_id": "mock-j4",
+    "title": "Fix bugs on existing WordPress site (menu, form, speed)",
+    "description": "Need someone to fix a few bugs on my WordPress site — the menu isn't responsive, the contact form isn't sending, and pages load slowly. Should be quick for the right person. Low budget, ongoing work possible if things go well.",
+    "skills": ["WordPress", "PHP", "CSS"],
+    "budget_type": "hourly",
+    "budget_min": "15",
+    "budget_max": null,
+    "currency": "USD",
+    "proposals_bucket": "20+",
+    "age_min": 158,
+    "screening_questions": [
+      "Can you start today?"
+    ],
+    "client": {
+      "upwork_client_id": "client-j4",
+      "verified_payment": false,
+      "hire_rate": 20,
+      "total_spent": "0",
+      "country": "India",
+      "avg_rating": null,
+      "total_jobs": 5,
+      "total_hires": 1,
+      "member_since": "2026-06-01"
+    }
+  }
+]

@@ -1,0 +1,64 @@
+{% load icons %}<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Upwork Copilot{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0}
+  body{background:#141414;color:#fafafa;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  *{box-sizing:border-box}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:6px;border:2px solid #141414}
+  ::-webkit-scrollbar-thumb:hover{background:#3a3a3a}
+  input::placeholder{color:#525252}
+  @keyframes ucPulse{0%,100%{opacity:.55}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div style="display:flex;height:100vh;width:100%;overflow:hidden;background:#141414;color:#fafafa">
+
+  <aside style="width:212px;flex:none;height:100%;display:flex;flex-direction:column;background:#181818;border-right:1px solid #404040">
+    <div style="display:flex;align-items:center;gap:10px;padding:18px 16px 16px">
+      <span style="width:30px;height:30px;border-radius:8px;background:rgba(182,208,134,0.14);display:flex;align-items:center;justify-content:center;flex:none">{% icon "shield-check" 18 "#b6d086" %}</span>
+      <div style="line-height:1.2;min-width:0">
+        <div style="font-size:14px;font-weight:600;white-space:nowrap">Upwork Copilot</div>
+        <div style="font-size:11px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">v0.4 · local</div>
+      </div>
+    </div>
+
+    <nav style="flex:1;padding:6px 12px;display:flex;flex-direction:column;gap:3px">
+      {% block nav %}
+      {% include "jobs/_nav_item.html" with label="Лента вакансий" ico="layout-grid" href_name="jobs:feed" active=is_feed %}
+      {% include "jobs/_nav_item.html" with label="Аналитика" ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
+      {% include "jobs/_nav_item.html" with label="Отправленные" ico="inbox" disabled=True %}
+      {% include "jobs/_nav_item.html" with label="GitHub-источники" ico="github" disabled=True %}
+      {% include "jobs/_nav_item.html" with label="Настройки" ico="sliders" disabled=True %}
+      {% endblock %}
+    </nav>
+
+    <div style="border-top:1px solid #404040;padding:12px 12px 14px">
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 8px">
+        <span style="width:30px;height:30px;border-radius:20px;background:#262626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:none;color:#d4d4d4">DM</span>
+        <span style="flex:1;min-width:0">
+          <span style="display:block;font-size:13px;font-weight:500">Denis M.</span>
+          <span style="display:block;font-size:11px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">Python · MT5 · WebRTC</span>
+        </span>
+        <span style="width:7px;height:7px;border-radius:20px;background:#4ade80;flex:none" title="Скрапер активен"></span>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex:1;min-width:0;height:100%;display:flex;flex-direction:column;overflow:hidden">
+    {% block main %}{% endblock %}
+  </main>
+
+</div>
+</body>
+</html>

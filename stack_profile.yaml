@@ -1,0 +1,37 @@
+# Your stack profile — edit by hand. Drives rule-based scoring (Phase 2a) and,
+# later, the embedding of "your profile" that job descriptions are compared to.
+min_hourly_rate: 40          # USD/hr floor; jobs below get a red flag
+
+# Skills you want to match on. Case-insensitive, matched against job skills+title.
+skills:
+  - Django
+  - DRF
+  - Python
+  - PostgreSQL
+  - Celery
+  - FastAPI
+  - MQL5
+  - MetaTrader 5
+  - MT5
+  - WebRTC
+  - WebSocket
+  - Algo Trading
+  - Node.js
+  - React
+
+# Phrases that signal a low-quality / risky posting.
+red_flag_phrases:
+  - should be quick
+  - quick fix
+  - simple job
+  - urgent
+  - low budget
+
+# Portfolio projects — used later by the GitHub RAG / cover-letter layer.
+projects:
+  - repo: django-trade-api
+    skills: [Django, DRF, PostgreSQL, Celery]
+  - repo: mt5-ea-toolkit
+    skills: [MQL5, MetaTrader 5, Algo Trading]
+  - repo: webrtc-signal
+    skills: [WebRTC, WebSocket, Node.js]

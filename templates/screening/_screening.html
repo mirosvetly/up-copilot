@@ -1,0 +1,34 @@
+{% load icons %}
+{% if screening %}
+<div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
+  <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+    <span style="font-size:14px;font-weight:600">Ответы на вопросы клиента</span>
+    <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ screening|length }}</span>
+  </div>
+  <div style="font-size:12px;color:#737373;margin-bottom:16px">Черновики ответов сгенерированы автоматически — проверь и поправь.</div>
+  <form method="post" action="{% url 'screening:save' pk %}">{% csrf_token %}
+    <div style="display:flex;flex-direction:column;gap:16px">
+      {% for q in screening %}
+      <div>
+        <div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:8px">
+          <span style="flex:none;width:20px;height:20px;border-radius:6px;background:#262626;color:#a3a3a3;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ q.num }}</span>
+          <span style="flex:1;font-size:13px;font-weight:500;line-height:1.5;color:#fafafa">{{ q.q }}</span>
+        </div>
+        <textarea name="answer_{{ q.id }}" style="width:calc(100% - 29px);height:74px;resize:vertical;background:#0a0a0a;border:1px solid #404040;border-radius:10px;padding:11px 13px;color:#d4d4d4;font-size:13px;line-height:1.55;outline:none;margin-left:29px">{{ q.a }}</textarea>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="margin-top:14px"><button style="height:32px;padding:0 16px;border:none;border-radius:8px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">Сохранить ответы</button></div>
+  </form>
+</div>
+{% elif has_screening_questions %}
+<div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span style="font-size:14px;font-weight:600">Вопросы клиента</span>
+    <div style="flex:1"></div>
+    <form method="post" action="{% url 'screening:generate' pk %}">{% csrf_token %}
+      <button style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border:1px solid #404040;border-radius:8px;background:#0a0a0a;color:#d4d4d4;font-size:12.5px;font-weight:500;cursor:pointer">{% icon "sparkles" 14 "#b6d086" %}Сгенерировать ответы</button>
+    </form>
+  </div>
+</div>
+{% endif %}

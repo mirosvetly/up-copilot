@@ -1,0 +1,11 @@
+{% load icons %}{% if disabled %}
+<span style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:#525252;cursor:not-allowed;opacity:.55">
+  <span style="display:inline-flex;flex:none">{% icon ico 16 "#525252" %}</span>
+  <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ label }}</span>
+</span>
+{% else %}
+<a href="{% url href_name %}" style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;background:{% if active %}#262626{% else %}transparent{% endif %};color:{% if active %}#fafafa{% else %}#a3a3a3{% endif %}">
+  <span style="display:inline-flex;flex:none">{% icon ico 16 %}</span>
+  <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ label }}</span>
+</a>
+{% endif %}

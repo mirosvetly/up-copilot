@@ -1,0 +1,14 @@
+# --- core (needed always) ---
+Django==5.2.9
+celery==5.4.0
+redis==5.2.1
+django-environ==0.11.2
+psycopg[binary]==3.2.3
+PyYAML==6.0.2
+gunicorn==23.0.0
+
+# --- real-provider deps (only used when *_PROVIDER != mock; safe to keep) ---
+anthropic==0.40.0        # LLM_PROVIDER=anthropic  (scoring / letters / screening)
+voyageai==0.3.2          # EMBEDDING_PROVIDER=voyage
+requests==2.32.3         # GITHUB_PROVIDER=github
+aiogram==3.15.0          # Telegram review bot

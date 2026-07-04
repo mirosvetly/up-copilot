@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load icons %}
+{% block title %}Аналитика · Upwork Copilot{% endblock %}
+{% block nav %}
+{% include "jobs/_nav_item.html" with label="Лента вакансий" ico="layout-grid" href_name="jobs:feed" active=False %}
+{% include "jobs/_nav_item.html" with label="Аналитика" ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
+{% include "jobs/_nav_item.html" with label="Отправленные" ico="inbox" disabled=True %}
+{% include "jobs/_nav_item.html" with label="GitHub-источники" ico="github" disabled=True %}
+{% include "jobs/_nav_item.html" with label="Настройки" ico="sliders" disabled=True %}
+{% endblock %}
+{% block main %}
+<div style="display:flex;flex-direction:column;height:100%;min-height:0">
+  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
+    <span style="display:inline-flex">{% icon "bar-chart" 17 "#b6d086" %}</span>
+    <div style="font-size:15px;font-weight:600">Аналитика</div>
+    <div style="width:1px;height:18px;background:#404040"></div>
+    <div style="font-size:12px;color:#a3a3a3">Живые данные · часовой пояс MSK · <a href="{% url 'analytics:metrics' %}" style="color:#b6d086">/metrics</a></div>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow:auto">
+    <div style="padding:24px;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+
+      <!-- stat cards -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px">
+        {% for s in stats %}
+        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px 18px">
+          <div style="font-size:12px;color:#a3a3a3;margin-bottom:10px">{{ s.label }}</div>
+          <span style="font-size:26px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ s.value }}</span>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:20px;align-items:start">
+        <!-- funnel -->
+        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+            <span style="display:inline-flex">{% icon "filter" 16 "#b6d086" %}</span>
+            <span style="font-size:14px;font-weight:600">Воронка</span>
+          </div>
+          <div style="font-size:12px;color:#737373;margin-bottom:18px">найдено → скоринг → черновик → одобрено → отправлено → интервью → найм</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            {% for f in funnel %}
+            <div style="display:flex;align-items:center;gap:14px">
+              <span style="width:104px;flex:none;font-size:12.5px;color:#d4d4d4">{{ f.label }}</span>
+              <div style="flex:1;height:30px;background:#0a0a0a;border-radius:7px;overflow:hidden">
+                <div style="height:100%;width:{{ f.pct }}%;background:{{ f.color }};border-radius:7px;display:flex;align-items:center;padding-left:11px">
+                  <span style="font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ f.text_color }}">{{ f.count }}</span>
+                </div>
+              </div>
+              <span style="width:52px;flex:none;text-align:right;font-size:11.5px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#737373">{{ f.conv }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- keywords -->
+        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+            <span style="display:inline-flex">{% icon "zap" 16 "#b6d086" %}</span>
+            <span style="font-size:14px;font-weight:600">Конверсия по ключевым словам</span>
+          </div>
+          <div style="font-size:12px;color:#737373;margin-bottom:18px">доля откликов, дошедших до отправки</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            {% for k in keywords %}
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                <span style="flex:1;font-size:12.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ k.kw }}</span>
+                <span style="font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ k.color }}">{{ k.conv }}%</span>
+                <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:52px;text-align:right">n={{ k.n }}</span>
+              </div>
+              <div style="height:8px;background:#0a0a0a;border-radius:20px;overflow:hidden"><div style="height:100%;width:{{ k.bar_w }}%;background:{{ k.color }};border-radius:20px"></div></div>
+            </div>
+            {% empty %}
+            <div style="font-size:12px;color:#737373">Пока нет данных.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- heatmap -->
+      <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px">
+          <span style="display:inline-flex">{% icon "activity" 16 "#b6d086" %}</span>
+          <span style="font-size:14px;font-weight:600">Когда публикуются лучшие вакансии</span>
+          <div style="flex:1"></div>
+          <span style="font-size:11.5px;color:#737373">кол-во вакансий score &gt; 75, по 3-часовым окнам</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:grid;grid-template-columns:38px repeat(8,1fr);gap:5px;align-items:center">
+            <span></span>
+            {% for b in heat.buckets %}<span style="font-size:10.5px;color:#737373;text-align:center;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ b }}</span>{% endfor %}
+          </div>
+          {% for row in heat.rows %}
+          <div style="display:grid;grid-template-columns:38px repeat(8,1fr);gap:5px;align-items:center">
+            <span style="font-size:11.5px;color:#a3a3a3;font-weight:500">{{ row.day }}</span>
+            {% for c in row.cells %}
+            <div style="height:30px;border-radius:6px;background:{{ c.bg }};border:{{ c.border }};display:flex;align-items:center;justify-content:center">
+              <span style="font-size:11px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ c.text_color }}">{{ c.text }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
