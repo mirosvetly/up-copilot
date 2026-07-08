@@ -2,6 +2,9 @@
 from relevant GitHub repos; real path prompts Claude. Same CoverLetterDraft output."""
 from __future__ import annotations
 
+from django.db import IntegrityError, transaction
+from django.db.models import Max
+
 from apps.core.llm import get_llm
 from apps.jobs.models import JobPosting
 from apps.scoring.profile import resolve_track, track_config
@@ -62,26 +65,46 @@ def _mock_segments(job: JobPosting, repos: list[Repo], version: int, cfg: dict) 
     return segs
 
 
+def _next_version(job) -> int:
+    # max+1, not count(): survives deleted drafts (gaps) without colliding.
+    m = job.cover_drafts.aggregate(mx=Max("version"))["mx"]
+    return 0 if m is None else m + 1
+
+
 def generate_cover(job: JobPosting) -> CoverLetterDraft:
     cfg = track_config(resolve_track(job))
     repos = get_github(projects=cfg["projects"]).relevant(job.skills)
     reasoning = job.score.reasoning if getattr(job, "score", None) else ""
-    version = job.cover_drafts.count()
     llm = get_llm()
     if llm:
+        # LLM call stays OUTSIDE the transaction — never hold a DB tx across a
+        # multi-second API request. _mock_segments only needs a version for its
+        # cosmetic A/B variety, so a provisional count() there is fine.
         body = llm.complete(_system(cfg), _prompt(job, repos, reasoning), max_tokens=512)
         segments = [{"t": body, "src": None}]
         model_name = "anthropic"
     else:
-        segments = _mock_segments(job, repos, version, cfg)
+        segments = _mock_segments(job, repos, job.cover_drafts.count(), cfg)
         body = "".join(s["t"] for s in segments)
         model_name = "mock-template-v1"
 
-    job.cover_drafts.update(is_active=False)
-    draft = CoverLetterDraft.objects.create(
-        job=job, version=version, body=body, segments=segments,
-        sources=[r.name for r in repos], is_active=True, model_name=model_name,
-    )
+    # Deactivate the old draft only AFTER the new one is created, inside a tx —
+    # a failed create must not orphan the previously active draft. Retry once on
+    # the unique (job, version) race two concurrent generates can trigger.
+    for _ in range(3):
+        try:
+            with transaction.atomic():
+                draft = CoverLetterDraft.objects.create(
+                    job=job, version=_next_version(job), body=body, segments=segments,
+                    sources=[r.name for r in repos], is_active=True, model_name=model_name,
+                )
+                job.cover_drafts.exclude(pk=draft.pk).update(is_active=False)
+            break
+        except IntegrityError:
+            continue
+    else:
+        raise IntegrityError("Could not allocate a cover-letter version after retries")
+
     if job.status == JobPosting.Status.SCORED:
         job.transition_to(JobPosting.Status.DRAFTED)
     return draft

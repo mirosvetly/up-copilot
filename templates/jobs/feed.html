@@ -2,7 +2,7 @@
 {% load icons %}
 {% block title %}Лента вакансий · Upwork Copilot{% endblock %}
 {% block main %}
-{% with nextqs="/?q="|add:q|add:"&sort="|add:sort %}
+{% with nextqs="/?q="|add:q|add:"&sort="|add:sort|add:"&track="|add:track %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
 
   <!-- header -->
@@ -16,10 +16,11 @@
       <span style="display:inline-flex">{% icon "search" 15 "#737373" %}</span>
       <input name="q" value="{{ q }}" placeholder="Фильтр по навыку…" style="flex:1;background:transparent;border:none;outline:none;color:#fafafa;font-size:13px;min-width:0"/>
       <input type="hidden" name="sort" value="{{ sort }}"/>
+      <input type="hidden" name="track" value="{{ track }}"/>
     </form>
     <div style="display:flex;background:#0a0a0a;border:1px solid #404040;border-radius:9px;padding:2px;gap:2px">
-      <a href="?q={{ q|urlencode }}&sort=fresh" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'fresh' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'fresh' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "clock" 13 %}Свежесть</a>
-      <a href="?q={{ q|urlencode }}&sort=score" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'score' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'score' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "zap" 13 %}Score</a>
+      <a href="?q={{ q|urlencode }}&track={{ track }}&sort=fresh" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'fresh' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'fresh' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "clock" 13 %}Свежесть</a>
+      <a href="?q={{ q|urlencode }}&track={{ track }}&sort=score" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'score' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'score' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "zap" 13 %}Score</a>
     </div>
   </div>
 
@@ -28,6 +29,17 @@
 
       <!-- feed column -->
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
+
+        <!-- direction filter -->
+        <div style="display:inline-flex;align-self:flex-start;background:#0a0a0a;border:1px solid #404040;border-radius:10px;padding:3px;gap:2px">
+          {% for p in track_pills %}
+          <a href="?q={{ q|urlencode }}&sort={{ sort }}&track={{ p.key }}" style="display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 14px;border-radius:7px;font-size:13px;font-weight:500;background:{% if p.active %}#b6d086{% else %}transparent{% endif %};color:{% if p.active %}#171717{% else %}#a3a3a3{% endif %}">
+            {{ p.label }}
+            <span style="font-size:11px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:1px 6px;border-radius:20px;background:{% if p.active %}rgba(23,23,23,0.16){% else %}#1f1f1f{% endif %};color:{% if p.active %}#171717{% else %}#737373{% endif %}">{{ p.count }}</span>
+          </a>
+          {% endfor %}
+        </div>
+
         <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#a3a3a3;padding:0 2px 2px">
           <span><span style="color:#fafafa;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ visible_count }}</span> вакансий в очереди на ревью</span>
           <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>

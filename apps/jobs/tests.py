@@ -323,6 +323,36 @@ class GmailAlertParseTests(TestCase):
         self.assertIsNone(parse_alert("Your password was changed.", "Security alert", None))
 
 
+class FeedTrackFilterTests(TestCase):
+    def setUp(self):
+        from apps.tracks.models import Track
+
+        Track.objects.all().delete()  # drop the migration-seeded track for a clean pill set
+        self.dev = Track.objects.create(name="DevTrack", is_default=True)
+        self.land = Track.objects.create(name="LandTrack")
+        self.fdev = SavedFilter.objects.create(name="d", track=self.dev)
+        self.fland = SavedFilter.objects.create(name="l", track=self.land)
+        JobPosting.objects.create(job_id="d1", title="Django job", budget_type="fixed", matched_filter=self.fdev)
+        JobPosting.objects.create(job_id="l1", title="Webflow job", budget_type="fixed", matched_filter=self.fland)
+
+    def test_all_shows_both(self):
+        r = self.client.get("/")
+        self.assertContains(r, "Django job")
+        self.assertContains(r, "Webflow job")
+
+    def test_track_filter_narrows_to_one_track(self):
+        r = self.client.get(f"/?track={self.land.pk}")
+        self.assertNotContains(r, "Django job")
+        self.assertContains(r, "Webflow job")
+
+    def test_pills_carry_counts_and_bad_track_falls_back_to_all(self):
+        r = self.client.get("/?track=notanid")
+        self.assertContains(r, "Django job")  # invalid track -> show all, no 500
+        pills = r.context["track_pills"]
+        self.assertEqual(pills[0]["label"], "Все")
+        self.assertEqual({p["label"]: p["count"] for p in pills}["DevTrack"], 1)
+
+
 class JobActionViewTests(TestCase):
     def _job(self, status=JobPosting.Status.SCORED):
         return JobPosting.objects.create(

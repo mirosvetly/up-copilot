@@ -46,3 +46,26 @@ class GeneratorTests(TestCase):
         self.assertEqual(second.version, 1)
         self.assertEqual(CoverLetterDraft.objects.filter(job=job, is_active=True).count(), 1)
         self.assertEqual(CoverLetterDraft.objects.filter(job=job).count(), 2)
+
+    def test_version_survives_a_gap_left_by_a_deleted_draft(self):
+        # count()-based versioning collided when a draft was deleted; max+1 must not.
+        job = self._job()
+        generate_cover(job)  # v0
+        generate_cover(job)  # v1
+        CoverLetterDraft.objects.filter(job=job, version=0).delete()  # gap: only v1 left
+        third = generate_cover(job)
+        self.assertEqual(third.version, 2)  # max(1)+1, not count()==1 -> collision
+        self.assertTrue(third.is_active)
+
+    def test_failed_create_does_not_orphan_the_active_draft(self):
+        # A generate that raises mid-save must leave the previous active draft active,
+        # not deactivate it (the bug that showed "not generated" while a draft existed).
+        from unittest.mock import patch
+
+        job = self._job()
+        first = generate_cover(job)
+        with patch.object(CoverLetterDraft.objects, "create", side_effect=RuntimeError("boom")):
+            with self.assertRaises(RuntimeError):
+                generate_cover(job)
+        first.refresh_from_db()
+        self.assertTrue(first.is_active)  # survivor still active

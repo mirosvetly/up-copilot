@@ -18,8 +18,15 @@ _ACTIONS = {
 
 
 def feed(request):
+    from django.db.models import Count
+
+    from apps.tracks.models import Track
+    from apps.scoring.profile import track_config
+
     q = request.GET.get("q", "").strip()
     sort = request.GET.get("sort", "fresh")
+    track = request.GET.get("track", "all")
+
     qs = (
         JobPosting.objects.exclude(status=JobPosting.Status.EXPIRED)
         .select_related("client", "score", "matched_filter__track")
@@ -27,20 +34,35 @@ def feed(request):
     if q:
         qs = qs.filter(Q(title__icontains=q) | Q(skills__icontains=q))
 
+    # Direction pills (Все / <track> …) with live counts, computed before the
+    # track filter is applied so each pill shows its full total.
+    tracks = list(Track.objects.all())
+    per_track = dict(
+        qs.values_list("matched_filter__track_id").annotate(n=Count("id"))
+    )
+    track_pills = [{"key": "all", "label": "Все", "count": qs.count(), "active": track == "all"}]
+    track_pills += [
+        {"key": str(t.pk), "label": t.name, "count": per_track.get(t.pk, 0), "active": track == str(t.pk)}
+        for t in tracks
+    ]
+
+    if track != "all":
+        try:
+            qs = qs.filter(matched_filter__track_id=int(track))
+        except ValueError:
+            track = "all"  # bad param -> show everything, don't 500
+
     # Each card highlights against its own track's skills. Resolve the default
     # once and memoize per track so the feed stays at O(1) track queries.
-    from apps.tracks.models import Track
-    from apps.scoring.profile import track_config
-
     default_track = Track.get_default()
     skills_by_track: dict = {}
 
     def skills_for(job):
         f = job.matched_filter
-        track = (f.track if f else None) or default_track
-        tid = track.id if track else None
+        t = (f.track if f else None) or default_track
+        tid = t.id if t else None
         if tid not in skills_by_track:
-            skills_by_track[tid] = {s.lower() for s in track_config(track)["skills"]}
+            skills_by_track[tid] = {s.lower() for s in track_config(t)["skills"]}
         return skills_by_track[tid]
 
     cards = [job_card(j, my_skills_lc=skills_for(j)) for j in qs]
@@ -68,6 +90,8 @@ def feed(request):
             "queue": queue,
             "q": q,
             "sort": sort,
+            "track": track,
+            "track_pills": track_pills,
             "is_feed": True,
         },
     )

@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import environ
@@ -129,3 +130,13 @@ GITHUB_USER = env("GITHUB_USER")
 TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = env("TELEGRAM_CHAT_ID")
 SITE_URL = env("SITE_URL")
+
+# Tests must be hermetic: never hit real APIs (Claude/Voyage/GitHub) or make the
+# suite depend on the developer's .env. Force every seam to its mock default.
+# ponytail: keys on `manage.py test`; add pytest detection if we ever adopt it.
+if "test" in sys.argv:
+    JOB_PROVIDER = "mock"
+    LLM_PROVIDER = "mock"
+    GITHUB_PROVIDER = "mock"
+    EMBEDDING_PROVIDER = "mock"
+    JOB_SCORER = "rule"
