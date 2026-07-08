@@ -443,6 +443,12 @@ class RefreshViewTests(TestCase):
         r = self.client.post("/refresh/", {"next": "//evil.com"})
         self.assertEqual(r["Location"], "/")  # not off-site
 
+    def test_refresh_ajax_returns_json(self):
+        SavedFilter.objects.create(name="all", keywords=[], is_active=True)
+        r = self.client.post("/refresh/", HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("created", r.json())  # browser auto-poll gets JSON, not a redirect
+
 
 class SentViewTests(TestCase):
     def setUp(self):

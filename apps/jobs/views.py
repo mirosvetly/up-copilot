@@ -150,6 +150,10 @@ def refresh(request):
             log.exception("Manual refresh failed for filter %s", f.name)
             errors += 1
     _score_in_background()
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        from django.http import JsonResponse
+
+        return JsonResponse({"created": created, "errors": errors})  # browser auto-poll
     if errors and not created:
         messages.error(request, _("Не удалось получить вакансии из API. Проверь ключ и подключение."))
     else:

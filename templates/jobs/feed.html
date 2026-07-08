@@ -26,6 +26,7 @@
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
       <button title="{% trans 'Запросить новые вакансии через API сейчас' %}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#d4d4d4;font-size:13px;font-weight:500;cursor:pointer"><span class="uc-ri" style="display:inline-flex">{% icon "refresh" 15 %}</span><span class="uc-rl">{% trans "Обновить" %}</span></button>
     </form>
+    <button type="button" id="uc-auto" onclick="ucToggleAuto()" title="{% trans 'Автоматически проверять новые вакансии, пока вкладка открыта' %}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid #404040;border-radius:9px;background:transparent;color:#a3a3a3;font-size:13px;font-weight:500;cursor:pointer"><span id="uc-auto-dot" style="width:7px;height:7px;border-radius:20px;background:#525252"></span>{% trans "Авто" %}</button>
     <script>
     function ucRefresh(f){
       var b=f.querySelector('button'); b.style.opacity='0.75'; b.style.cursor='wait';
@@ -33,6 +34,20 @@
       var l=b.querySelector('.uc-rl'); if(l){l.textContent='{% trans "Обновление…" %}';}
       setTimeout(function(){b.disabled=true;},0); return true;
     }
+    (function(){
+      var CSRF="{{ csrf_token }}", INT=300000, timer=null;  // poll every 5 min while open
+      function on(){ return localStorage.getItem('uc_auto')==='1'; }
+      function paint(){ var b=document.getElementById('uc-auto'),d=document.getElementById('uc-auto-dot');
+        b.style.background=on()?'rgba(182,208,134,0.14)':'transparent'; b.style.color=on()?'#c5dc9f':'#a3a3a3';
+        d.style.background=on()?'#4ade80':'#525252'; if(on()){d.style.animation='ucPulse 2s infinite';}else{d.style.animation='';} }
+      function poll(){ fetch("{% url 'jobs:refresh' %}",{method:'POST',headers:{'X-Requested-With':'XMLHttpRequest','X-CSRFToken':CSRF}})
+        .then(function(r){return r.json();}).then(function(d){
+          if(d&&d.created>0){var bn=document.getElementById('uc-newbanner');bn.querySelector('.uc-n').textContent=d.created;bn.style.display='flex';}
+        }).catch(function(){}); }
+      function schedule(){ if(timer){clearInterval(timer);timer=null;} if(on()){timer=setInterval(poll,INT);} }
+      window.ucToggleAuto=function(){ localStorage.setItem('uc_auto', on()?'0':'1'); paint(); schedule(); };
+      paint(); schedule();
+    })();
     </script>
   </div>
 
@@ -41,6 +56,12 @@
 
       <!-- feed column -->
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
+
+        <div id="uc-newbanner" style="display:none;align-items:center;gap:10px;background:rgba(182,208,134,0.12);border:1px solid #b6d086;border-radius:10px;padding:10px 14px;font-size:13px;color:#d9ecc0">
+          <span style="width:7px;height:7px;border-radius:20px;background:#4ade80;flex:none;animation:ucPulse 2s infinite"></span>
+          <span><span class="uc-n" style="font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">0</span> {% trans "новых вакансий" %}</span>
+          <a href="{{ request.get_full_path }}" style="color:#b6d086;font-weight:600;text-decoration:underline;cursor:pointer">{% trans "показать" %}</a>
+        </div>
 
         {% if messages %}
         {% for m in messages %}
