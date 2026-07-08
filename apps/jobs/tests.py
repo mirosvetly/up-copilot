@@ -55,6 +55,33 @@ class CollectorTests(TestCase):
         self.f = SavedFilter.objects.create(name="all", keywords=[])
         self.provider = MockProvider()
 
+    @override_settings(MAX_JOB_AGE_HOURS=24)
+    def test_stale_jobs_are_not_imported(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from .providers.base import RawClient, RawJob
+
+        now = timezone.now()
+
+        def mk(jid, age_h):
+            return RawJob(
+                job_id=jid, title="t", description="d", skills=[], budget_type="fixed",
+                budget_min=None, budget_max=None, currency="USD", proposals_bucket="",
+                posted_at=now - timedelta(hours=age_h),
+                client=RawClient(upwork_client_id="c:" + jid), raw={"source": "vibeworker"},
+            )
+
+        class Stub:
+            def fetch_jobs(self, f):
+                return [mk("fresh", 2), mk("stale", 48)]
+
+        collect_for_filter(self.f, provider=Stub())
+        ids = set(JobPosting.objects.values_list("job_id", flat=True))
+        self.assertIn("fresh", ids)
+        self.assertNotIn("stale", ids)  # older than 24h -> skipped, never scored
+
     def test_deleted_jobs_are_not_reimported(self):
         from .models import SeenJob
 
@@ -92,7 +119,7 @@ class CollectorTests(TestCase):
         self.assertEqual(r["seen"], 1)  # only the MT5 job matches
 
     def test_repoll_from_sparser_source_keeps_richer_raw_and_client(self):
-        from datetime import datetime, timezone as tz
+        from django.utils import timezone
 
         from .providers.base import RawClient, RawJob
 
@@ -100,7 +127,7 @@ class CollectorTests(TestCase):
             return RawJob(
                 job_id="x1", title="t", description="d", skills=[], budget_type="fixed",
                 budget_min=None, budget_max=None, currency="USD", proposals_bucket="",
-                posted_at=datetime(2026, 7, 7, tzinfo=tz.utc),
+                posted_at=timezone.now(),  # fresh, so the age filter keeps it
                 client=RawClient(upwork_client_id=client_id, **client_kw),
                 raw={"source": source, "scores": {"quickWin": 8} if source == "vibeworker" else None},
             )

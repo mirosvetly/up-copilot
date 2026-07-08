@@ -4,6 +4,7 @@ import logging
 from datetime import timedelta
 
 from celery import shared_task
+from django.conf import settings
 from django.utils import timezone
 
 from .models import ClientProfile, JobPosting, SavedFilter, SeenJob
@@ -40,6 +41,10 @@ def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
     deleted — the API keeps returning the same recent jobs on every poll."""
     provider = provider or get_provider()
     raw_jobs = provider.fetch_jobs(saved_filter)
+    # Only keep fresh jobs: the API returns a ~7-day window, but week-old postings
+    # already have a crowd of applicants — not worth importing or scoring.
+    cutoff = timezone.now() - timedelta(hours=settings.MAX_JOB_AGE_HOURS)
+    raw_jobs = [rj for rj in raw_jobs if not (rj.posted_at and rj.posted_at < cutoff)]
     ids = [rj.job_id for rj in raw_jobs]
     already = set(SeenJob.objects.filter(job_id__in=ids).values_list("job_id", flat=True))
     created = 0
