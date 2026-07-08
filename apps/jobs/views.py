@@ -159,6 +159,29 @@ def refresh(request):
     return redirect(_safe_next(request))
 
 
+@require_POST
+def skip_all(request):
+    """Bulk-clear the untouched review backlog (status new/scored) for the current
+    track, deleting the rows so the DB doesn't bloat. Drafts, approved and sent
+    jobs are kept — only never-touched ones go."""
+    from apps.jobs.models import ClientProfile
+
+    track = request.POST.get("track", "all")
+    qs = JobPosting.objects.filter(
+        status__in=[JobPosting.Status.NEW, JobPosting.Status.SCORED]
+    )
+    if track != "all":
+        try:
+            qs = qs.filter(matched_filter__track_id=int(track))
+        except ValueError:
+            pass
+    n = qs.count()
+    qs.delete()  # cascades JobScore / drafts; orphaned clients tidied below
+    ClientProfile.objects.filter(jobs__isnull=True).delete()
+    messages.success(request, _("Удалено вакансий из ленты: %(n)s.") % {"n": n})
+    return redirect(_safe_next(request))
+
+
 def _translations_ready(job) -> bool:
     if job.description and not job.description_ru:
         return False

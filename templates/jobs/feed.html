@@ -62,6 +62,14 @@
           <span><span style="color:#fafafa;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ visible_count }}</span> {% if is_sent %}{% trans "отправлено вручную" %}{% else %}{% trans "вакансий в очереди на ревью" %}{% endif %}</span>
           <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
           <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:20px;background:#4ade80;animation:ucPulse 2s infinite"></span>{% trans "авто-скрапинг" %}</span>
+          {% if not is_sent and cards %}
+          <div style="flex:1"></div>
+          <form method="post" action="{% url 'jobs:skip_all' %}" onsubmit="return confirm('{% trans "Удалить все непросмотренные вакансии из ленты? Действие необратимо." %}')" style="margin:0">{% csrf_token %}
+            <input type="hidden" name="track" value="{{ track }}">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button title="{% trans 'Удаляет непросмотренные (new/scored) из базы' %}" style="display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border:1px solid #404040;border-radius:7px;background:transparent;color:#737373;font-size:12px;cursor:pointer">{% icon "x" 13 %}{% trans "Пропустить все" %}</button>
+          </form>
+          {% endif %}
         </div>
 
         {% for job in cards %}

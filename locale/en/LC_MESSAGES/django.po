@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-08 23:58+0300\n"
+"POT-Creation-Date: 2026-07-09 00:02+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -183,7 +183,7 @@ msgid "В очереди на ручную отправку. Открой на U
 msgstr "In queue for manual sending. Open it on Upwork and submit."
 
 #: apps/jobs/presenters.py:148 templates/jobs/detail.html:29
-#: templates/jobs/feed.html:126
+#: templates/jobs/feed.html:134
 msgid "Отправлено вручную"
 msgstr "Sent manually"
 
@@ -191,7 +191,7 @@ msgstr "Sent manually"
 msgid "Отмечено как отправленное. Жди ответа клиента."
 msgstr "Marked as sent. Wait for the client's response."
 
-#: apps/jobs/presenters.py:149 templates/jobs/feed.html:128
+#: apps/jobs/presenters.py:149 templates/jobs/feed.html:136
 msgid "Пропущено"
 msgstr "Missed"
 
@@ -230,7 +230,12 @@ msgstr ""
 "New ones collected: %(n)s. Evaluation in progress - refresh the page in a "
 "minute."
 
-#: apps/jobs/views.py:250
+#: apps/jobs/views.py:181
+#, python-format
+msgid "Удалено вакансий из ленты: %(n)s."
+msgstr "Vacancies removed from feed: %(n)s."
+
+#: apps/jobs/views.py:273
 #, python-format
 msgid "Неизвестное действие: %(action)s"
 msgstr "Unknown action: %(action)s"
@@ -473,68 +478,83 @@ msgstr "vacancies in queue for review"
 msgid "авто-скрапинг"
 msgstr "auto-scraping"
 
-#: templates/jobs/feed.html:89
+#: templates/jobs/feed.html:67
+msgid "Удалить все непросмотренные вакансии из ленты? Действие необратимо."
+msgstr ""
+"Delete all unviewed vacancies from your feed? The action is irreversible."
+
+#: templates/jobs/feed.html:70
+msgid "Удаляет непросмотренные (new/scored) из базы"
+msgstr "Removes unwatched (new/scored) items from the database"
+
+#: templates/jobs/feed.html:70
+#, fuzzy
+#| msgid "Пропустить"
+msgid "Пропустить все"
+msgstr "Skip all"
+
+#: templates/jobs/feed.html:97
 msgid "score"
 msgstr "score"
 
-#: templates/jobs/feed.html:101
+#: templates/jobs/feed.html:109
 msgid "Оплата подтверждена"
 msgstr "Payment confirmed"
 
-#: templates/jobs/feed.html:102
+#: templates/jobs/feed.html:110
 msgid "Оплата не подтверждена"
 msgstr "Payment not confirmed"
 
-#: templates/jobs/feed.html:103
+#: templates/jobs/feed.html:111
 msgid "Нанимает"
 msgstr "Hires"
 
-#: templates/jobs/feed.html:104
+#: templates/jobs/feed.html:112
 msgid "откликов"
 msgstr "responses"
 
-#: templates/jobs/feed.html:111
+#: templates/jobs/feed.html:119
 msgid "Одобрить"
 msgstr "Approve"
 
-#: templates/jobs/feed.html:114
+#: templates/jobs/feed.html:122
 msgid "Пропустить"
 msgstr "Skip"
 
-#: templates/jobs/feed.html:117
+#: templates/jobs/feed.html:125
 msgid "Открыть"
 msgstr "Open"
 
-#: templates/jobs/feed.html:119
+#: templates/jobs/feed.html:127
 msgid "В очереди на отправку"
 msgstr "Queue for dispatch"
 
-#: templates/jobs/feed.html:121
+#: templates/jobs/feed.html:129
 msgid "Отменить"
 msgstr "Cancel"
 
-#: templates/jobs/feed.html:124
+#: templates/jobs/feed.html:132
 msgid "Открыть детально"
 msgstr "Open in detail"
 
-#: templates/jobs/feed.html:130
+#: templates/jobs/feed.html:138
 msgid "Вернуть в ленту"
 msgstr "Return to feed"
 
-#: templates/jobs/feed.html:137
+#: templates/jobs/feed.html:145
 msgid "Ничего не найдено"
 msgstr "Nothing found"
 
-#: templates/jobs/feed.html:137
+#: templates/jobs/feed.html:145
 #, python-format
 msgid "по фильтру «%(q)s»"
 msgstr "by filter “%(q)s”"
 
-#: templates/jobs/feed.html:146
+#: templates/jobs/feed.html:154
 msgid "Очередь на отправку"
 msgstr "Queue for dispatch"
 
-#: templates/jobs/feed.html:157
+#: templates/jobs/feed.html:165
 msgid ""
 "Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на"
 " Upwork."
@@ -542,23 +562,23 @@ msgstr ""
 "Empty for now. Approve the cards on the left - they will go here for manual "
 "submission to Upwork."
 
-#: templates/jobs/feed.html:162
+#: templates/jobs/feed.html:170
 msgid "Сегодня"
 msgstr "Today"
 
-#: templates/jobs/feed.html:164
+#: templates/jobs/feed.html:172
 msgid "найдено"
 msgstr "found"
 
-#: templates/jobs/feed.html:165
+#: templates/jobs/feed.html:173
 msgid "одобрено"
 msgstr "approved"
 
-#: templates/jobs/feed.html:166
+#: templates/jobs/feed.html:174
 msgid "отправлено"
 msgstr "sent"
 
-#: templates/jobs/feed.html:167
+#: templates/jobs/feed.html:175
 msgid "пропущено"
 msgstr "missed"
 

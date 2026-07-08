@@ -353,6 +353,40 @@ class FeedTrackFilterTests(TestCase):
         self.assertEqual({p["label"]: p["count"] for p in pills}["DevTrack"], 1)
 
 
+class SkipAllViewTests(TestCase):
+    def setUp(self):
+        from apps.tracks.models import Track
+
+        self.dev = Track.objects.create(name="Dev", is_default=True)
+        self.fdev = SavedFilter.objects.create(name="d", track=self.dev)
+        self.new = JobPosting.objects.create(job_id="sa-new", title="t", budget_type="fixed",
+                                             status=JobPosting.Status.NEW, matched_filter=self.fdev)
+        self.scored = JobPosting.objects.create(job_id="sa-sc", title="t", budget_type="fixed",
+                                                status=JobPosting.Status.SCORED, matched_filter=self.fdev)
+        self.drafted = JobPosting.objects.create(job_id="sa-dr", title="t", budget_type="fixed",
+                                                 status=JobPosting.Status.DRAFTED, matched_filter=self.fdev)
+        self.applied = JobPosting.objects.create(job_id="sa-ap", title="t", budget_type="fixed",
+                                                 status=JobPosting.Status.APPLIED, matched_filter=self.fdev)
+
+    def test_skip_all_deletes_only_untouched(self):
+        r = self.client.post("/skip-all/", {"track": "all", "next": "/"})
+        self.assertEqual(r.status_code, 302)
+        ids = set(JobPosting.objects.values_list("job_id", flat=True))
+        self.assertEqual(ids, {"sa-dr", "sa-ap"})  # new+scored deleted; drafted/applied kept
+
+    def test_skip_all_respects_track_filter(self):
+        from apps.tracks.models import Track
+
+        other = Track.objects.create(name="Other")
+        fo = SavedFilter.objects.create(name="o", track=other)
+        JobPosting.objects.create(job_id="sa-other", title="t", budget_type="fixed",
+                                  status=JobPosting.Status.NEW, matched_filter=fo)
+        self.client.post("/skip-all/", {"track": str(other.pk), "next": "/"})
+        # only the other-track NEW job removed; dev-track new/scored untouched
+        self.assertFalse(JobPosting.objects.filter(job_id="sa-other").exists())
+        self.assertTrue(JobPosting.objects.filter(job_id="sa-new").exists())
+
+
 class RefreshViewTests(TestCase):
     def test_refresh_collects_now_and_redirects(self):
         # Collection is synchronous (fast); scoring is kicked to a background
