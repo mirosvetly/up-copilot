@@ -16,6 +16,14 @@
       <a href="?lang=en{{ editqs }}" style="height:28px;display:inline-flex;align-items:center;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;background:{% if content_lang == 'en' %}#b6d086{% else %}transparent{% endif %};color:{% if content_lang == 'en' %}#171717{% else %}#a3a3a3{% endif %}">EN</a>
     </div>
     {% endwith %}
+    {% if translating %}
+    <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3" title="{% trans 'Показан английский оригинал, русский перевод подтянется' %}"><span style="display:inline-flex;animation:ucSpin .8s linear infinite">{% icon "refresh" 13 "#a3a3a3" %}</span>{% trans "Перевод загружается…" %}</span>
+    <script>
+    (function(){var n=0,t=setInterval(function(){if(++n>25){clearInterval(t);return;}
+      fetch("{% url 'jobs:tr_status' pk %}").then(function(r){return r.json();}).then(function(d){
+        if(d.ready){clearInterval(t);location.reload();}}).catch(function(){});},1600);})();
+    </script>
+    {% endif %}
     <a href="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% icon "arrow-up-right" 14 %}{% trans "Открыть на Upwork" %}</a>
     {% if job.is_sent %}
       <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#b6d086;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#b6d086" %}{% trans "Отправлено вручную" %}</span>

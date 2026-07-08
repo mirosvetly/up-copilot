@@ -54,3 +54,23 @@ def translate_ru(text: str) -> str:
     except Exception:
         log.exception("Translation failed")
         return ""
+
+
+def translate_ru_batch(texts: list[str]) -> list[str]:
+    """Translate many short strings in one call (e.g. scoring reasons) instead of
+    one HTTP round-trip each. Returns "" per item on failure/mock (caller keeps EN)."""
+    texts = [t or "" for t in texts]
+    idx = [i for i, t in enumerate(texts) if t.strip()]
+    if not idx or settings.TRANSLATE_PROVIDER == "mock":
+        return ["" for _ in texts]
+    try:
+        from deep_translator import GoogleTranslator
+
+        got = GoogleTranslator(source="auto", target="ru").translate_batch([texts[i] for i in idx])
+        out = ["" for _ in texts]
+        for k, i in enumerate(idx):
+            out[i] = got[k] or ""
+        return out
+    except Exception:
+        log.exception("Batch translation failed")
+        return ["" for _ in texts]

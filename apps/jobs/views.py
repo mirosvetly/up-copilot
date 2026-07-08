@@ -159,6 +159,43 @@ def refresh(request):
     return redirect(_safe_next(request))
 
 
+def _translations_ready(job) -> bool:
+    if job.description and not job.description_ru:
+        return False
+    s = getattr(job, "score", None)
+    return not (s and s.breakdown and not s.breakdown_ru)
+
+
+def _translate_in_background(pk):
+    """Translate a job's title/description/reasons off the request thread, so the
+    detail page opens instantly in English and the RU pulls in when it's ready."""
+    import threading
+
+    from django.db import connection
+
+    def run():
+        try:
+            job = JobPosting.objects.select_related("score").filter(pk=pk).first()
+            if job:
+                job.ensure_ru()
+                if getattr(job, "score", None):
+                    job.score.ensure_ru()
+        except Exception:
+            log.exception("Background translation failed for job %s", pk)
+        finally:
+            connection.close()
+
+    threading.Thread(target=run, daemon=True).start()
+
+
+def tr_status(request, pk):
+    """Poll target: is this job's RU translation cached yet?"""
+    from django.http import JsonResponse
+
+    job = get_object_or_404(JobPosting.objects.select_related("score"), pk=pk)
+    return JsonResponse({"ready": _translations_ready(job)})
+
+
 def detail(request, pk):
     from django.utils.translation import get_language
 
@@ -173,9 +210,13 @@ def detail(request, pk):
     job = get_object_or_404(
         JobPosting.objects.select_related("client", "score", "matched_filter__track"), pk=pk
     )
-    job.ensure_ru()  # translate job title/description once (cached)
-    if getattr(job, "score", None):
-        job.score.ensure_ru()  # translate the scoring reasons once (cached)
+    # Don't block the page on translation: if RU is wanted but not cached yet,
+    # serve English now, translate in the background, and let the page pull RU in.
+    translating = False
+    if lang == "ru" and not _translations_ready(job):
+        _translate_in_background(job.pk)
+        lang = "en"
+        translating = True
     dj = job_detail(job, lang=lang)
     draft = CoverLetterDraft.objects.filter(job=job, is_active=True).first()
     cover = cover_context(draft, edit=request.GET.get("edit") == "1") if draft else None
@@ -193,6 +234,7 @@ def detail(request, pk):
             "pk": job.pk,
             "cover": cover,
             "content_lang": lang,
+            "translating": translating,
             "screening": screening,
             "has_screening_questions": bool((job.raw or {}).get("screening_questions")),
             "is_feed": True,  # sidebar keeps "Лента" active, like the design

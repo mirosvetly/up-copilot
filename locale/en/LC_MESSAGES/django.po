@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-08 23:50+0300\n"
+"POT-Creation-Date: 2026-07-08 23:58+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -182,7 +182,7 @@ msgstr "The letter has been generated and is awaiting approval."
 msgid "В очереди на ручную отправку. Открой на Upwork и отправь."
 msgstr "In queue for manual sending. Open it on Upwork and submit."
 
-#: apps/jobs/presenters.py:148 templates/jobs/detail.html:21
+#: apps/jobs/presenters.py:148 templates/jobs/detail.html:29
 #: templates/jobs/feed.html:126
 msgid "Отправлено вручную"
 msgstr "Sent manually"
@@ -230,7 +230,7 @@ msgstr ""
 "New ones collected: %(n)s. Evaluation in progress - refresh the page in a "
 "minute."
 
-#: apps/jobs/views.py:208
+#: apps/jobs/views.py:250
 #, python-format
 msgid "Неизвестное действие: %(action)s"
 msgstr "Unknown action: %(action)s"
@@ -338,82 +338,90 @@ msgstr "Ribbon"
 msgid "Язык содержимого: вакансия, скоринг, письмо"
 msgstr "Content language: vacancy, scoring, letter"
 
-#: templates/jobs/detail.html:19
+#: templates/jobs/detail.html:20
+msgid "Показан английский оригинал, русский перевод подтянется"
+msgstr "The English original is shown, the Russian translation will follow"
+
+#: templates/jobs/detail.html:20
+msgid "Перевод загружается…"
+msgstr "Translation is loading..."
+
+#: templates/jobs/detail.html:27
 msgid "Открыть на Upwork"
 msgstr "Open on Upwork"
 
-#: templates/jobs/detail.html:24
+#: templates/jobs/detail.html:32
 msgid "Отметить как отправлено"
 msgstr "Mark as sent"
 
-#: templates/jobs/detail.html:45
+#: templates/jobs/detail.html:53
 #, python-format
 msgid "%(n)s откликов"
 msgstr "%(n)s responses"
 
-#: templates/jobs/detail.html:50
+#: templates/jobs/detail.html:58
 msgid "match score"
 msgstr "match score"
 
-#: templates/jobs/detail.html:65
+#: templates/jobs/detail.html:73
 msgid "Почему подходит"
 msgstr "Why is it suitable?"
 
-#: templates/jobs/detail.html:66
+#: templates/jobs/detail.html:74
 #, python-format
 msgid "скоринг · %(model_name)s"
 msgstr "scoring · %(model_name)s"
 
-#: templates/jobs/detail.html:68
+#: templates/jobs/detail.html:76
 msgid "итог"
 msgstr "result"
 
-#: templates/jobs/detail.html:84
+#: templates/jobs/detail.html:92
 msgid "Описание вакансии"
 msgstr "Job Description"
 
-#: templates/jobs/detail.html:101
+#: templates/jobs/detail.html:109
 msgid "Карточка клиента"
 msgstr "Customer card"
 
-#: templates/jobs/detail.html:107
+#: templates/jobs/detail.html:115
 msgid "визитка риска"
 msgstr "risk business card"
 
-#: templates/jobs/detail.html:112
+#: templates/jobs/detail.html:120
 msgid "Оплата"
 msgstr "Payment"
 
-#: templates/jobs/detail.html:117
+#: templates/jobs/detail.html:125
 msgid "Всего потрачено"
 msgstr "Total spent"
 
-#: templates/jobs/detail.html:123
+#: templates/jobs/detail.html:131
 msgid "Hire rate"
 msgstr "Hire rate"
 
-#: templates/jobs/detail.html:130
+#: templates/jobs/detail.html:138
 msgid "Страна"
 msgstr "Country"
 
-#: templates/jobs/detail.html:135
+#: templates/jobs/detail.html:143
 msgid "Рейтинг"
 msgstr "Rating"
 
-#: templates/jobs/detail.html:141
+#: templates/jobs/detail.html:149
 msgid "вакансий"
 msgstr "vacancies"
 
-#: templates/jobs/detail.html:145
+#: templates/jobs/detail.html:153
 msgid "наймов"
 msgstr "hires"
 
-#: templates/jobs/detail.html:148
+#: templates/jobs/detail.html:156
 #, python-format
 msgid "На Upwork с %(member_since)s"
 msgstr "On Upwork with %(member_since)s"
 
-#: templates/jobs/detail.html:154
+#: templates/jobs/detail.html:162
 msgid "Статус в трекере"
 msgstr "Tracker status"
 

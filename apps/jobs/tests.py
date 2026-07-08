@@ -386,6 +386,33 @@ class SentViewTests(TestCase):
         self.assertNotContains(r, "new job")
 
 
+class LazyTranslationTests(TestCase):
+    def test_detail_serves_english_and_flags_translating_when_ru_missing(self):
+        job = JobPosting.objects.create(
+            job_id="lt1", title="t", budget_type="fixed", description="Some description",
+        )
+        r = self.client.get(f"/job/{job.pk}/?lang=ru")
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.context["translating"])         # RU not cached -> background it
+        self.assertEqual(r.context["content_lang"], "en")  # page opens in English
+
+    def test_detail_serves_ru_when_cached_no_translating(self):
+        job = JobPosting.objects.create(
+            job_id="lt2", title="t", budget_type="fixed",
+            description="Some description", description_ru="Некое описание",
+        )
+        r = self.client.get(f"/job/{job.pk}/?lang=ru")
+        self.assertFalse(r.context["translating"])
+        self.assertEqual(r.context["content_lang"], "ru")
+
+    def test_tr_status_endpoint(self):
+        job = JobPosting.objects.create(job_id="lt3", title="t", budget_type="fixed", description="d")
+        self.assertFalse(self.client.get(f"/job/{job.pk}/tr-status/").json()["ready"])
+        job.description_ru = "перевод"
+        job.save(update_fields=["description_ru"])
+        self.assertTrue(self.client.get(f"/job/{job.pk}/tr-status/").json()["ready"])
+
+
 class ContentLangTests(TestCase):
     def test_job_detail_picks_language_for_title_and_description(self):
         from .presenters import job_detail

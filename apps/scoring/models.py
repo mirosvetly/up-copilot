@@ -28,9 +28,11 @@ class JobScore(TimeStampedModel):
         the LLM in English). No-op if done or translation is off/unavailable."""
         if self.breakdown_ru or not self.breakdown:
             return
-        from apps.core.translate import translate_ru
+        from apps.core.translate import translate_ru_batch
 
-        translated = [{**b, "text": translate_ru(b.get("text", ""))} for b in self.breakdown]
-        if any(b["text"] for b in translated):
-            self.breakdown_ru = translated
+        ru = translate_ru_batch([b.get("text", "") for b in self.breakdown])  # one call
+        if any(ru):
+            self.breakdown_ru = [
+                {**b, "text": r or b.get("text", "")} for b, r in zip(self.breakdown, ru)
+            ]
             self.save(update_fields=["breakdown_ru", "updated_at"])
