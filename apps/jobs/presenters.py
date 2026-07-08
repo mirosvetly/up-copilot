@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from django.utils import timezone
 
-from apps.scoring.profile import load_profile
+from apps.scoring.profile import resolve_track, track_config
 
 from .models import JobPosting
 
@@ -83,7 +83,8 @@ def _budget(job):
 
 def job_card(job, *, my_skills_lc=None):
     if my_skills_lc is None:
-        my_skills_lc = {s.lower() for s in load_profile().get("skills", [])}
+        # Highlight against the job's own track skills (dev job -> dev stack).
+        my_skills_lc = {s.lower() for s in track_config(resolve_track(job))["skills"]}
     m = _age_minutes(job)
     age_big, posted_text = _age_parts(m)
     fresh_label, fresh_color, fresh_soft = _fresh_meta(m)

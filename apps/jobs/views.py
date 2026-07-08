@@ -5,8 +5,6 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from apps.scoring.profile import load_profile
-
 from .models import JobPosting
 from .presenters import job_card, job_detail
 
@@ -24,13 +22,28 @@ def feed(request):
     sort = request.GET.get("sort", "fresh")
     qs = (
         JobPosting.objects.exclude(status=JobPosting.Status.EXPIRED)
-        .select_related("client", "score")
+        .select_related("client", "score", "matched_filter__track")
     )
     if q:
         qs = qs.filter(Q(title__icontains=q) | Q(skills__icontains=q))
 
-    my_skills_lc = {s.lower() for s in load_profile().get("skills", [])}
-    cards = [job_card(j, my_skills_lc=my_skills_lc) for j in qs]
+    # Each card highlights against its own track's skills. Resolve the default
+    # once and memoize per track so the feed stays at O(1) track queries.
+    from apps.tracks.models import Track
+    from apps.scoring.profile import track_config
+
+    default_track = Track.get_default()
+    skills_by_track: dict = {}
+
+    def skills_for(job):
+        f = job.matched_filter
+        track = (f.track if f else None) or default_track
+        tid = track.id if track else None
+        if tid not in skills_by_track:
+            skills_by_track[tid] = {s.lower() for s in track_config(track)["skills"]}
+        return skills_by_track[tid]
+
+    cards = [job_card(j, my_skills_lc=skills_for(j)) for j in qs]
 
     def sort_key(c):
         skipped = c["state"] == "skipped"
@@ -66,7 +79,7 @@ def detail(request, pk):
     from apps.screening.models import ScreeningQuestion
 
     job = get_object_or_404(
-        JobPosting.objects.select_related("client", "score"), pk=pk
+        JobPosting.objects.select_related("client", "score", "matched_filter__track"), pk=pk
     )
     dj = job_detail(job)
     draft = CoverLetterDraft.objects.filter(job=job, is_active=True).first()

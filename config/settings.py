@@ -10,12 +10,15 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, ["*"]),
     # Provider swaps: "mock" (no key, deterministic) vs real API. Default mock
     # everywhere so the whole app runs on sqlite with zero external credentials.
-    JOB_PROVIDER=(str, "mock"),  # mock | upwork
+    JOB_PROVIDER=(str, "mock"),  # mock | upwork | vibeworker | gmail
     LLM_PROVIDER=(str, "mock"),  # mock | anthropic
     GITHUB_PROVIDER=(str, "mock"),  # mock | github
     EMBEDDING_PROVIDER=(str, "mock"),  # mock | voyage
     JOB_SCORER=(str, "rule"),  # rule | llm
     DRAFT_MIN_SCORE=(int, 50),  # only auto-draft cover letters at/above this score
+    VIBEWORKER_API_KEY=(str, ""),  # tryvibeworker.com/settings -> Developer
+    GMAIL_IMAP_USER=(str, ""),  # JOB_PROVIDER=gmail: mailbox receiving Upwork job alerts
+    GMAIL_IMAP_PASSWORD=(str, ""),  # Google app password (myaccount.google.com/apppasswords)
     ANTHROPIC_API_KEY=(str, ""),
     ANTHROPIC_MODEL=(str, "claude-sonnet-5"),
     VOYAGE_API_KEY=(str, ""),
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "apps.core",
+    "apps.tracks",
     "apps.jobs",
     "apps.scoring",
     "apps.letters",
@@ -75,6 +79,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.core.context_processors.freelancer",
             ],
         },
     },
@@ -112,6 +117,9 @@ LLM_PROVIDER = env("LLM_PROVIDER")
 GITHUB_PROVIDER = env("GITHUB_PROVIDER")
 EMBEDDING_PROVIDER = env("EMBEDDING_PROVIDER")
 JOB_SCORER = env("JOB_SCORER")
+VIBEWORKER_API_KEY = env("VIBEWORKER_API_KEY")
+GMAIL_IMAP_USER = env("GMAIL_IMAP_USER")
+GMAIL_IMAP_PASSWORD = env("GMAIL_IMAP_PASSWORD")
 DRAFT_MIN_SCORE = env("DRAFT_MIN_SCORE")
 ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY")
 ANTHROPIC_MODEL = env("ANTHROPIC_MODEL")

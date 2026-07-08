@@ -4,16 +4,17 @@ from celery import shared_task
 
 from apps.jobs.models import JobPosting
 
-from .profile import load_profile
 from .scorer import score_job
 
 
 @shared_task
 def score_pending_jobs() -> dict:
-    """Score every job still in `new`. Runs after collection."""
-    profile = load_profile()
+    """Score every job still in `new` under its own track's persona."""
     scored = 0
-    for job in JobPosting.objects.filter(status=JobPosting.Status.NEW).select_related("client"):
-        score_job(job, profile=profile)
+    qs = JobPosting.objects.filter(status=JobPosting.Status.NEW).select_related(
+        "client", "matched_filter__track"
+    )
+    for job in qs:
+        score_job(job)  # resolves the job's track internally
         scored += 1
     return {"scored": scored}

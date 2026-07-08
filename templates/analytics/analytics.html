@@ -6,7 +6,7 @@
 {% include "jobs/_nav_item.html" with label="Аналитика" ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
 {% include "jobs/_nav_item.html" with label="Отправленные" ico="inbox" disabled=True %}
 {% include "jobs/_nav_item.html" with label="GitHub-источники" ico="github" disabled=True %}
-{% include "jobs/_nav_item.html" with label="Настройки" ico="sliders" disabled=True %}
+{% include "jobs/_nav_item.html" with label="Настройки" ico="sliders" href_name="tracks:list" active=is_settings %}
 {% endblock %}
 {% block main %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">

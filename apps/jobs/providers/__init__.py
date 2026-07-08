@@ -1,10 +1,17 @@
 from django.conf import settings
 
 from .base import JobProvider, RawClient, RawJob
+from .gmail import GmailProvider
 from .mock import MockProvider
 from .upwork import UpworkProvider
+from .vibeworker import VibeworkerProvider
 
-_PROVIDERS = {"mock": MockProvider, "upwork": UpworkProvider}
+_PROVIDERS = {
+    "mock": MockProvider,
+    "upwork": UpworkProvider,
+    "vibeworker": VibeworkerProvider,
+    "gmail": GmailProvider,
+}
 
 
 def get_provider(name: str | None = None) -> JobProvider:

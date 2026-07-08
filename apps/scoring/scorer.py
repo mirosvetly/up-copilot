@@ -11,7 +11,7 @@ from apps.jobs.models import JobPosting
 from .embeddings import cosine, get_embedding_provider
 from .llm_scorer import llm_compute
 from .models import JobScore
-from .profile import load_profile
+from .profile import resolve_track, track_config
 
 # ponytail: transparent rule-based scorer + optional LLM scorer. Both keep the
 # {score, breakdown, reasoning} contract so the UI/model never change.
@@ -37,9 +37,12 @@ def _profile_text(profile: dict) -> str:
 
 
 def _profile_embedding(provider, profile: dict) -> list[float]:
-    key = (type(provider).__name__, tuple(profile.get("skills", [])))
+    # Key by the exact embedded text, so editing a track's skills OR projects
+    # (same track_id) yields a fresh vector instead of a stale cached one.
+    text = _profile_text(profile)
+    key = (type(provider).__name__, text)
     if key not in _PROFILE_EMB_CACHE:
-        _PROFILE_EMB_CACHE[key] = provider.embed_one(_profile_text(profile))
+        _PROFILE_EMB_CACHE[key] = provider.embed_one(text)
     return _PROFILE_EMB_CACHE[key]
 
 
@@ -79,11 +82,13 @@ def _compute(job: JobPosting, profile: dict, similarity: float = 0.0) -> dict:
 
     # --- client track record ---
     if client:
-        hr = client.hire_rate or 0
-        if hr >= 70:
+        # None = unknown (email alerts carry no hire rate) — no penalty,
+        # only a real low number is a signal.
+        hr = client.hire_rate
+        if hr is not None and hr >= 70:
             score += 12
             _add(reasons, f"Hire rate {hr}%", 12)
-        elif hr < 40:
+        elif hr is not None and hr < 40:
             score -= 6
             _add(reasons, f"Низкий hire rate {hr}%", 6, neg=True)
         if client.total_spent is not None and client.total_spent == 0:
@@ -134,13 +139,15 @@ def _compute(job: JobPosting, profile: dict, similarity: float = 0.0) -> dict:
     return {"score": score, "breakdown": reasons, "reasoning": reasoning}
 
 
-def score_job(job: JobPosting, *, profile: dict | None = None) -> JobScore:
+def score_job(job: JobPosting, *, profile: dict | None = None, track=None) -> JobScore:
     """Score a job, persist JobScore (+embedding/similarity), advance new -> scored.
 
-    JOB_SCORER=rule (default) uses the transparent heuristic; JOB_SCORER=llm with
-    a configured Claude key uses the LLM scorer. Both fold in embedding similarity.
+    Uses the persona of the job's track (its saved search's track, else default).
+    Pass `profile` to override the resolved config (tests). JOB_SCORER=rule
+    (default) uses the transparent heuristic; JOB_SCORER=llm uses the LLM scorer.
     """
-    profile = profile or load_profile()
+    if profile is None:
+        profile = track_config(track or resolve_track(job))
     provider = get_embedding_provider()
     job_vec = provider.embed_one(_job_text(job))
     similarity = cosine(_profile_embedding(provider, profile), job_vec)

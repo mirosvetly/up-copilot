@@ -29,6 +29,13 @@ class ScorerTests(TestCase):
         job.refresh_from_db()
         self.assertEqual(job.status, JobPosting.Status.SCORED)
 
+    def test_unknown_hire_rate_is_not_penalized(self):
+        # gmail alerts carry no hire rate: None must be neutral, not "0%"
+        c = ClientProfile.objects.create(upwork_client_id="c-none", verified_payment=True)
+        job = self._job(job_id="s-none", skills=["Django"], budget_min=50, client=c)
+        s = score_job(job, profile=PROFILE)
+        self.assertFalse([r for r in s.breakdown if "hire rate" in r["text"].lower()])
+
     def test_bad_match_scores_low(self):
         c = ClientProfile.objects.create(
             upwork_client_id="c2", verified_payment=False, hire_rate=20, total_spent=0

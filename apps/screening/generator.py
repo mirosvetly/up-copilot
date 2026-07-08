@@ -7,13 +7,13 @@ from __future__ import annotations
 import re
 
 from apps.core.llm import get_llm
+from apps.scoring.profile import resolve_track, track_config
 
 from .models import KnowledgeBase, ScreeningAnswer, ScreeningQuestion
 
-_SYSTEM = (
-    "You answer Upwork screening questions as the freelancer Denis, in the first "
-    "person, 1-3 sentences, concrete and honest. Use only the provided facts."
-)
+
+def _system(job) -> str:
+    return track_config(resolve_track(job))["screening_instructions"]
 
 
 def _tokens(text: str) -> set[str]:
@@ -38,7 +38,9 @@ def generate_answer(question: ScreeningQuestion) -> ScreeningAnswer:
     llm = get_llm()
     if llm:
         ctx = "\n".join(f"- {f.content}" for f in facts) or "(no facts on file)"
-        body = llm.complete(_SYSTEM, f"Facts:\n{ctx}\n\nQuestion: {question.text}", max_tokens=200)
+        body = llm.complete(
+            _system(question.job), f"Facts:\n{ctx}\n\nQuestion: {question.text}", max_tokens=200
+        )
         model_name = "anthropic"
     else:
         body = facts[0].content if facts else "Yes — happy to walk through this on a quick call."

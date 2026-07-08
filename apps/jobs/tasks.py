@@ -40,7 +40,7 @@ def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
         # Dedup on job_id. Existing rows keep their status and posted_at (don't
         # reset a job's position in the machine just because we saw it again);
         # only refresh volatile fields.
-        _, is_new = JobPosting.objects.get_or_create(
+        obj, is_new = JobPosting.objects.get_or_create(
             job_id=rj.job_id,
             defaults={
                 "title": rj.title,
@@ -58,9 +58,12 @@ def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
             },
         )
         if not is_new:
-            JobPosting.objects.filter(job_id=rj.job_id).update(
-                proposals_bucket=rj.proposals_bucket, raw=rj.raw, client=client
-            )
+            updates = {"proposals_bucket": rj.proposals_bucket}
+            # Refresh raw/client only from the same source: a sparse gmail
+            # alert must not clobber the richer row vibeworker collected.
+            if (obj.raw or {}).get("source") == rj.raw.get("source"):
+                updates.update(raw=rj.raw, client=client)
+            JobPosting.objects.filter(job_id=rj.job_id).update(**updates)
         created += int(is_new)
     saved_filter.last_polled_at = timezone.now()
     saved_filter.save(update_fields=["last_polled_at", "updated_at"])
@@ -83,6 +86,14 @@ def collect_jobs() -> dict:
             r = collect_for_filter(f)
         except NotImplementedError as exc:
             log.warning("Provider not ready for filter %s: %s", f.name, exc)
+            continue
+        except Exception:
+            # One broken filter (API down, quota hit) must not kill the loop —
+            # and must retry on its own cadence, not on every 60s beat tick,
+            # so mark it polled even though the attempt failed.
+            log.exception("Collect failed for filter %s", f.name)
+            f.last_polled_at = now
+            f.save(update_fields=["last_polled_at", "updated_at"])
             continue
         totals["filters"] += 1
         totals["created"] += r["created"]

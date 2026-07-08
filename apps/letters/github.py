@@ -7,10 +7,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from zlib import crc32
 
 from django.conf import settings
-
-from apps.scoring.profile import load_profile
 
 # Palette matching the design's source-highlight legend.
 _COLORS = ["#b6d086", "#60a5fa", "#c084fc", "#f59e0b", "#4ade80"]
@@ -45,18 +44,26 @@ class GitHubProvider(ABC):
 
 
 class MockGitHub(GitHubProvider):
+    """Portfolio repos from a track's `projects` list (no network)."""
+
+    def __init__(self, projects: list[dict] | None = None):
+        self._projects = projects or []
+
     def repos(self) -> list[Repo]:
-        projects = load_profile().get("projects", [])
-        return [
-            Repo(
+        out = []
+        for p in self._projects:
+            skills = p.get("skills") or []
+            # Colour keyed by repo name, not list position, so the cover-letter
+            # highlight stays stable when projects are reordered.
+            color = _COLORS[crc32(p["repo"].encode()) % len(_COLORS)]
+            out.append(Repo(
                 name=p["repo"],
-                skills=p.get("skills", []),
-                color=_COLORS[i % len(_COLORS)],
-                description=f"{', '.join(p.get('skills', [])[:3])} project",
-                languages=p.get("skills", [])[:3],
-            )
-            for i, p in enumerate(projects)
-        ]
+                skills=skills,
+                color=color,
+                description=f"{', '.join(skills[:3])} project",
+                languages=skills[:3],
+            ))
+        return out
 
 
 class GitHubClient(GitHubProvider):
@@ -84,12 +91,12 @@ class GitHubClient(GitHubProvider):
         return out
 
 
-def get_github() -> GitHubProvider:
+def get_github(projects: list[dict] | None = None) -> GitHubProvider:
     if settings.GITHUB_PROVIDER == "github" and settings.GITHUB_TOKEN:
         return GitHubClient()
-    return MockGitHub()
+    return MockGitHub(projects=projects)
 
 
-def color_map() -> dict[str, str]:
+def color_map(projects: list[dict] | None = None) -> dict[str, str]:
     """repo name -> highlight colour, for rendering cover-letter sources."""
-    return {r.name: r.color for r in get_github().repos()}
+    return {r.name: r.color for r in get_github(projects=projects).repos()}

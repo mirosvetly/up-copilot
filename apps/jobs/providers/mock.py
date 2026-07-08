@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from apps.jobs.models import SavedFilter
 
-from .base import JobProvider, RawClient, RawJob
+from .base import JobProvider, RawClient, RawJob, matches_filter
 
 FIXTURE = Path(__file__).resolve().parent.parent / "fixtures" / "mock_jobs.json"
 
@@ -32,7 +32,7 @@ class MockProvider(JobProvider):
         rows = json.loads(self._fixture.read_text())
         now = timezone.now()
         jobs = [self._to_raw(r, now) for r in rows]
-        return [j for j in jobs if self._matches(j, saved_filter)]
+        return [j for j in jobs if matches_filter(j, saved_filter)]
 
     def _to_raw(self, r: dict, now) -> RawJob:
         c = r["client"]
@@ -61,14 +61,3 @@ class MockProvider(JobProvider):
             client=client,
             raw=r,
         )
-
-    def _matches(self, job: RawJob, f: SavedFilter) -> bool:
-        if f.require_verified_payment and not job.client.verified_payment:
-            return False
-        if f.min_budget is not None and (job.budget_min or Decimal(0)) < f.min_budget:
-            return False
-        if f.keywords:
-            haystack = (job.title + " " + " ".join(job.skills)).lower()
-            if not any(k.lower() in haystack for k in f.keywords):
-                return False
-        return True

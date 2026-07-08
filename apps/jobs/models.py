@@ -14,6 +14,10 @@ class SavedFilter(TimeStampedModel):
     is_active = models.BooleanField(default=True)
     poll_interval_min = models.PositiveSmallIntegerField(default=15)
     last_polled_at = models.DateTimeField(null=True, blank=True)
+    # The persona jobs from this search are scored & drafted under. Null -> default.
+    track = models.ForeignKey(
+        "tracks.Track", null=True, blank=True, on_delete=models.SET_NULL, related_name="filters"
+    )
 
     def __str__(self):
         return self.name

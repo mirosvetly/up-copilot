@@ -39,16 +39,16 @@
       {% include "jobs/_nav_item.html" with label="Аналитика" ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
       {% include "jobs/_nav_item.html" with label="Отправленные" ico="inbox" disabled=True %}
       {% include "jobs/_nav_item.html" with label="GitHub-источники" ico="github" disabled=True %}
-      {% include "jobs/_nav_item.html" with label="Настройки" ico="sliders" disabled=True %}
+      {% include "jobs/_nav_item.html" with label="Настройки" ico="sliders" href_name="tracks:list" active=is_settings %}
       {% endblock %}
     </nav>
 
     <div style="border-top:1px solid #404040;padding:12px 12px 14px">
       <div style="display:flex;align-items:center;gap:10px;padding:6px 8px">
-        <span style="width:30px;height:30px;border-radius:20px;background:#262626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:none;color:#d4d4d4">DM</span>
+        <span style="width:30px;height:30px;border-radius:20px;background:#262626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:none;color:#d4d4d4">{{ freelancer.initials }}</span>
         <span style="flex:1;min-width:0">
-          <span style="display:block;font-size:13px;font-weight:500">Denis M.</span>
-          <span style="display:block;font-size:11px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">Python · MT5 · WebRTC</span>
+          <span style="display:block;font-size:13px;font-weight:500">{{ freelancer.display_name }}</span>
+          <span style="display:block;font-size:11px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ freelancer.headline }}</span>
         </span>
         <span style="width:7px;height:7px;border-radius:20px;background:#4ade80;flex:none" title="Скрапер активен"></span>
       </div>

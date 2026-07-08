@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from apps.scoring.profile import resolve_track, track_config
+
 from .github import color_map
 
 
 def cover_context(draft, *, edit=False) -> dict:
     """Display fields for the cover-letter card: highlighted segments + legend."""
-    cmap = color_map()
+    cmap = color_map(track_config(resolve_track(draft.job))["projects"])
     segments = []
     for s in draft.segments:
         src = s.get("src")

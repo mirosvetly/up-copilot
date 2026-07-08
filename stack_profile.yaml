@@ -1,5 +1,24 @@
 # Your stack profile — edit by hand. Drives rule-based scoring (Phase 2a) and,
 # later, the embedding of "your profile" that job descriptions are compared to.
+freelancer:
+  name: Max
+  display_name: Max
+  initials: MX
+  headline: "Python · Automation · AI"
+  signoff: "Best,\nMax"
+  cover_letter_instructions: >
+    Write concise, specific Upwork cover letters in the freelancer's voice.
+    No fluff, 120-160 words, reference relevant projects, and end with the configured signoff.
+  screening_instructions: >
+    Answer Upwork screening questions in the first person, 1-3 sentences,
+    concrete and honest. Use only the provided facts.
+  scorer_role: "freelance developer"
+
+job_analysis_prompt: >
+  Score fit for me as a freelancer. Prefer jobs that match my skills and projects,
+  have serious clients, clear scope, verified payment, realistic budgets, and low red flags.
+  Penalize vague urgent posts, low-budget work, weak stack match, and clients with poor hiring signals.
+
 min_hourly_rate: 40          # USD/hr floor; jobs below get a red flag
 
 # Skills you want to match on. Case-insensitive, matched against job skills+title.

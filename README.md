@@ -31,7 +31,7 @@ so the whole app runs and is verifiable on sqlite with zero credentials:
 
 | Switch | `mock` (default) | real |
 |--------|------------------|------|
-| `JOB_PROVIDER` | fixture jobs | `upwork` (blocked on OAuth approval — stub) |
+| `JOB_PROVIDER` | fixture jobs | `gmail` (Upwork alert emails over IMAP) · `vibeworker` (REST, needs `VIBEWORKER_API_KEY`) · `upwork` (blocked on OAuth approval — stub) |
 | `LLM_PROVIDER` | deterministic templates | `anthropic` (Claude) |
 | `EMBEDDING_PROVIDER` | hashed bag-of-words | `voyage` (voyage-3) |
 | `GITHUB_PROVIDER` | repos from `stack_profile.yaml` | `github` API |
@@ -65,7 +65,9 @@ until `TELEGRAM_BOT_TOKEN` is set.
 
 ## Going live later
 
-- **Upwork**: implement `apps/jobs/providers/upwork.py` when OAuth is approved, set `JOB_PROVIDER=upwork`.
+- **Gmail** (alert-письма Upwork, свежие и бесплатные): включи job alerts по сохранённым поискам на Upwork, создай app password (myaccount.google.com/apppasswords) → `GMAIL_IMAP_USER` + `GMAIL_IMAP_PASSWORD` в `.env`, `JOB_PROVIDER=gmail`. Письма дают усечённые заголовок/описание и не дают hire rate клиента.
+- **Vibeworker** (Upwork через посредника, уже работает): ключ с tryvibeworker.com/settings → `VIBEWORKER_API_KEY` в `.env`, `JOB_PROVIDER=vibeworker`. Free-план: 100 вакансий/день (списывается за каждый *возвращённый* результат, дубли тоже), сброс в полночь UTC — при лимите 20/запрос это ~5 опросов в день, ставь `poll_interval_min≈300` у фильтра или бери платный план.
+- **Upwork напрямую**: implement `apps/jobs/providers/upwork.py` when OAuth is approved, set `JOB_PROVIDER=upwork`.
 - **LLM/embeddings/GitHub/Telegram**: set the corresponding `*_PROVIDER` + key in `.env`.
 - Edit `stack_profile.yaml` (skills, min rate, projects) and the `KnowledgeBase` (admin) to tune scoring and screening answers.
 

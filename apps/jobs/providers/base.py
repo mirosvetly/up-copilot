@@ -45,3 +45,16 @@ class JobProvider(ABC):
     def fetch_jobs(self, saved_filter: SavedFilter) -> list[RawJob]:
         """Return raw jobs matching a saved filter. No persistence here."""
         raise NotImplementedError
+
+
+def matches_filter(job: RawJob, f: SavedFilter) -> bool:
+    """Loose client-side SavedFilter check for providers that can't filter server-side."""
+    if f.require_verified_payment and not job.client.verified_payment:
+        return False
+    if f.min_budget is not None and (job.budget_min or Decimal(0)) < f.min_budget:
+        return False
+    if f.keywords:
+        haystack = (job.title + " " + " ".join(job.skills)).lower()
+        if not any(k.lower() in haystack for k in f.keywords):
+            return False
+    return True

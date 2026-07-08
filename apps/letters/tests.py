@@ -7,13 +7,19 @@ from .github import MockGitHub
 from .models import CoverLetterDraft
 
 
+PROJECTS = [
+    {"repo": "django-trade-api", "skills": ["Django", "DRF", "Celery"]},
+    {"repo": "webrtc-signal", "skills": ["WebRTC", "Node.js"]},
+]
+
+
 class GitHubTests(TestCase):
     def test_relevant_by_overlap(self):
-        repos = MockGitHub().relevant(["Django", "Celery"])
+        repos = MockGitHub(projects=PROJECTS).relevant(["Django", "Celery"])
         self.assertEqual(repos[0].name, "django-trade-api")
 
     def test_relevant_falls_back_when_no_overlap(self):
-        repos = MockGitHub().relevant(["COBOL"])
+        repos = MockGitHub(projects=PROJECTS).relevant(["COBOL"])
         self.assertEqual(len(repos), 1)  # never empty
 
 
@@ -28,7 +34,7 @@ class GeneratorTests(TestCase):
         job = self._job()
         draft = generate_cover(job)
         self.assertTrue(draft.is_active)
-        self.assertIn("Best,\nDenis", draft.body)
+        self.assertIn("Best,\nMax", draft.body)
         self.assertTrue(any(s.get("src") for s in draft.segments))  # GitHub-sourced span
         job.refresh_from_db()
         self.assertEqual(job.status, JobPosting.Status.DRAFTED)
