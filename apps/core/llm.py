@@ -13,11 +13,11 @@ from django.conf import settings
 
 
 class AnthropicLLM:
-    def __init__(self):
+    def __init__(self, model: str | None = None):
         import anthropic  # lazy: only needed on the real path
 
         self._client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-        self._model = settings.ANTHROPIC_MODEL
+        self._model = model or settings.ANTHROPIC_MODEL
 
     def complete(self, system: str, user: str, max_tokens: int = 1024) -> str:
         msg = self._client.messages.create(
@@ -32,9 +32,11 @@ class AnthropicLLM:
         return _extract_json(self.complete(system, user, max_tokens))
 
 
-def get_llm():
+def get_llm(model: str | None = None):
+    """Real client on the anthropic path, else None. `model` overrides the
+    default (letters/screening use the default; scoring passes a cheaper one)."""
     if settings.LLM_PROVIDER == "anthropic" and settings.ANTHROPIC_API_KEY:
-        return AnthropicLLM()
+        return AnthropicLLM(model)
     return None
 
 

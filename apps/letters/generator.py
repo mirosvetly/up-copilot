@@ -2,6 +2,8 @@
 from relevant GitHub repos; real path prompts Claude. Same CoverLetterDraft output."""
 from __future__ import annotations
 
+import re
+
 from django.db import IntegrityError, transaction
 from django.db.models import Max
 
@@ -14,7 +16,7 @@ from .models import CoverLetterDraft
 
 
 def _system(cfg: dict) -> str:
-    return f"{cfg['cover_letter_instructions']} End with exactly:\n{cfg['signoff']}"
+    return f"{cfg['cover_letter_instructions']} Sign off with:\n{cfg['signoff']}"
 
 
 def _prompt(job: JobPosting, repos: list[Repo], reasoning: str) -> str:
@@ -65,6 +67,14 @@ def _mock_segments(job: JobPosting, repos: list[Repo], version: int, cfg: dict) 
     return segs
 
 
+def _dedash(text: str) -> str:
+    """Strip em/en dashes — Claude adds them despite the prompt, and they read
+    as AI-written. Replace with a comma; collapse any doubled commas/spaces."""
+    text = re.sub(r"\s*[—–]\s*", ", ", text)
+    text = re.sub(r",\s*,", ",", text)
+    return re.sub(r"[ \t]{2,}", " ", text)
+
+
 def _next_version(job) -> int:
     # max+1, not count(): survives deleted drafts (gaps) without colliding.
     m = job.cover_drafts.aggregate(mx=Max("version"))["mx"]
@@ -80,11 +90,11 @@ def generate_cover(job: JobPosting) -> CoverLetterDraft:
         # LLM call stays OUTSIDE the transaction — never hold a DB tx across a
         # multi-second API request. _mock_segments only needs a version for its
         # cosmetic A/B variety, so a provisional count() there is fine.
-        body = llm.complete(_system(cfg), _prompt(job, repos, reasoning), max_tokens=512)
+        body = _dedash(llm.complete(_system(cfg), _prompt(job, repos, reasoning), max_tokens=512))
         segments = [{"t": body, "src": None}]
         model_name = "anthropic"
     else:
-        segments = _mock_segments(job, repos, job.cover_drafts.count(), cfg)
+        segments = [{**s, "t": _dedash(s["t"])} for s in _mock_segments(job, repos, job.cover_drafts.count(), cfg)]
         body = "".join(s["t"] for s in segments)
         model_name = "mock-template-v1"
 

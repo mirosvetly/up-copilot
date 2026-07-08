@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 from decimal import Decimal
 
 from django.conf import settings
 from django.utils import timezone
+
+log = logging.getLogger(__name__)
 
 from apps.core.llm import get_llm
 from apps.jobs.models import JobPosting
@@ -152,10 +155,18 @@ def score_job(job: JobPosting, *, profile: dict | None = None, track=None) -> Jo
     job_vec = provider.embed_one(_job_text(job))
     similarity = cosine(_profile_embedding(provider, profile), job_vec)
 
-    llm = get_llm() if settings.JOB_SCORER == "llm" else None
+    # Bulk scoring runs on the cheaper/faster model; letters keep the default.
+    llm = get_llm(settings.ANTHROPIC_SCORER_MODEL) if settings.JOB_SCORER == "llm" else None
     if llm:
-        result = llm_compute(job, profile, similarity, llm)
-        model_name = "anthropic"
+        try:
+            result = llm_compute(job, profile, similarity, llm)
+            model_name = "anthropic"
+        except Exception:
+            # Malformed JSON, API/rate-limit errors: degrade to the deterministic
+            # rule scorer so one bad response can't stall the job in `new` forever.
+            log.exception("LLM scoring failed for job %s; using rule scorer", job.pk)
+            result = _compute(job, profile, similarity)
+            model_name = "rule-fallback"
     else:
         result = _compute(job, profile, similarity)
         model_name = "rule-based-v1"

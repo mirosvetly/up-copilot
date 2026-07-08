@@ -24,7 +24,7 @@ def feed(request):
     from apps.scoring.profile import track_config
 
     q = request.GET.get("q", "").strip()
-    sort = request.GET.get("sort", "fresh")
+    sort = request.GET.get("sort", "score")  # default: best-scored first
     track = request.GET.get("track", "all")
 
     qs = (

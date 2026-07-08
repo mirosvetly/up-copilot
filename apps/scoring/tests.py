@@ -1,4 +1,6 @@
-from django.test import TestCase
+from unittest.mock import patch
+
+from django.test import TestCase, override_settings
 
 from apps.jobs.models import ClientProfile, JobPosting
 from apps.jobs.providers.mock import MockProvider
@@ -18,6 +20,28 @@ class ScorerTests(TestCase):
         defaults = dict(job_id="s1", title="t", budget_type="hourly", skills=[])
         defaults.update(kw)
         return JobPosting.objects.create(**defaults)
+
+    @override_settings(JOB_SCORER="llm", ANTHROPIC_SCORER_MODEL="claude-haiku-4-5-20251001")
+    def test_llm_scoring_uses_the_cheaper_scorer_model(self):
+        with patch("apps.scoring.scorer.get_llm") as gl, \
+             patch("apps.scoring.scorer.llm_compute") as lc:
+            gl.return_value = object()  # truthy -> take the LLM path
+            lc.return_value = {"score": 60, "breakdown": [], "reasoning": "ok"}
+            score_job(self._job(skills=["Django"]))
+        gl.assert_called_once_with("claude-haiku-4-5-20251001")
+
+    @override_settings(JOB_SCORER="llm")
+    def test_llm_json_error_falls_back_to_rule_scorer(self):
+        # A malformed-JSON response (seen ~1.6% of the time) must not crash or
+        # stall the job — degrade to the rule scorer instead.
+        with patch("apps.scoring.scorer.get_llm") as gl, \
+             patch("apps.scoring.scorer.llm_compute", side_effect=ValueError("bad json")):
+            gl.return_value = object()
+            job = self._job(skills=["Django"], budget_min=50)
+            s = score_job(job)
+        self.assertEqual(s.model_name, "rule-fallback")
+        job.refresh_from_db()
+        self.assertEqual(job.status, JobPosting.Status.SCORED)  # still advanced, not stuck
 
     def test_strong_match_scores_high_and_transitions(self):
         c = ClientProfile.objects.create(

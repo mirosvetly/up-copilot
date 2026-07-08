@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import logging
+
 from celery import shared_task
 
 from apps.jobs.models import JobPosting
 
 from .scorer import score_job
+
+log = logging.getLogger(__name__)
 
 
 @shared_task
@@ -15,6 +19,10 @@ def score_pending_jobs() -> dict:
         "client", "matched_filter__track"
     )
     for job in qs:
-        score_job(job)  # resolves the job's track internally
-        scored += 1
+        try:
+            score_job(job)  # resolves the job's track internally
+            scored += 1
+        except Exception:
+            # One unscoreable job must not abort the whole batch (or the beat loop).
+            log.exception("Scoring failed for job %s", job.pk)
     return {"scored": scored}

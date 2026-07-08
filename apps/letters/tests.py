@@ -47,6 +47,16 @@ class GeneratorTests(TestCase):
         self.assertEqual(CoverLetterDraft.objects.filter(job=job, is_active=True).count(), 1)
         self.assertEqual(CoverLetterDraft.objects.filter(job=job).count(), 2)
 
+    def test_generated_letter_has_no_em_dashes(self):
+        from .generator import _dedash
+
+        self.assertEqual(_dedash("Week 1 — schema, auth — RLS"), "Week 1, schema, auth, RLS")
+        job = self._job()
+        draft = generate_cover(job)
+        self.assertNotIn("—", draft.body)
+        self.assertNotIn("–", draft.body)
+        self.assertNotIn("—", "".join(s["t"] for s in draft.segments))
+
     def test_version_survives_a_gap_left_by_a_deleted_draft(self):
         # count()-based versioning collided when a draft was deleted; max+1 must not.
         job = self._job()

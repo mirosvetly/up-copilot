@@ -21,7 +21,8 @@ env = environ.Env(
     GMAIL_IMAP_USER=(str, ""),  # JOB_PROVIDER=gmail: mailbox receiving Upwork job alerts
     GMAIL_IMAP_PASSWORD=(str, ""),  # Google app password (myaccount.google.com/apppasswords)
     ANTHROPIC_API_KEY=(str, ""),
-    ANTHROPIC_MODEL=(str, "claude-sonnet-5"),
+    ANTHROPIC_MODEL=(str, "claude-sonnet-5"),  # cover letters / screening (quality)
+    ANTHROPIC_SCORER_MODEL=(str, "claude-haiku-4-5-20251001"),  # bulk scoring (cheap/fast)
     VOYAGE_API_KEY=(str, ""),
     GITHUB_TOKEN=(str, ""),
     GITHUB_USER=(str, ""),
@@ -124,6 +125,7 @@ GMAIL_IMAP_PASSWORD = env("GMAIL_IMAP_PASSWORD")
 DRAFT_MIN_SCORE = env("DRAFT_MIN_SCORE")
 ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY")
 ANTHROPIC_MODEL = env("ANTHROPIC_MODEL")
+ANTHROPIC_SCORER_MODEL = env("ANTHROPIC_SCORER_MODEL")
 VOYAGE_API_KEY = env("VOYAGE_API_KEY")
 GITHUB_TOKEN = env("GITHUB_TOKEN")
 GITHUB_USER = env("GITHUB_USER")
