@@ -28,6 +28,7 @@ def cover_context(draft, *, edit=False) -> dict:
         "id": draft.id,
         "version": draft.version,
         "body": draft.body,
+        "body_ru": draft.body_ru,
         "segments": segments,
         "legend": legend,
         "edit": edit,

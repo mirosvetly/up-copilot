@@ -115,6 +115,14 @@ def generate_cover(job: JobPosting) -> CoverLetterDraft:
     else:
         raise IntegrityError("Could not allocate a cover-letter version after retries")
 
+    # RU translation for the human's review (the English `body` is what's sent).
+    from apps.core.translate import translate_ru
+
+    ru = translate_ru(draft.body)
+    if ru:
+        draft.body_ru = ru
+        draft.save(update_fields=["body_ru", "updated_at"])
+
     if job.status == JobPosting.Status.SCORED:
         job.transition_to(JobPosting.Status.DRAFTED)
     return draft

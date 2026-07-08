@@ -10,7 +10,8 @@ class CoverLetterDraft(TimeStampedModel):
 
     job = models.ForeignKey(JobPosting, on_delete=models.CASCADE, related_name="cover_drafts")
     version = models.PositiveSmallIntegerField(default=0)
-    body = models.TextField(blank=True)
+    body = models.TextField(blank=True)  # English — this is what gets sent
+    body_ru = models.TextField(blank=True)  # RU translation for the human's review only
     # [{"t": "...", "src": "repo-name"|null}] — src marks GitHub-sourced spans.
     segments = models.JSONField(default=list, blank=True)
     sources = models.JSONField(default=list, blank=True)  # repo names used

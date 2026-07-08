@@ -14,6 +14,7 @@ _ACTIONS = {
     "skip": JobPosting.Status.SKIPPED,
     "undo": JobPosting.Status.SCORED,
     "mark_sent": JobPosting.Status.APPLIED,
+    "unsend": JobPosting.Status.DRAFTED,  # revert an accidental "sent"
 }
 
 
@@ -105,6 +106,7 @@ def detail(request, pk):
     job = get_object_or_404(
         JobPosting.objects.select_related("client", "score", "matched_filter__track"), pk=pk
     )
+    job.ensure_ru()  # translate once on first open (cached), RU reading aid
     dj = job_detail(job)
     draft = CoverLetterDraft.objects.filter(job=job, is_active=True).first()
     cover = cover_context(draft, edit=request.GET.get("edit") == "1") if draft else None

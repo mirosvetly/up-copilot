@@ -79,18 +79,22 @@ class JobPosting(TimeStampedModel):
         # scored -> reviewed is a shortcut: approving before the letters/draft
         # phase exists. Once drafting is built, the normal path is scored ->
         # drafted -> reviewed; both stay valid.
+        # drafted -> applied is the one-click "copy & open on Upwork" send;
+        # applied -> drafted is its undo (applied is otherwise the final state).
         Status.NEW: {Status.SCORED, Status.SKIPPED, Status.EXPIRED},
-        Status.SCORED: {Status.DRAFTED, Status.REVIEWED, Status.SKIPPED, Status.EXPIRED},
-        Status.DRAFTED: {Status.REVIEWED, Status.SKIPPED, Status.EXPIRED},
+        Status.SCORED: {Status.DRAFTED, Status.REVIEWED, Status.APPLIED, Status.SKIPPED, Status.EXPIRED},
+        Status.DRAFTED: {Status.REVIEWED, Status.APPLIED, Status.SKIPPED, Status.EXPIRED},
         Status.REVIEWED: {Status.APPLIED, Status.SCORED, Status.SKIPPED, Status.EXPIRED},
-        Status.APPLIED: set(),
+        Status.APPLIED: {Status.DRAFTED},
         Status.SKIPPED: {Status.NEW, Status.SCORED},
         Status.EXPIRED: set(),
     }
 
     job_id = models.CharField(max_length=96, unique=True)  # dedup key
     title = models.CharField(max_length=300)
+    title_ru = models.TextField(blank=True)  # cached RU translation (reading aid)
     description = models.TextField(blank=True)
+    description_ru = models.TextField(blank=True)  # cached RU translation
     skills = models.JSONField(default=list, blank=True)
     budget_type = models.CharField(max_length=8, choices=BudgetType.choices)
     budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -120,6 +124,19 @@ class JobPosting(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+    def ensure_ru(self):
+        """Translate title/description to RU once and cache. No-op if already
+        done or translation is off/unavailable (then the UI shows English)."""
+        if self.description_ru or not self.description:
+            return
+        from apps.core.translate import translate_ru
+
+        ru = translate_ru(self.description)
+        if ru:  # only cache a real result, so a transient failure retries later
+            self.title_ru = translate_ru(self.title)
+            self.description_ru = ru
+            self.save(update_fields=["title_ru", "description_ru", "updated_at"])
 
     def transition_to(self, new_status, *, save=True):
         """Move to new_status if the transition is allowed, else raise ValueError."""

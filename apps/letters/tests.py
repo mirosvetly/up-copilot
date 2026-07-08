@@ -23,6 +23,39 @@ class GitHubTests(TestCase):
         self.assertEqual(len(repos), 1)  # never empty
 
 
+class CopyOpenButtonTests(TestCase):
+    def _drafted_job(self):
+        job = JobPosting.objects.create(
+            job_id="cb1", title="t", budget_type="fixed",
+            status=JobPosting.Status.SCORED,
+            raw={"url": "https://www.upwork.com/jobs/~01abc"},
+        )
+        generate_cover(job)  # scored -> drafted, active draft exists
+        return job
+
+    def test_detail_renders_copy_and_open_button(self):
+        job = self._drafted_job()
+        r = self.client.get(f"/job/{job.pk}/")
+        self.assertContains(r, "Скопировать письмо и открыть на Upwork")
+        self.assertContains(r, "https://www.upwork.com/jobs/~01abc")  # data-url
+        self.assertContains(r, "ucCopyOpen")
+        self.assertContains(r, f"/job/{job.pk}/mark_sent/")  # button posts mark_sent
+
+    def test_copy_button_marks_sent_then_undo_returns_to_drafted(self):
+        job = self._drafted_job()  # status drafted
+        self.client.post(f"/job/{job.pk}/mark_sent/", {"next": f"/job/{job.pk}/"})
+        job.refresh_from_db()
+        self.assertEqual(job.status, JobPosting.Status.APPLIED)
+        # detail now shows the sent badge + Вернуть, not the copy button
+        r = self.client.get(f"/job/{job.pk}/")
+        self.assertContains(r, "Отправлено на Upwork")
+        self.assertContains(r, "unsend")
+        # undo
+        self.client.post(f"/job/{job.pk}/unsend/", {"next": f"/job/{job.pk}/"})
+        job.refresh_from_db()
+        self.assertEqual(job.status, JobPosting.Status.DRAFTED)
+
+
 class GeneratorTests(TestCase):
     def _job(self, status=JobPosting.Status.SCORED):
         return JobPosting.objects.create(

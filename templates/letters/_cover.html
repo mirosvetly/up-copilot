@@ -24,6 +24,12 @@
       </form>
     {% else %}
       <div style="font-size:14px;line-height:1.7;color:#e5e5e5;white-space:pre-wrap;background:#0a0a0a;border:1px solid #262626;border-radius:10px;padding:16px">{% for seg in cover.segments %}<span style="background:{{ seg.bg }};border-bottom:{{ seg.border }};border-radius:{{ seg.radius }};padding:{{ seg.pad }};color:{{ seg.color }}" title="{{ seg.title }}">{{ seg.t }}</span>{% endfor %}</div>
+      {% if cover.body_ru %}
+      <div style="margin-top:12px">
+        <div style="font-size:11px;color:#737373;margin-bottom:6px;display:flex;align-items:center;gap:6px">{% icon "circle-check" 12 "#737373" %}Перевод для проверки · клиенту уходит английский оригинал</div>
+        <div style="font-size:13px;line-height:1.65;color:#a3a3a3;white-space:pre-wrap;background:#0d0d0d;border:1px dashed #303030;border-radius:10px;padding:14px">{{ cover.body_ru }}</div>
+      </div>
+      {% endif %}
     {% endif %}
 
     {% if cover.legend %}
@@ -34,6 +40,34 @@
       {% endfor %}
     </div>
     {% endif %}
+
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid #262626">
+      {% if job.is_sent %}
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.3);color:#b6d086;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#b6d086" %}Отправлено на Upwork</span>
+        <form method="post" action="{% url 'jobs:job_action' pk 'unsend' %}"><input type="hidden" name="next" value="/job/{{ pk }}/">{% csrf_token %}
+          <button type="submit" style="height:38px;padding:0 14px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:12.5px;cursor:pointer">Вернуть</button>
+        </form>
+      </div>
+      {% else %}
+      <form method="post" action="{% url 'jobs:job_action' pk 'mark_sent' %}" onsubmit="return ucCopyOpen(this)"
+        data-url="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}"
+        data-target="uc-body-{{ cover.id }}">
+        <input type="hidden" name="next" value="/job/{{ pk }}/">{% csrf_token %}
+        <button type="submit" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13.5px;font-weight:600;cursor:pointer">{% icon "arrow-up-right" 16 "#171717" %}Скопировать письмо и открыть на Upwork</button>
+      </form>
+      <div style="font-size:11px;color:#737373;margin-top:7px">Копирует английский оригинал, открывает вакансию и помечает карточку «Отправлено».</div>
+      {% endif %}
+    </div>
+    <textarea id="uc-body-{{ cover.id }}" aria-hidden="true" tabindex="-1" style="position:absolute;left:-9999px;top:-9999px;opacity:0">{{ cover.body }}</textarea>
+    <script>
+    function ucCopyOpen(form){
+      var ta=document.getElementById(form.dataset.target);
+      if(ta&&navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).catch(function(){});}
+      if(form.dataset.url){window.open(form.dataset.url,'_blank','noopener');}
+      return true;  // let the form POST mark_sent, page reloads showing "Отправлено"
+    }
+    </script>
   {% else %}
     <div style="font-size:12px;color:#737373;line-height:1.5">Черновик ещё не сгенерирован — нажми «Сгенерировать».</div>
   {% endif %}

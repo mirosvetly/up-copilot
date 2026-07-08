@@ -16,6 +16,7 @@ env = environ.Env(
     GITHUB_PROVIDER=(str, "mock"),  # mock | github
     EMBEDDING_PROVIDER=(str, "mock"),  # mock | voyage
     JOB_SCORER=(str, "rule"),  # rule | llm
+    TRANSLATE_PROVIDER=(str, "google"),  # google (free, no key) | mock (off)
     DRAFT_MIN_SCORE=(int, 50),  # only auto-draft cover letters at/above this score
     VIBEWORKER_API_KEY=(str, ""),  # tryvibeworker.com/settings -> Developer
     GMAIL_IMAP_USER=(str, ""),  # JOB_PROVIDER=gmail: mailbox receiving Upwork job alerts
@@ -119,6 +120,7 @@ LLM_PROVIDER = env("LLM_PROVIDER")
 GITHUB_PROVIDER = env("GITHUB_PROVIDER")
 EMBEDDING_PROVIDER = env("EMBEDDING_PROVIDER")
 JOB_SCORER = env("JOB_SCORER")
+TRANSLATE_PROVIDER = env("TRANSLATE_PROVIDER")
 VIBEWORKER_API_KEY = env("VIBEWORKER_API_KEY")
 GMAIL_IMAP_USER = env("GMAIL_IMAP_USER")
 GMAIL_IMAP_PASSWORD = env("GMAIL_IMAP_PASSWORD")
@@ -142,3 +144,4 @@ if "test" in sys.argv:
     GITHUB_PROVIDER = "mock"
     EMBEDDING_PROVIDER = "mock"
     JOB_SCORER = "rule"
+    TRANSLATE_PROVIDER = "mock"

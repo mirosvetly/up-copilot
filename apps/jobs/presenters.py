@@ -175,6 +175,8 @@ def job_detail(job):
     return {
         **card,
         "description": job.description,
+        "description_ru": job.description_ru,
+        "title_ru": job.title_ru,
         "reasons": reasons,
         "upwork_url": (job.raw or {}).get("url", ""),
         "model_name": score_obj.model_name if score_obj else "—",
