@@ -1,5 +1,5 @@
 {% load icons i18n %}
-<div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
+<div id="cover" style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px;scroll-margin-top:76px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
     <span style="font-size:14px;font-weight:600">{% trans "Черновик cover letter" %}</span>
     <div style="flex:1"></div>
@@ -9,9 +9,19 @@
         <a href="?edit=1" style="height:26px;display:inline-flex;align-items:center;padding:0 11px;border-radius:6px;font-size:12px;font-weight:500;background:{% if cover.edit %}#b6d086{% else %}transparent{% endif %};color:{% if cover.edit %}#171717{% else %}#a3a3a3{% endif %}">{% trans "Редактировать" %}</a>
       </div>
     {% endif %}
-    <form method="post" action="{% url 'letters:generate' pk %}">{% csrf_token %}
-      <button style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid #404040;border-radius:8px;background:#0a0a0a;color:#d4d4d4;font-size:12.5px;font-weight:500;cursor:pointer">{% icon "refresh" 14 %}{% if cover %}{% trans "Перегенерировать" %}{% else %}{% trans "Сгенерировать" %}{% endif %}</button>
+    <form method="post" action="{% url 'letters:generate' pk %}" onsubmit="return ucGen(this)">{% csrf_token %}
+      <button style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid #404040;border-radius:8px;background:#0a0a0a;color:#d4d4d4;font-size:12.5px;font-weight:500;cursor:pointer"><span class="uc-gi" style="display:inline-flex">{% icon "refresh" 14 %}</span><span class="uc-gl">{% if cover %}{% trans "Перегенерировать" %}{% else %}{% trans "Сгенерировать" %}{% endif %}</span></button>
     </form>
+    <script>
+    function ucGen(f){
+      var b=f.querySelector('button');
+      b.style.opacity='0.75'; b.style.cursor='wait';
+      var i=b.querySelector('.uc-gi'); if(i){i.style.animation='ucSpin .8s linear infinite';}
+      var l=b.querySelector('.uc-gl'); if(l){l.textContent='{% trans "Генерация…" %}';}
+      setTimeout(function(){b.disabled=true;},0);  // block double-click after submit fires
+      return true;
+    }
+    </script>
   </div>
 
   {% if cover %}
@@ -42,7 +52,7 @@
       {% if job.is_sent %}
       <div style="display:flex;align-items:center;gap:12px">
         <span style="display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.3);color:#b6d086;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#b6d086" %}{% trans "Отправлено на Upwork" %}</span>
-        <form method="post" action="{% url 'jobs:job_action' pk 'unsend' %}"><input type="hidden" name="next" value="/job/{{ pk }}/">{% csrf_token %}
+        <form method="post" action="{% url 'jobs:job_action' pk 'unsend' %}"><input type="hidden" name="next" value="/job/{{ pk }}/#cover">{% csrf_token %}
           <button type="submit" style="height:38px;padding:0 14px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:12.5px;cursor:pointer">{% trans "Вернуть" %}</button>
         </form>
       </div>
@@ -50,7 +60,7 @@
       <form method="post" action="{% url 'jobs:job_action' pk 'mark_sent' %}" onsubmit="return ucCopyOpen(this)"
         data-url="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}"
         data-target="uc-body-{{ cover.id }}">
-        <input type="hidden" name="next" value="/job/{{ pk }}/">{% csrf_token %}
+        <input type="hidden" name="next" value="/job/{{ pk }}/#cover">{% csrf_token %}
         <button type="submit" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13.5px;font-weight:600;cursor:pointer">{% icon "arrow-up-right" 16 "#171717" %}{% trans "Скопировать письмо и открыть на Upwork" %}</button>
       </form>
       <div style="font-size:11px;color:#737373;margin-top:7px">{% trans "Копирует английский оригинал, открывает вакансию и помечает карточку «Отправлено»." %}</div>

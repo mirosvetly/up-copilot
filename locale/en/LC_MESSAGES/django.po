@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-08 23:28+0300\n"
+"POT-Creation-Date: 2026-07-08 23:34+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -259,26 +259,26 @@ msgstr "The track “%(name)s” has been saved."
 msgid "Аналитика · Upwork Copilot"
 msgstr "Analytics · Upwork Copilot"
 
-#: templates/analytics/analytics.html:5 templates/base.html:38
+#: templates/analytics/analytics.html:5 templates/base.html:39
 #: templates/jobs/feed.html:11
 msgid "Лента вакансий"
 msgstr "Job feed"
 
 #: templates/analytics/analytics.html:7 templates/analytics/analytics.html:20
-#: templates/base.html:39
+#: templates/base.html:40
 msgid "Аналитика"
 msgstr "Analytics"
 
-#: templates/analytics/analytics.html:9 templates/base.html:40
+#: templates/analytics/analytics.html:9 templates/base.html:41
 #: templates/jobs/feed.html:11
 msgid "Отправленные"
 msgstr "Sent"
 
-#: templates/analytics/analytics.html:11 templates/base.html:41
+#: templates/analytics/analytics.html:11 templates/base.html:42
 msgid "GitHub-источники"
 msgstr "GitHub sources"
 
-#: templates/analytics/analytics.html:13 templates/base.html:42
+#: templates/analytics/analytics.html:13 templates/base.html:43
 #: templates/tracks/edit.html:3
 msgid "Настройки"
 msgstr "Settings"
@@ -315,7 +315,7 @@ msgstr "When are the best vacancies published?"
 msgid "кол-во вакансий score &gt; 75, по 3-часовым окнам"
 msgstr "number of vacancies score &gt; 75, in 3-hour windows"
 
-#: templates/base.html:64
+#: templates/base.html:65
 msgid "Скрапер активен"
 msgstr "Scrapper is active"
 
@@ -549,7 +549,11 @@ msgstr "Regenerate"
 msgid "Сгенерировать"
 msgstr "Generate"
 
-#: templates/letters/_cover.html:18
+#: templates/letters/_cover.html:20
+msgid "Генерация…"
+msgstr "Generating…"
+
+#: templates/letters/_cover.html:28
 msgid ""
 "Подсвеченные фрагменты взяты из твоих GitHub-проектов — редактируй перед "
 "отправкой."
@@ -557,11 +561,11 @@ msgstr ""
 "The highlighted fragments are taken from your GitHub projects - edit before "
 "sending."
 
-#: templates/letters/_cover.html:23 templates/tracks/edit.html:29
+#: templates/letters/_cover.html:33 templates/tracks/edit.html:29
 msgid "Сохранить"
 msgstr "Save"
 
-#: templates/letters/_cover.html:27
+#: templates/letters/_cover.html:37
 #, fuzzy
 #| msgid "Перевод для проверки · клиенту уходит английский оригинал"
 msgid ""
@@ -570,30 +574,30 @@ msgid ""
 msgstr ""
 "Translation for verification · the English original is sent to the client"
 
-#: templates/letters/_cover.html:34
+#: templates/letters/_cover.html:44
 msgid "Источники:"
 msgstr "Sources:"
 
-#: templates/letters/_cover.html:44
+#: templates/letters/_cover.html:54
 msgid "Отправлено на Upwork"
 msgstr "Sent on Upwork"
 
-#: templates/letters/_cover.html:46
+#: templates/letters/_cover.html:56
 msgid "Вернуть"
 msgstr "Undo"
 
-#: templates/letters/_cover.html:54
+#: templates/letters/_cover.html:64
 msgid "Скопировать письмо и открыть на Upwork"
 msgstr "Copy letter & open on Upwork"
 
-#: templates/letters/_cover.html:56
+#: templates/letters/_cover.html:66
 msgid ""
 "Копирует английский оригинал, открывает вакансию и помечает карточку "
 "«Отправлено»."
 msgstr ""
 "Copies the English original, opens the posting, and marks the card as Sent."
 
-#: templates/letters/_cover.html:69
+#: templates/letters/_cover.html:79
 msgid "Черновик ещё не сгенерирован — нажми «Сгенерировать»."
 msgstr "The draft has not yet been generated - click “Generate”."
 

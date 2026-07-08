@@ -72,6 +72,12 @@ class GeneratorTests(TestCase):
         job.refresh_from_db()
         self.assertEqual(job.status, JobPosting.Status.DRAFTED)
 
+    def test_generate_redirects_to_cover_anchor(self):
+        job = self._job()
+        r = self.client.post(f"/job/{job.pk}/cover/generate/")
+        self.assertEqual(r.status_code, 302)
+        self.assertTrue(r["Location"].endswith(f"/job/{job.pk}/#cover"))  # scroll to letter
+
     def test_regenerate_versions_and_single_active(self):
         job = self._job()
         generate_cover(job)

@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from apps.jobs.models import JobPosting
@@ -8,7 +9,8 @@ from .models import CoverLetterDraft
 
 
 def _back(pk):
-    return redirect("jobs:detail", pk=pk)
+    # #cover anchors the scroll to the letter card so the page doesn't jump to top
+    return redirect(reverse("jobs:detail", args=[pk]) + "#cover")
 
 
 @require_POST
