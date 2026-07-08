@@ -44,7 +44,7 @@ class ScorerTests(TestCase):
         self.assertIn("payment verified", p)
         self.assertIn("hire rate 87%", p)
         self.assertIn("20 connects", p)          # competition signal now fed to the scorer
-        self.assertIn("red-flags score 9/10", p)
+        self.assertIn("cleanliness 9/10", p)
 
     @override_settings(JOB_SCORER="llm")
     def test_llm_json_error_falls_back_to_rule_scorer(self):
