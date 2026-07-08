@@ -17,11 +17,43 @@ def _system(profile: dict) -> str:
     )
 
 
+def _client_line(job: JobPosting) -> str:
+    c = getattr(job, "client", None)
+    if not c:
+        return "Client: unknown"
+    bits = [
+        "payment verified" if c.verified_payment else "payment NOT verified",
+        f"${int(c.total_spent)} spent" if c.total_spent is not None else "spend unknown",
+        f"hire rate {c.hire_rate}%" if c.hire_rate is not None else "hire rate unknown",
+        f"rating {c.avg_rating}" if c.avg_rating is not None else "no rating",
+        c.country or "location unknown",
+    ]
+    return "Client: " + ", ".join(bits)
+
+
+def _competition_line(job: JobPosting) -> str:
+    raw = job.raw or {}
+    bits = []
+    if raw.get("connects") is not None:
+        bits.append(f"{raw['connects']} connects required to apply "
+                    "(higher usually means a more contested / premium posting)")
+    if job.proposals_bucket:
+        bits.append(f"proposals so far: {job.proposals_bucket}")
+    vw = raw.get("scores") or {}
+    if vw.get("redFlags") is not None:
+        bits.append(f"client cleanliness {vw['redFlags']}/10 (HIGHER is better; 10 = no red flags)")
+    if vw.get("quickWin") is not None:
+        bits.append(f"quick-win score {vw['quickWin']}/10")
+    return "Competition & signals: " + ("; ".join(bits) if bits else "n/a")
+
+
 def _prompt(job: JobPosting, profile: dict, similarity: float) -> str:
     return (
         f"My stack: {', '.join(profile.get('skills', []))}. "
         f"Min rate: ${profile.get('min_hourly_rate')}/hr.\n"
-        f"Profile↔job embedding cosine: {similarity:.2f}\n\n"
+        f"Profile↔job embedding cosine: {similarity:.2f}\n"
+        f"{_client_line(job)}\n"
+        f"{_competition_line(job)}\n\n"
         f"Job: {job.title}\nSkills: {', '.join(job.skills)}\n"
         f"Budget: {job.budget_type} {job.budget_min}-{job.budget_max}\n"
         f"Description:\n{job.description}"

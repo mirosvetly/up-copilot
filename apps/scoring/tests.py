@@ -30,6 +30,22 @@ class ScorerTests(TestCase):
             score_job(self._job(skills=["Django"]))
         gl.assert_called_once_with("claude-haiku-4-5-20251001")
 
+    def test_llm_prompt_includes_client_and_competition(self):
+        from .llm_scorer import _prompt
+
+        c = ClientProfile.objects.create(
+            upwork_client_id="pc1", verified_payment=True, total_spent=3700, hire_rate=87
+        )
+        job = self._job(
+            skills=["Django"], budget_min=50, client=c,
+            raw={"connects": 20, "scores": {"redFlags": 9, "quickWin": 5}},
+        )
+        p = _prompt(job, PROFILE, 0.5)
+        self.assertIn("payment verified", p)
+        self.assertIn("hire rate 87%", p)
+        self.assertIn("20 connects", p)          # competition signal now fed to the scorer
+        self.assertIn("red-flags score 9/10", p)
+
     @override_settings(JOB_SCORER="llm")
     def test_llm_json_error_falls_back_to_rule_scorer(self):
         # A malformed-JSON response (seen ~1.6% of the time) must not crash or
