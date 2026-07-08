@@ -353,6 +353,21 @@ class FeedTrackFilterTests(TestCase):
         self.assertEqual({p["label"]: p["count"] for p in pills}["DevTrack"], 1)
 
 
+class RefreshViewTests(TestCase):
+    def test_refresh_collects_now_and_redirects(self):
+        # Collection is synchronous (fast); scoring is kicked to a background
+        # thread, so we only assert the sync part here.
+        SavedFilter.objects.create(name="all", keywords=[], is_active=True)
+        r = self.client.post("/refresh/", {"next": "/"})
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r["Location"], "/")
+        self.assertTrue(JobPosting.objects.exists())  # mock provider collected jobs
+
+    def test_refresh_offsite_next_falls_back_to_feed(self):
+        r = self.client.post("/refresh/", {"next": "//evil.com"})
+        self.assertEqual(r["Location"], "/")  # not off-site
+
+
 class SentViewTests(TestCase):
     def setUp(self):
         JobPosting.objects.create(job_id="n1", title="new job", budget_type="fixed",

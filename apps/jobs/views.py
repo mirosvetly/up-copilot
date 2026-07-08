@@ -1,13 +1,23 @@
 from __future__ import annotations
 
+import logging
+
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from .models import JobPosting
 from .presenters import job_card, job_detail
+
+log = logging.getLogger(__name__)
+
+
+def _safe_next(request):
+    nxt = request.POST.get("next", "")
+    return nxt if nxt.startswith("/") and not nxt.startswith("//") else reverse("jobs:feed")
 
 # Feed action -> target status. transition_to() enforces legality.
 _ACTIONS = {
@@ -103,6 +113,50 @@ def feed(request, sent=False):
             "is_sent": sent,
         },
     )
+
+
+def _score_in_background():
+    """Score pending jobs off the request thread — LLM calls are too slow to
+    block on. Own DB connection, closed at the end; errors are swallowed."""
+    import threading
+
+    from django.db import connection
+
+    def run():
+        try:
+            from apps.scoring.tasks import score_pending_jobs
+
+            score_pending_jobs()
+        except Exception:
+            log.exception("Background scoring after refresh failed")
+        finally:
+            connection.close()
+
+    threading.Thread(target=run, daemon=True).start()
+
+
+@require_POST
+def refresh(request):
+    """Manual stand-in for the beat: poll the API now (fast, synchronous) and
+    kick off scoring in the background so the request returns immediately."""
+    from apps.jobs.models import SavedFilter
+    from apps.jobs.tasks import collect_for_filter
+
+    created, errors = 0, 0
+    for f in SavedFilter.objects.filter(is_active=True):
+        try:
+            created += collect_for_filter(f)["created"]
+        except Exception:
+            log.exception("Manual refresh failed for filter %s", f.name)
+            errors += 1
+    _score_in_background()
+    if errors and not created:
+        messages.error(request, _("Не удалось получить вакансии из API. Проверь ключ и подключение."))
+    else:
+        messages.success(request, _(
+            "Собрано новых: %(n)s. Идёт оценка — обнови страницу через минуту."
+        ) % {"n": created})
+    return redirect(_safe_next(request))
 
 
 def detail(request, pk):

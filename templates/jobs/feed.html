@@ -22,6 +22,18 @@
       <a href="?q={{ q|urlencode }}&track={{ track }}&sort=fresh" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'fresh' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'fresh' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "clock" 13 %}{% trans "Свежесть" %}</a>
       <a href="?q={{ q|urlencode }}&track={{ track }}&sort=score" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'score' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'score' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "zap" 13 %}{% trans "Score" %}</a>
     </div>
+    <form method="post" action="{% url 'jobs:refresh' %}" onsubmit="return ucRefresh(this)" style="margin:0">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button title="{% trans 'Запросить новые вакансии через API сейчас' %}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#d4d4d4;font-size:13px;font-weight:500;cursor:pointer"><span class="uc-ri" style="display:inline-flex">{% icon "refresh" 15 %}</span><span class="uc-rl">{% trans "Обновить" %}</span></button>
+    </form>
+    <script>
+    function ucRefresh(f){
+      var b=f.querySelector('button'); b.style.opacity='0.75'; b.style.cursor='wait';
+      var i=b.querySelector('.uc-ri'); if(i){i.style.animation='ucSpin .8s linear infinite';}
+      var l=b.querySelector('.uc-rl'); if(l){l.textContent='{% trans "Обновление…" %}';}
+      setTimeout(function(){b.disabled=true;},0); return true;
+    }
+    </script>
   </div>
 
   <div style="flex:1;min-height:0;overflow:auto">
@@ -29,6 +41,12 @@
 
       <!-- feed column -->
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
+
+        {% if messages %}
+        {% for m in messages %}
+        <div style="border-radius:10px;padding:10px 14px;font-size:13px;{% if m.tags == 'error' %}background:rgba(248,113,113,0.1);border:1px solid #f87171;color:#fca5a5{% else %}background:rgba(182,208,134,0.12);border:1px solid #b6d086;color:#d9ecc0{% endif %}">{{ m }}</div>
+        {% endfor %}
+        {% endif %}
 
         <!-- direction filter -->
         <div style="display:inline-flex;align-self:flex-start;background:#0a0a0a;border:1px solid #404040;border-radius:10px;padding:3px;gap:2px">
