@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-08 23:13+0300\n"
+"POT-Creation-Date: 2026-07-08 23:28+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -182,7 +182,7 @@ msgstr "The letter has been generated and is awaiting approval."
 msgid "В очереди на ручную отправку. Открой на Upwork и отправь."
 msgstr "In queue for manual sending. Open it on Upwork and submit."
 
-#: apps/jobs/presenters.py:148 templates/jobs/detail.html:15
+#: apps/jobs/presenters.py:148 templates/jobs/detail.html:21
 #: templates/jobs/feed.html:108
 msgid "Отправлено вручную"
 msgstr "Sent manually"
@@ -203,23 +203,23 @@ msgstr "Removed from the feed. Can be returned."
 msgid "Публикация устарела."
 msgstr "The publication is outdated."
 
-#: apps/jobs/presenters.py:198
+#: apps/jobs/presenters.py:206
 msgid "Подтверждена"
 msgstr "Confirmed"
 
-#: apps/jobs/presenters.py:198
+#: apps/jobs/presenters.py:206
 msgid "Не подтверждена"
 msgstr "Not confirmed"
 
-#: apps/jobs/presenters.py:204
+#: apps/jobs/presenters.py:212
 msgid "нет отзывов"
 msgstr "no reviews"
 
-#: apps/jobs/views.py:45
+#: apps/jobs/views.py:49
 msgid "Все"
 msgstr "All"
 
-#: apps/jobs/views.py:139
+#: apps/jobs/views.py:154
 #, python-format
 msgid "Неизвестное действие: %(action)s"
 msgstr "Unknown action: %(action)s"
@@ -270,6 +270,7 @@ msgid "Аналитика"
 msgstr "Analytics"
 
 #: templates/analytics/analytics.html:9 templates/base.html:40
+#: templates/jobs/feed.html:11
 msgid "Отправленные"
 msgstr "Sent"
 
@@ -322,86 +323,86 @@ msgstr "Scrapper is active"
 msgid "Лента"
 msgstr "Ribbon"
 
-#: templates/jobs/detail.html:13
+#: templates/jobs/detail.html:14
+msgid "Язык содержимого: вакансия, скоринг, письмо"
+msgstr "Content language: vacancy, scoring, letter"
+
+#: templates/jobs/detail.html:19
 msgid "Открыть на Upwork"
 msgstr "Open on Upwork"
 
-#: templates/jobs/detail.html:18
+#: templates/jobs/detail.html:24
 msgid "Отметить как отправлено"
 msgstr "Mark as sent"
 
-#: templates/jobs/detail.html:44
+#: templates/jobs/detail.html:45
 #, python-format
 msgid "%(n)s откликов"
 msgstr "%(n)s responses"
 
-#: templates/jobs/detail.html:49
+#: templates/jobs/detail.html:50
 msgid "match score"
 msgstr "match score"
 
-#: templates/jobs/detail.html:64
+#: templates/jobs/detail.html:65
 msgid "Почему подходит"
 msgstr "Why is it suitable?"
 
-#: templates/jobs/detail.html:65
+#: templates/jobs/detail.html:66
 #, python-format
 msgid "скоринг · %(model_name)s"
 msgstr "scoring · %(model_name)s"
 
-#: templates/jobs/detail.html:67
+#: templates/jobs/detail.html:68
 msgid "итог"
 msgstr "result"
 
-#: templates/jobs/detail.html:83
+#: templates/jobs/detail.html:84
 msgid "Описание вакансии"
 msgstr "Job Description"
 
-#: templates/jobs/detail.html:87
-msgid "Показать оригинал (EN)"
-msgstr "Show original (EN)"
-
-#: templates/jobs/detail.html:108
+#: templates/jobs/detail.html:101
 msgid "Карточка клиента"
 msgstr "Customer card"
 
-#: templates/jobs/detail.html:114
+#: templates/jobs/detail.html:107
 msgid "визитка риска"
 msgstr "risk business card"
 
-#: templates/jobs/detail.html:119
+#: templates/jobs/detail.html:112
 msgid "Оплата"
 msgstr "Payment"
 
-#: templates/jobs/detail.html:124
+#: templates/jobs/detail.html:117
 msgid "Всего потрачено"
 msgstr "Total spent"
 
-#: templates/jobs/detail.html:130
+#: templates/jobs/detail.html:123
 msgid "Hire rate"
 msgstr "Hire rate"
 
-#: templates/jobs/detail.html:137
+#: templates/jobs/detail.html:130
 msgid "Страна"
 msgstr "Country"
 
-#: templates/jobs/detail.html:142
+#: templates/jobs/detail.html:135
 msgid "Рейтинг"
 msgstr "Rating"
 
-#: templates/jobs/detail.html:148
+#: templates/jobs/detail.html:141
 msgid "вакансий"
 msgstr "vacancies"
 
-#: templates/jobs/detail.html:152
+#: templates/jobs/detail.html:145
 msgid "наймов"
 msgstr "hires"
 
-#: templates/jobs/detail.html:155
+#: templates/jobs/detail.html:148
 #, python-format
 msgid "На Upwork с %(member_since)s"
 msgstr "On Upwork with %(member_since)s"
 
-#: templates/jobs/detail.html:161
+#: templates/jobs/detail.html:154
 msgid "Статус в трекере"
 msgstr "Tracker status"
 
@@ -424,6 +425,12 @@ msgstr "Freshness"
 #: templates/jobs/feed.html:23
 msgid "Score"
 msgstr "Score"
+
+#: templates/jobs/feed.html:44
+#, fuzzy
+#| msgid "Отправлено вручную"
+msgid "отправлено вручную"
+msgstr "sent manually"
 
 #: templates/jobs/feed.html:44
 msgid "вакансий в очереди на ревью"
@@ -554,35 +561,39 @@ msgstr ""
 msgid "Сохранить"
 msgstr "Save"
 
-#: templates/letters/_cover.html:29
-msgid "Перевод для проверки · клиенту уходит английский оригинал"
+#: templates/letters/_cover.html:27
+#, fuzzy
+#| msgid "Перевод для проверки · клиенту уходит английский оригинал"
+msgid ""
+"Перевод для чтения · клиенту уходит английский оригинал (кнопка копирует "
+"его)"
 msgstr ""
 "Translation for verification · the English original is sent to the client"
 
-#: templates/letters/_cover.html:37
+#: templates/letters/_cover.html:34
 msgid "Источники:"
 msgstr "Sources:"
 
-#: templates/letters/_cover.html:47
+#: templates/letters/_cover.html:44
 msgid "Отправлено на Upwork"
 msgstr "Sent on Upwork"
 
-#: templates/letters/_cover.html:49
+#: templates/letters/_cover.html:46
 msgid "Вернуть"
 msgstr "Undo"
 
-#: templates/letters/_cover.html:57
+#: templates/letters/_cover.html:54
 msgid "Скопировать письмо и открыть на Upwork"
 msgstr "Copy letter & open on Upwork"
 
-#: templates/letters/_cover.html:59
+#: templates/letters/_cover.html:56
 msgid ""
 "Копирует английский оригинал, открывает вакансию и помечает карточку "
 "«Отправлено»."
 msgstr ""
 "Copies the English original, opens the posting, and marks the card as Sent."
 
-#: templates/letters/_cover.html:72
+#: templates/letters/_cover.html:69
 msgid "Черновик ещё не сгенерирован — нажми «Сгенерировать»."
 msgstr "The draft has not yet been generated - click “Generate”."
 
@@ -652,3 +663,6 @@ msgstr ""
 #: templates/tracks/list.html:38
 msgid "Пока нет ни одного трека. Создайте первый."
 msgstr "There are no tracks yet. Create the first one."
+
+#~ msgid "Показать оригинал (EN)"
+#~ msgstr "Show original (EN)"

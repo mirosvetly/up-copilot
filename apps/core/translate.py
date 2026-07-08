@@ -38,7 +38,8 @@ def _chunks(text: str, size: int) -> list[str]:
 def _google(text: str) -> str:
     from deep_translator import GoogleTranslator  # lazy: only on the real path
 
-    tr = GoogleTranslator(source="en", target="ru")
+    # auto source: reasons may already be Russian (rule scorer) — don't force EN
+    tr = GoogleTranslator(source="auto", target="ru")
     if len(text) <= _MAX:
         return tr.translate(text) or ""
     return "\n".join(tr.translate(c) or "" for c in _chunks(text, _MAX))

@@ -7,7 +7,7 @@
 {% trans "Аналитика" as nav_label_2 %}
 {% include "jobs/_nav_item.html" with label=nav_label_2 ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
 {% trans "Отправленные" as nav_label_3 %}
-{% include "jobs/_nav_item.html" with label=nav_label_3 ico="inbox" disabled=True %}
+{% include "jobs/_nav_item.html" with label=nav_label_3 ico="inbox" href_name="jobs:sent" active=is_sent %}
 {% trans "GitHub-источники" as nav_label_4 %}
 {% include "jobs/_nav_item.html" with label=nav_label_4 ico="github" disabled=True %}
 {% trans "Настройки" as nav_label_5 %}

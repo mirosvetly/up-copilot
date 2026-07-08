@@ -19,7 +19,7 @@ _ACTIONS = {
 }
 
 
-def feed(request):
+def feed(request, sent=False):
     from django.db.models import Count
 
     from apps.tracks.models import Track
@@ -28,6 +28,7 @@ def feed(request):
     q = request.GET.get("q", "").strip()
     sort = request.GET.get("sort", "score")  # default: best-scored first
     track = request.GET.get("track", "all")
+    applied = JobPosting.Status.APPLIED
 
     qs = (
         JobPosting.objects.exclude(status=JobPosting.Status.EXPIRED)
@@ -35,6 +36,9 @@ def feed(request):
     )
     if q:
         qs = qs.filter(Q(title__icontains=q) | Q(skills__icontains=q))
+    # Sent jobs live in their own view; the review feed shows only unsent, so the
+    # top is always the highest-scored job still waiting.
+    qs = qs.filter(status=applied) if sent else qs.exclude(status=applied)
 
     # Direction pills (Все / <track> …) with live counts, computed before the
     # track filter is applied so each pill shows its full total.
@@ -94,21 +98,31 @@ def feed(request):
             "sort": sort,
             "track": track,
             "track_pills": track_pills,
-            "is_feed": True,
+            "sent_view": sent,
+            "is_feed": not sent,
+            "is_sent": sent,
         },
     )
 
 
 def detail(request, pk):
+    from django.utils.translation import get_language
+
     from apps.letters.models import CoverLetterDraft
     from apps.letters.presenters import cover_context
     from apps.screening.models import ScreeningQuestion
 
+    # Content language for this card: ?lang overrides, else follows the UI language.
+    lang = request.GET.get("lang") or (get_language() or "ru")
+    lang = "ru" if str(lang).startswith("ru") else "en"
+
     job = get_object_or_404(
         JobPosting.objects.select_related("client", "score", "matched_filter__track"), pk=pk
     )
-    job.ensure_ru()  # translate once on first open (cached), RU reading aid
-    dj = job_detail(job)
+    job.ensure_ru()  # translate job title/description once (cached)
+    if getattr(job, "score", None):
+        job.score.ensure_ru()  # translate the scoring reasons once (cached)
+    dj = job_detail(job, lang=lang)
     draft = CoverLetterDraft.objects.filter(job=job, is_active=True).first()
     cover = cover_context(draft, edit=request.GET.get("edit") == "1") if draft else None
 
@@ -124,6 +138,7 @@ def detail(request, pk):
             "job": dj,
             "pk": job.pk,
             "cover": cover,
+            "content_lang": lang,
             "screening": screening,
             "has_screening_questions": bool((job.raw or {}).get("screening_questions")),
             "is_feed": True,  # sidebar keeps "Лента" active, like the design

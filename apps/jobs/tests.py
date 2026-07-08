@@ -353,6 +353,53 @@ class FeedTrackFilterTests(TestCase):
         self.assertEqual({p["label"]: p["count"] for p in pills}["DevTrack"], 1)
 
 
+class SentViewTests(TestCase):
+    def setUp(self):
+        JobPosting.objects.create(job_id="n1", title="new job", budget_type="fixed",
+                                  status=JobPosting.Status.NEW)
+        JobPosting.objects.create(job_id="s1", title="sent job", budget_type="fixed",
+                                  status=JobPosting.Status.APPLIED)
+
+    def test_review_feed_excludes_sent(self):
+        r = self.client.get("/")
+        self.assertContains(r, "new job")
+        self.assertNotContains(r, "sent job")  # sent moved out of the review feed
+
+    def test_sent_view_shows_only_sent(self):
+        r = self.client.get("/sent/")
+        self.assertContains(r, "sent job")
+        self.assertNotContains(r, "new job")
+
+
+class ContentLangTests(TestCase):
+    def test_job_detail_picks_language_for_title_and_description(self):
+        from .presenters import job_detail
+
+        job = JobPosting.objects.create(
+            job_id="cl1", title="Build app", title_ru="Собрать приложение",
+            description="Long desc", description_ru="Длинное описание", budget_type="fixed",
+        )
+        self.assertEqual(job_detail(job, "ru")["description"], "Длинное описание")
+        self.assertEqual(job_detail(job, "en")["description"], "Long desc")
+        self.assertEqual(job_detail(job, "ru")["title"], "Собрать приложение")
+        self.assertEqual(job_detail(job, "en")["title"], "Build app")
+
+    def test_job_detail_uses_ru_breakdown_when_available(self):
+        from apps.scoring.models import JobScore
+
+        from .presenters import job_detail
+
+        job = JobPosting.objects.create(job_id="cl2", title="t", budget_type="fixed")
+        JobScore.objects.create(
+            job=job, score=60,
+            breakdown=[{"text": "Stack match", "w": 10, "neg": False}],
+            breakdown_ru=[{"text": "Совпадение стека", "w": 10, "neg": False}],
+        )
+        job.refresh_from_db()
+        self.assertEqual(job_detail(job, "ru")["reasons"][0]["text"], "Совпадение стека")
+        self.assertEqual(job_detail(job, "en")["reasons"][0]["text"], "Stack match")
+
+
 class I18nTests(TestCase):
     def test_feed_defaults_to_russian(self):
         self.assertContains(self.client.get("/"), "Лента вакансий")

@@ -6,6 +6,7 @@ app_name = "jobs"
 
 urlpatterns = [
     path("", views.feed, name="feed"),
+    path("sent/", views.feed, {"sent": True}, name="sent"),
     path("job/<int:pk>/", views.detail, name="detail"),
     path("job/<int:pk>/<str:action>/", views.job_action, name="job_action"),
 ]

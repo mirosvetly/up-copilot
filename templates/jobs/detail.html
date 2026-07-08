@@ -10,6 +10,12 @@
     <div style="width:1px;height:18px;background:#404040"></div>
     <div style="font-size:12px;color:#a3a3a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px">{{ job.title }}</div>
     <div style="flex:1"></div>
+    {% with editqs=cover.edit|yesno:"&edit=1," %}
+    <div style="display:flex;background:#0a0a0a;border:1px solid #404040;border-radius:9px;padding:2px;gap:2px" title="{% trans 'Язык содержимого: вакансия, скоринг, письмо' %}">
+      <a href="?lang=ru{{ editqs }}" style="height:28px;display:inline-flex;align-items:center;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;background:{% if content_lang == 'ru' %}#b6d086{% else %}transparent{% endif %};color:{% if content_lang == 'ru' %}#171717{% else %}#a3a3a3{% endif %}">RU</a>
+      <a href="?lang=en{{ editqs }}" style="height:28px;display:inline-flex;align-items:center;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;background:{% if content_lang == 'en' %}#b6d086{% else %}transparent{% endif %};color:{% if content_lang == 'en' %}#171717{% else %}#a3a3a3{% endif %}">EN</a>
+    </div>
+    {% endwith %}
     <a href="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% icon "arrow-up-right" 14 %}{% trans "Открыть на Upwork" %}</a>
     {% if job.is_sent %}
       <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#b6d086;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#b6d086" %}{% trans "Отправлено вручную" %}</span>
@@ -30,12 +36,7 @@
         <div>
           <div style="display:flex;align-items:flex-start;gap:16px">
             <div style="flex:1;min-width:0">
-              {% if job.title_ru %}
-              <h1 style="font-size:23px;font-weight:700;line-height:1.25;letter-spacing:-0.01em">{{ job.title_ru }}</h1>
-              <div style="font-size:13px;color:#737373;margin-top:5px">{{ job.title }}</div>
-              {% else %}
               <h1 style="font-size:23px;font-weight:700;line-height:1.25;letter-spacing:-0.01em">{{ job.title }}</h1>
-              {% endif %}
               <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:12px">
                 <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600">{% icon "dollar" 14 "#b6d086" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
                 <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
@@ -81,15 +82,7 @@
         <!-- description -->
         <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
           <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">{% trans "Описание вакансии" %}</div>
-          {% if job.description_ru %}
-          <p style="font-size:14px;line-height:1.65;color:#d4d4d4;white-space:pre-wrap;margin:0">{{ job.description_ru }}</p>
-          <details style="margin-top:12px">
-            <summary style="cursor:pointer;font-size:12px;color:#737373;list-style:none">{% trans "Показать оригинал (EN)" %}</summary>
-            <p style="font-size:13px;line-height:1.6;color:#8a8a8a;white-space:pre-wrap;margin:10px 0 0">{{ job.description }}</p>
-          </details>
-          {% else %}
           <p style="font-size:14px;line-height:1.65;color:#d4d4d4;white-space:pre-wrap;margin:0">{{ job.description }}</p>
-          {% endif %}
         </div>
 
         <!-- cover letter -->

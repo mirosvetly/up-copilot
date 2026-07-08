@@ -42,7 +42,7 @@
       {% trans "Настройки" as nav_settings %}
       {% include "jobs/_nav_item.html" with label=nav_feed ico="layout-grid" href_name="jobs:feed" active=is_feed %}
       {% include "jobs/_nav_item.html" with label=nav_analytics ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
-      {% include "jobs/_nav_item.html" with label=nav_sent ico="inbox" disabled=True %}
+      {% include "jobs/_nav_item.html" with label=nav_sent ico="inbox" href_name="jobs:sent" active=is_sent %}
       {% include "jobs/_nav_item.html" with label=nav_github ico="github" disabled=True %}
       {% include "jobs/_nav_item.html" with label=nav_settings ico="sliders" href_name="tracks:list" active=is_settings %}
       {% endblock %}

@@ -2,13 +2,13 @@
 {% load icons i18n %}
 {% block title %}{% trans "Лента вакансий · Upwork Copilot" %}{% endblock %}
 {% block main %}
-{% with nextqs="/?q="|add:q|add:"&sort="|add:sort|add:"&track="|add:track %}
+{% with nextqs=request.path|add:"?q="|add:q|add:"&sort="|add:sort|add:"&track="|add:track %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
 
   <!-- header -->
   <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
     <span style="display:inline-flex">{% icon "briefcase" 17 "#b6d086" %}</span>
-    <div style="font-size:15px;font-weight:600">{% trans "Лента вакансий" %}</div>
+    <div style="font-size:15px;font-weight:600">{% if is_sent %}{% trans "Отправленные" %}{% else %}{% trans "Лента вакансий" %}{% endif %}</div>
     <div style="width:1px;height:18px;background:#404040"></div>
     <div style="font-size:12px;color:#a3a3a3">{% trans "Upwork · Python / Trading / WebRTC" %}</div>
     <div style="flex:1"></div>
@@ -41,7 +41,7 @@
         </div>
 
         <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#a3a3a3;padding:0 2px 2px">
-          <span><span style="color:#fafafa;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ visible_count }}</span> {% trans "вакансий в очереди на ревью" %}</span>
+          <span><span style="color:#fafafa;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ visible_count }}</span> {% if is_sent %}{% trans "отправлено вручную" %}{% else %}{% trans "вакансий в очереди на ревью" %}{% endif %}</span>
           <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
           <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:20px;background:#4ade80;animation:ucPulse 2s infinite"></span>{% trans "авто-скрапинг" %}</span>
         </div>

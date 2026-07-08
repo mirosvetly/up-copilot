@@ -22,14 +22,11 @@
         <textarea name="body" style="width:100%;height:230px;resize:vertical;background:#0a0a0a;border:1px solid #404040;border-radius:10px;padding:16px;color:#e5e5e5;font-size:14px;line-height:1.7;outline:none">{{ cover.body }}</textarea>
         <div style="margin-top:10px"><button style="height:32px;padding:0 16px;border:none;border-radius:8px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">{% trans "Сохранить" %}</button></div>
       </form>
+    {% elif content_lang == 'ru' and cover.body_ru %}
+      <div style="font-size:14px;line-height:1.7;color:#e5e5e5;white-space:pre-wrap;background:#0a0a0a;border:1px solid #262626;border-radius:10px;padding:16px">{{ cover.body_ru }}</div>
+      <div style="font-size:11px;color:#737373;margin-top:7px">{% trans "Перевод для чтения · клиенту уходит английский оригинал (кнопка копирует его)" %}</div>
     {% else %}
       <div style="font-size:14px;line-height:1.7;color:#e5e5e5;white-space:pre-wrap;background:#0a0a0a;border:1px solid #262626;border-radius:10px;padding:16px">{% for seg in cover.segments %}<span style="background:{{ seg.bg }};border-bottom:{{ seg.border }};border-radius:{{ seg.radius }};padding:{{ seg.pad }};color:{{ seg.color }}" title="{{ seg.title }}">{{ seg.t }}</span>{% endfor %}</div>
-      {% if cover.body_ru %}
-      <div style="margin-top:12px">
-        <div style="font-size:11px;color:#737373;margin-bottom:6px;display:flex;align-items:center;gap:6px">{% icon "circle-check" 12 "#737373" %}{% trans "Перевод для проверки · клиенту уходит английский оригинал" %}</div>
-        <div style="font-size:13px;line-height:1.65;color:#a3a3a3;white-space:pre-wrap;background:#0d0d0d;border:1px dashed #303030;border-radius:10px;padding:14px">{{ cover.body_ru }}</div>
-      </div>
-      {% endif %}
     {% endif %}
 
     {% if cover.legend %}

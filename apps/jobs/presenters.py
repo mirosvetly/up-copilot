@@ -165,12 +165,20 @@ def _ru_member_since(d):
     return f"{_RU_MONTHS[d.month]} {d.year}" if d else "—"
 
 
-def job_detail(job):
-    """Display fields for the Detail screen: reasons, client card, tracker status."""
+def job_detail(job, lang="ru"):
+    """Display fields for the Detail screen. `lang` ("ru"/"en") picks the content
+    language for title, description and the scoring reasons (originals are EN;
+    RU are the cached translations)."""
+    ru = lang == "ru"
     card = job_card(job)
+    title = (job.title_ru or job.title) if ru else job.title
+    description = (job.description_ru or job.description) if ru else job.description
     score_obj = getattr(job, "score", None)
+    bd = []
+    if score_obj:
+        bd = score_obj.breakdown_ru if (ru and score_obj.breakdown_ru) else score_obj.breakdown
     reasons = []
-    for r in (score_obj.breakdown if score_obj else []):
+    for r in bd:
         neg = r.get("neg", False)
         reasons.append({
             "text": r["text"],
@@ -182,9 +190,9 @@ def job_detail(job):
     tracker = _STATUS_TRACKER[JobPosting.Status(job.status)]
     return {
         **card,
-        "description": job.description,
-        "description_ru": job.description_ru,
-        "title_ru": job.title_ru,
+        "title": title,
+        "description": description,
+        "content_lang": lang,
         "reasons": reasons,
         "upwork_url": _safe_url((job.raw or {}).get("url", "")),
         "model_name": score_obj.model_name if score_obj else "—",
