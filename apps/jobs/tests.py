@@ -55,6 +55,21 @@ class CollectorTests(TestCase):
         self.f = SavedFilter.objects.create(name="all", keywords=[])
         self.provider = MockProvider()
 
+    def test_deleted_jobs_are_not_reimported(self):
+        from .models import SeenJob
+
+        # First poll imports the mock jobs and records them as seen.
+        first = collect_for_filter(self.f, provider=self.provider)
+        self.assertEqual(first["created"], 4)
+        self.assertEqual(SeenJob.objects.count(), 4)
+        # User clears them from the DB (like "Skip all").
+        JobPosting.objects.all().delete()
+        # Re-poll: the API returns the same jobs, but the ledger skips them —
+        # nothing re-created, so nothing re-scored (no paying twice).
+        again = collect_for_filter(self.f, provider=self.provider)
+        self.assertEqual(again["created"], 0)
+        self.assertEqual(JobPosting.objects.count(), 0)
+
     def test_collect_creates_and_dedups(self):
         first = collect_for_filter(self.f, provider=self.provider)
         self.assertEqual(first["created"], 4)

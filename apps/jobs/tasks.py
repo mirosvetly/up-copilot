@@ -6,8 +6,10 @@ from datetime import timedelta
 from celery import shared_task
 from django.utils import timezone
 
-from .models import ClientProfile, JobPosting, SavedFilter
+from .models import ClientProfile, JobPosting, SavedFilter, SeenJob
 from .providers import RawClient, get_provider
+
+SEEN_TTL_DAYS = 21  # API window is ~7 days; keep the ledger a few multiples of that
 
 log = logging.getLogger(__name__)
 
@@ -31,16 +33,21 @@ def _upsert_client(rc: RawClient) -> ClientProfile:
 
 
 def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
-    """Fetch + dedup-persist jobs for one filter. Returns {created, seen}."""
+    """Fetch + dedup-persist jobs for one filter. Returns {created, seen}.
+
+    Dedup is against the SeenJob ledger, not the live JobPosting table, so a job
+    imported once is never re-imported (hence never re-scored) even after it's
+    deleted — the API keeps returning the same recent jobs on every poll."""
     provider = provider or get_provider()
     raw_jobs = provider.fetch_jobs(saved_filter)
+    ids = [rj.job_id for rj in raw_jobs]
+    already = set(SeenJob.objects.filter(job_id__in=ids).values_list("job_id", flat=True))
     created = 0
     for rj in raw_jobs:
+        if rj.job_id in already:
+            continue  # seen before (maybe since deleted) — don't re-import or re-score
         client = _upsert_client(rj.client)
-        # Dedup on job_id. Existing rows keep their status and posted_at (don't
-        # reset a job's position in the machine just because we saw it again);
-        # only refresh volatile fields.
-        obj, is_new = JobPosting.objects.get_or_create(
+        _, is_new = JobPosting.objects.get_or_create(
             job_id=rj.job_id,
             defaults={
                 "title": rj.title,
@@ -57,14 +64,14 @@ def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
                 "raw": rj.raw,
             },
         )
-        if not is_new:
-            updates = {"proposals_bucket": rj.proposals_bucket}
-            # Refresh raw/client only from the same source: a sparse gmail
-            # alert must not clobber the richer row vibeworker collected.
-            if (obj.raw or {}).get("source") == rj.raw.get("source"):
-                updates.update(raw=rj.raw, client=client)
-            JobPosting.objects.filter(job_id=rj.job_id).update(**updates)
         created += int(is_new)
+    # Remember every id we just saw so the next poll skips them; prune the tail.
+    SeenJob.objects.bulk_create(
+        [SeenJob(job_id=i) for i in ids if i not in already], ignore_conflicts=True
+    )
+    SeenJob.objects.filter(
+        created_at__lt=timezone.now() - timedelta(days=SEEN_TTL_DAYS)
+    ).delete()
     saved_filter.last_polled_at = timezone.now()
     saved_filter.save(update_fields=["last_polled_at", "updated_at"])
     return {"created": created, "seen": len(raw_jobs)}

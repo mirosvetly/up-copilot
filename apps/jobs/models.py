@@ -24,6 +24,21 @@ class SavedFilter(TimeStampedModel):
         return self.name
 
 
+class SeenJob(models.Model):
+    """Ledger of every job_id ever collected. Survives JobPosting deletion, so a
+    re-poll skips jobs we've already imported (even ones cleared with "Skip all")
+    and never re-scores them — no paying twice. Pruned past the API's ~7-day window."""
+
+    job_id = models.CharField(max_length=96, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=("created_at",))]
+
+    def __str__(self):
+        return self.job_id
+
+
 class ClientProfile(TimeStampedModel):
     """The Upwork client that posts a job. Risk is derived, not stored."""
 
