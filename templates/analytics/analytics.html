@@ -1,20 +1,25 @@
 {% extends "base.html" %}
-{% load icons %}
-{% block title %}Аналитика · Upwork Copilot{% endblock %}
+{% load icons i18n %}
+{% block title %}{% trans "Аналитика · Upwork Copilot" %}{% endblock %}
 {% block nav %}
-{% include "jobs/_nav_item.html" with label="Лента вакансий" ico="layout-grid" href_name="jobs:feed" active=False %}
-{% include "jobs/_nav_item.html" with label="Аналитика" ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
-{% include "jobs/_nav_item.html" with label="Отправленные" ico="inbox" disabled=True %}
-{% include "jobs/_nav_item.html" with label="GitHub-источники" ico="github" disabled=True %}
-{% include "jobs/_nav_item.html" with label="Настройки" ico="sliders" href_name="tracks:list" active=is_settings %}
+{% trans "Лента вакансий" as nav_label_1 %}
+{% include "jobs/_nav_item.html" with label=nav_label_1 ico="layout-grid" href_name="jobs:feed" active=False %}
+{% trans "Аналитика" as nav_label_2 %}
+{% include "jobs/_nav_item.html" with label=nav_label_2 ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
+{% trans "Отправленные" as nav_label_3 %}
+{% include "jobs/_nav_item.html" with label=nav_label_3 ico="inbox" disabled=True %}
+{% trans "GitHub-источники" as nav_label_4 %}
+{% include "jobs/_nav_item.html" with label=nav_label_4 ico="github" disabled=True %}
+{% trans "Настройки" as nav_label_5 %}
+{% include "jobs/_nav_item.html" with label=nav_label_5 ico="sliders" href_name="tracks:list" active=is_settings %}
 {% endblock %}
 {% block main %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
   <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
     <span style="display:inline-flex">{% icon "bar-chart" 17 "#b6d086" %}</span>
-    <div style="font-size:15px;font-weight:600">Аналитика</div>
+    <div style="font-size:15px;font-weight:600">{% trans "Аналитика" %}</div>
     <div style="width:1px;height:18px;background:#404040"></div>
-    <div style="font-size:12px;color:#a3a3a3">Живые данные · часовой пояс MSK · <a href="{% url 'analytics:metrics' %}" style="color:#b6d086">/metrics</a></div>
+    <div style="font-size:12px;color:#a3a3a3">{% trans "Живые данные · часовой пояс MSK ·" %} <a href="{% url 'analytics:metrics' %}" style="color:#b6d086">/metrics</a></div>
   </div>
 
   <div style="flex:1;min-height:0;overflow:auto">
@@ -35,9 +40,9 @@
         <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
           <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
             <span style="display:inline-flex">{% icon "filter" 16 "#b6d086" %}</span>
-            <span style="font-size:14px;font-weight:600">Воронка</span>
+            <span style="font-size:14px;font-weight:600">{% trans "Воронка" %}</span>
           </div>
-          <div style="font-size:12px;color:#737373;margin-bottom:18px">найдено → скоринг → черновик → одобрено → отправлено → интервью → найм</div>
+          <div style="font-size:12px;color:#737373;margin-bottom:18px">{% trans "найдено → скоринг → черновик → одобрено → отправлено → интервью → найм" %}</div>
           <div style="display:flex;flex-direction:column;gap:9px">
             {% for f in funnel %}
             <div style="display:flex;align-items:center;gap:14px">
@@ -57,9 +62,9 @@
         <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
           <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
             <span style="display:inline-flex">{% icon "zap" 16 "#b6d086" %}</span>
-            <span style="font-size:14px;font-weight:600">Конверсия по ключевым словам</span>
+            <span style="font-size:14px;font-weight:600">{% trans "Конверсия по ключевым словам" %}</span>
           </div>
-          <div style="font-size:12px;color:#737373;margin-bottom:18px">доля откликов, дошедших до отправки</div>
+          <div style="font-size:12px;color:#737373;margin-bottom:18px">{% trans "доля откликов, дошедших до отправки" %}</div>
           <div style="display:flex;flex-direction:column;gap:12px">
             {% for k in keywords %}
             <div>
@@ -71,7 +76,7 @@
               <div style="height:8px;background:#0a0a0a;border-radius:20px;overflow:hidden"><div style="height:100%;width:{{ k.bar_w }}%;background:{{ k.color }};border-radius:20px"></div></div>
             </div>
             {% empty %}
-            <div style="font-size:12px;color:#737373">Пока нет данных.</div>
+            <div style="font-size:12px;color:#737373">{% trans "Пока нет данных." %}</div>
             {% endfor %}
           </div>
         </div>
@@ -81,9 +86,9 @@
       <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
         <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px">
           <span style="display:inline-flex">{% icon "activity" 16 "#b6d086" %}</span>
-          <span style="font-size:14px;font-weight:600">Когда публикуются лучшие вакансии</span>
+          <span style="font-size:14px;font-weight:600">{% trans "Когда публикуются лучшие вакансии" %}</span>
           <div style="flex:1"></div>
-          <span style="font-size:11.5px;color:#737373">кол-во вакансий score &gt; 75, по 3-часовым окнам</span>
+          <span style="font-size:11.5px;color:#737373">{% trans "кол-во вакансий score &gt; 75, по 3-часовым окнам" %}</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:5px">
           <div style="display:grid;grid-template-columns:38px repeat(8,1fr);gap:5px;align-items:center">

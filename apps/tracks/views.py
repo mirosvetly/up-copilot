@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 
 from .forms import TrackForm
 from .models import Track
@@ -19,7 +20,7 @@ def track_edit(request, pk=None):
         form = TrackForm(request.POST, instance=track)
         if form.is_valid():
             saved = form.save()
-            messages.success(request, f"Трек «{saved.name}» сохранён.")
+            messages.success(request, _("Трек «%(name)s» сохранён.") % {"name": saved.name})
             return redirect("tracks:list")
     else:
         form = TrackForm(instance=track)

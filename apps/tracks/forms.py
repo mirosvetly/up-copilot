@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from django import forms
+from django.utils.translation import gettext, gettext_lazy as _
 
 from .models import Track
 
@@ -35,22 +36,22 @@ class _ProjectsField(forms.CharField):
         try:
             data = json.loads(value)
         except json.JSONDecodeError as e:
-            raise forms.ValidationError(f"Невалидный JSON: {e}")
+            raise forms.ValidationError(gettext("Невалидный JSON: %(err)s") % {"err": e})
         ok = isinstance(data, list) and all(
             isinstance(p, dict) and p.get("repo") and isinstance(p.get("skills", []), list)
             for p in data
         )
         if not ok:
-            raise forms.ValidationError(
+            raise forms.ValidationError(gettext(
                 'Ожидается список объектов вида {"repo": "...", "skills": ["...", ...]} '
                 "(skills — список строк)."
-            )
+            ))
         return data
 
 
 class TrackForm(forms.ModelForm):
-    skills = _LinesField(required=False, help_text="По одному навыку в строке.")
-    red_flag_phrases = _LinesField(required=False, help_text="По одной фразе в строке.")
+    skills = _LinesField(required=False, help_text=_("По одному навыку в строке."))
+    red_flag_phrases = _LinesField(required=False, help_text=_("По одной фразе в строке."))
     projects = _ProjectsField(required=False)
 
     class Meta:

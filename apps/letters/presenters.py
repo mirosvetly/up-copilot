@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from django.utils.translation import gettext
+
 from apps.scoring.profile import resolve_track, track_config
 
 from .github import color_map
@@ -16,7 +18,7 @@ def cover_context(draft, *, edit=False) -> dict:
             segments.append({
                 "t": s["t"], "bg": c + "22", "border": f"1.5px solid {c}",
                 "radius": "3px", "pad": "1px 2px", "color": "#f0f0f0",
-                "title": f"Взято из {src}",
+                "title": gettext("Взято из %(src)s") % {"src": src},
             })
         else:
             segments.append({

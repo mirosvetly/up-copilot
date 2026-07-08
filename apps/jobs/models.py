@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 
@@ -63,17 +64,17 @@ class JobPosting(TimeStampedModel):
     """
 
     class Status(models.TextChoices):
-        NEW = "new", "Новая"
-        SCORED = "scored", "Оценена"
-        DRAFTED = "drafted", "Черновик готов"
-        REVIEWED = "reviewed", "Одобрена"
-        APPLIED = "applied", "Отправлена"
-        SKIPPED = "skipped", "Пропущена"
-        EXPIRED = "expired", "Устарела"
+        NEW = "new", _("Новая")
+        SCORED = "scored", _("Оценена")
+        DRAFTED = "drafted", _("Черновик готов")
+        REVIEWED = "reviewed", _("Одобрена")
+        APPLIED = "applied", _("Отправлена")
+        SKIPPED = "skipped", _("Пропущена")
+        EXPIRED = "expired", _("Устарела")
 
     class BudgetType(models.TextChoices):
-        HOURLY = "hourly", "Почасовая"
-        FIXED = "fixed", "Фикс"
+        HOURLY = "hourly", _("Почасовая")
+        FIXED = "fixed", _("Фикс")
 
     ALLOWED_TRANSITIONS = {
         # scored -> reviewed is a shortcut: approving before the letters/draft

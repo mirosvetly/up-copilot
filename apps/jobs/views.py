@@ -3,6 +3,7 @@ from __future__ import annotations
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from .models import JobPosting
@@ -41,7 +42,7 @@ def feed(request):
     per_track = dict(
         qs.values_list("matched_filter__track_id").annotate(n=Count("id"))
     )
-    track_pills = [{"key": "all", "label": "Все", "count": qs.count(), "active": track == "all"}]
+    track_pills = [{"key": "all", "label": _("Все"), "count": qs.count(), "active": track == "all"}]
     track_pills += [
         {"key": str(t.pk), "label": t.name, "count": per_track.get(t.pk, 0), "active": track == str(t.pk)}
         for t in tracks
@@ -135,7 +136,7 @@ def job_action(request, pk, action):
     job = get_object_or_404(JobPosting, pk=pk)
     target = _ACTIONS.get(action)
     if target is None:
-        messages.error(request, f"Неизвестное действие: {action}")
+        messages.error(request, _("Неизвестное действие: %(action)s") % {"action": action})
     else:
         try:
             job.transition_to(target)

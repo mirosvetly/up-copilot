@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% load icons %}
-{% block title %}Лента вакансий · Upwork Copilot{% endblock %}
+{% load icons i18n %}
+{% block title %}{% trans "Лента вакансий · Upwork Copilot" %}{% endblock %}
 {% block main %}
 {% with nextqs="/?q="|add:q|add:"&sort="|add:sort|add:"&track="|add:track %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
@@ -8,19 +8,19 @@
   <!-- header -->
   <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
     <span style="display:inline-flex">{% icon "briefcase" 17 "#b6d086" %}</span>
-    <div style="font-size:15px;font-weight:600">Лента вакансий</div>
+    <div style="font-size:15px;font-weight:600">{% trans "Лента вакансий" %}</div>
     <div style="width:1px;height:18px;background:#404040"></div>
-    <div style="font-size:12px;color:#a3a3a3">Upwork · Python / Trading / WebRTC</div>
+    <div style="font-size:12px;color:#a3a3a3">{% trans "Upwork · Python / Trading / WebRTC" %}</div>
     <div style="flex:1"></div>
     <form method="get" style="display:flex;align-items:center;gap:8px;height:34px;padding:0 11px;border-radius:9px;background:#0a0a0a;border:1px solid #404040;width:230px">
       <span style="display:inline-flex">{% icon "search" 15 "#737373" %}</span>
-      <input name="q" value="{{ q }}" placeholder="Фильтр по навыку…" style="flex:1;background:transparent;border:none;outline:none;color:#fafafa;font-size:13px;min-width:0"/>
+      <input name="q" value="{{ q }}" placeholder="{% trans "Фильтр по навыку…" %}" style="flex:1;background:transparent;border:none;outline:none;color:#fafafa;font-size:13px;min-width:0"/>
       <input type="hidden" name="sort" value="{{ sort }}"/>
       <input type="hidden" name="track" value="{{ track }}"/>
     </form>
     <div style="display:flex;background:#0a0a0a;border:1px solid #404040;border-radius:9px;padding:2px;gap:2px">
-      <a href="?q={{ q|urlencode }}&track={{ track }}&sort=fresh" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'fresh' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'fresh' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "clock" 13 %}Свежесть</a>
-      <a href="?q={{ q|urlencode }}&track={{ track }}&sort=score" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'score' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'score' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "zap" 13 %}Score</a>
+      <a href="?q={{ q|urlencode }}&track={{ track }}&sort=fresh" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'fresh' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'fresh' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "clock" 13 %}{% trans "Свежесть" %}</a>
+      <a href="?q={{ q|urlencode }}&track={{ track }}&sort=score" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:500;background:{% if sort == 'score' %}#b6d086{% else %}transparent{% endif %};color:{% if sort == 'score' %}#171717{% else %}#a3a3a3{% endif %}">{% icon "zap" 13 %}{% trans "Score" %}</a>
     </div>
   </div>
 
@@ -41,9 +41,9 @@
         </div>
 
         <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#a3a3a3;padding:0 2px 2px">
-          <span><span style="color:#fafafa;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ visible_count }}</span> вакансий в очереди на ревью</span>
+          <span><span style="color:#fafafa;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ visible_count }}</span> {% trans "вакансий в очереди на ревью" %}</span>
           <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
-          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:20px;background:#4ade80;animation:ucPulse 2s infinite"></span>авто-скрапинг</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:20px;background:#4ade80;animation:ucPulse 2s infinite"></span>{% trans "авто-скрапинг" %}</span>
         </div>
 
         {% for job in cards %}
@@ -68,7 +68,7 @@
                   <span style="width:7px;height:7px;border-radius:20px;background:{{ job.score_color }}"></span>
                   <span style="font-size:15px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};line-height:1">{{ job.score_display }}</span>
                 </div>
-                <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">score</span>
+                <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">{% trans "score" %}</span>
               </div>
             </div>
 
@@ -80,43 +80,43 @@
 
             <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:11px 0 0;border-top:1px solid #262626">
               <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#fafafa">{% icon "dollar" 14 "#b6d086" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
-              {% if job.verified %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#4ade80">{% icon "circle-check" 13 "#4ade80" %}Оплата подтверждена</span>
-              {% else %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#f87171">{% icon "alert-triangle" 13 "#f87171" %}Оплата не подтверждена</span>{% endif %}
-              {% if job.hire_rate is not None %}<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{% icon "trending-up" 13 "#737373" %}Нанимает <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.hire_color }};font-weight:600">{{ job.hire_rate }}%</span></span>{% endif %}
-              {% if job.proposals %}<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{% icon "users" 13 "#737373" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#d4d4d4">{{ job.proposals }}</span> откликов</span>{% endif %}
+              {% if job.verified %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#4ade80">{% icon "circle-check" 13 "#4ade80" %}{% trans "Оплата подтверждена" %}</span>
+              {% else %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#f87171">{% icon "alert-triangle" 13 "#f87171" %}{% trans "Оплата не подтверждена" %}</span>{% endif %}
+              {% if job.hire_rate is not None %}<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{% icon "trending-up" 13 "#737373" %}{% trans "Нанимает" %} <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.hire_color }};font-weight:600">{{ job.hire_rate }}%</span></span>{% endif %}
+              {% if job.proposals %}<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{% icon "users" 13 "#737373" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#d4d4d4">{{ job.proposals }}</span> {% trans "откликов" %}</span>{% endif %}
             </div>
 
             <!-- actions -->
             <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
               {% if job.state == "new" %}
                 <form method="post" action="{% url 'jobs:job_action' job.id 'approve' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
-                  <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 18px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13.5px;font-weight:600;cursor:pointer">{% icon "check" 16 "#171717" %}Одобрить</button>
+                  <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 18px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13.5px;font-weight:600;cursor:pointer">{% icon "check" 16 "#171717" %}{% trans "Одобрить" %}</button>
                 </form>
                 <form method="post" action="{% url 'jobs:job_action' job.id 'skip' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
-                  <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:13.5px;font-weight:500;cursor:pointer">{% icon "x" 15 %}Пропустить</button>
+                  <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:13.5px;font-weight:500;cursor:pointer">{% icon "x" 15 %}{% trans "Пропустить" %}</button>
                 </form>
                 <div style="flex:1"></div>
-                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:9px;color:#a3a3a3;font-size:13px;font-weight:500">Открыть {% icon "arrow-up-right" 14 %}</a>
+                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:9px;color:#a3a3a3;font-size:13px;font-weight:500">{% trans "Открыть" %} {% icon "arrow-up-right" 14 %}</a>
               {% elif job.state == "approved" %}
-                <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#4ade80" %}В очереди на отправку</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#4ade80" %}{% trans "В очереди на отправку" %}</span>
                 <form method="post" action="{% url 'jobs:job_action' job.id 'undo' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
-                  <button style="height:36px;padding:0 12px;border:none;border-radius:9px;background:transparent;color:#737373;font-size:12.5px;cursor:pointer">Отменить</button>
+                  <button style="height:36px;padding:0 12px;border:none;border-radius:9px;background:transparent;color:#737373;font-size:12.5px;cursor:pointer">{% trans "Отменить" %}</button>
                 </form>
                 <div style="flex:1"></div>
-                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">Открыть детально {% icon "arrow-up-right" 14 %}</a>
+                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% trans "Открыть детально" %} {% icon "arrow-up-right" 14 %}</a>
               {% elif job.state == "sent" %}
-                <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.3);color:#b6d086;font-size:13px;font-weight:600">{% icon "send" 14 "#b6d086" %}Отправлено вручную</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.3);color:#b6d086;font-size:13px;font-weight:600">{% icon "send" 14 "#b6d086" %}{% trans "Отправлено вручную" %}</span>
               {% elif job.state == "skipped" %}
-                <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#737373">{% icon "x" 15 %}Пропущено</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#737373">{% icon "x" 15 %}{% trans "Пропущено" %}</span>
                 <form method="post" action="{% url 'jobs:job_action' job.id 'undo' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
-                  <button style="height:34px;padding:0 12px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:12.5px;cursor:pointer">Вернуть в ленту</button>
+                  <button style="height:34px;padding:0 12px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:12.5px;cursor:pointer">{% trans "Вернуть в ленту" %}</button>
                 </form>
               {% endif %}
             </div>
           </div>
         </div>
         {% empty %}
-        <div style="text-align:center;padding:60px 20px;color:#737373;font-size:13px">Ничего не найдено{% if q %} по фильтру «{{ q }}»{% endif %}</div>
+        <div style="text-align:center;padding:60px 20px;color:#737373;font-size:13px">{% trans "Ничего не найдено" %}{% if q %} {% blocktrans %}по фильтру «{{ q }}»{% endblocktrans %}{% endif %}</div>
         {% endfor %}
       </div>
 
@@ -125,7 +125,7 @@
         <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
             <span style="display:inline-flex">{% icon "inbox" 15 "#b6d086" %}</span>
-            <span style="font-size:13px;font-weight:600">Очередь на отправку</span>
+            <span style="font-size:13px;font-weight:600">{% trans "Очередь на отправку" %}</span>
             <div style="flex:1"></div>
             <span style="font-size:11px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#b6d086;background:rgba(182,208,134,0.12);padding:1px 7px;border-radius:20px">{{ counts.approved }}</span>
           </div>
@@ -136,17 +136,17 @@
             <span style="font-size:10.5px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;flex:none">{{ q.age_big }}</span>
           </div>
           {% empty %}
-          <div style="font-size:12px;color:#737373;line-height:1.5;padding:4px 2px">Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на Upwork.</div>
+          <div style="font-size:12px;color:#737373;line-height:1.5;padding:4px 2px">{% trans "Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на Upwork." %}</div>
           {% endfor %}
         </div>
 
         <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Сегодня</div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">{% trans "Сегодня" %}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ cards|length }}</div><div style="font-size:11px;color:#737373">найдено</div></div>
-            <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#b6d086">{{ counts.approved }}</div><div style="font-size:11px;color:#737373">одобрено</div></div>
-            <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ counts.sent }}</div><div style="font-size:11px;color:#737373">отправлено</div></div>
-            <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#737373">{{ counts.skipped }}</div><div style="font-size:11px;color:#737373">пропущено</div></div>
+            <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ cards|length }}</div><div style="font-size:11px;color:#737373">{% trans "найдено" %}</div></div>
+            <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#b6d086">{{ counts.approved }}</div><div style="font-size:11px;color:#737373">{% trans "одобрено" %}</div></div>
+            <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ counts.sent }}</div><div style="font-size:11px;color:#737373">{% trans "отправлено" %}</div></div>
+            <div><div style="font-size:22px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#737373">{{ counts.skipped }}</div><div style="font-size:11px;color:#737373">{% trans "пропущено" %}</div></div>
           </div>
         </div>
       </div>

@@ -1,0 +1,654 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-08 23:13+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/analytics/metrics.py:16
+msgid "Пн"
+msgstr "Mon"
+
+#: apps/analytics/metrics.py:16
+msgid "Вт"
+msgstr "W"
+
+#: apps/analytics/metrics.py:16
+msgid "Ср"
+msgstr "Wed"
+
+#: apps/analytics/metrics.py:16
+msgid "Чт"
+msgstr "Thu"
+
+#: apps/analytics/metrics.py:16
+msgid "Пт"
+msgstr "Fri"
+
+#: apps/analytics/metrics.py:16
+msgid "Сб"
+msgstr "Sat"
+
+#: apps/analytics/metrics.py:16
+msgid "Вс"
+msgstr "Sun"
+
+#: apps/analytics/metrics.py:23 apps/analytics/metrics.py:104
+msgid "Найдено"
+msgstr "Found"
+
+#: apps/analytics/metrics.py:24
+msgid "Прошло скоринг"
+msgstr "Passed scoring"
+
+#: apps/analytics/metrics.py:25 apps/jobs/models.py:69
+#: apps/jobs/presenters.py:146
+msgid "Черновик готов"
+msgstr "Draft ready"
+
+#: apps/analytics/metrics.py:26 apps/jobs/presenters.py:147
+msgid "Одобрено"
+msgstr "Approved"
+
+#: apps/analytics/metrics.py:27 apps/analytics/metrics.py:105
+msgid "Отправлено"
+msgstr "Sent"
+
+#: apps/analytics/metrics.py:28
+msgid "Интервью"
+msgstr "Interview"
+
+#: apps/analytics/metrics.py:29 apps/analytics/metrics.py:107
+msgid "Найм"
+msgstr "Hiring"
+
+#: apps/analytics/metrics.py:106
+msgid "Ответ клиента"
+msgstr "Client response"
+
+#: apps/analytics/metrics.py:108
+msgid "Ср. score одобр."
+msgstr "Wed. score approved"
+
+#: apps/jobs/models.py:67
+msgid "Новая"
+msgstr "New"
+
+#: apps/jobs/models.py:68
+msgid "Оценена"
+msgstr "Rated"
+
+#: apps/jobs/models.py:70
+msgid "Одобрена"
+msgstr "Approved"
+
+#: apps/jobs/models.py:71
+msgid "Отправлена"
+msgstr "Sent"
+
+#: apps/jobs/models.py:72
+msgid "Пропущена"
+msgstr "Missed"
+
+#: apps/jobs/models.py:73 apps/jobs/presenters.py:58
+#: apps/jobs/presenters.py:150
+msgid "Устарела"
+msgstr "Outdated"
+
+#: apps/jobs/models.py:76
+msgid "Почасовая"
+msgstr "Hourly"
+
+#: apps/jobs/models.py:77
+msgid "Фикс"
+msgstr "Fix"
+
+#: apps/jobs/presenters.py:44
+msgid "время неизвестно"
+msgstr "time unknown"
+
+#: apps/jobs/presenters.py:46
+#, python-format
+msgid "%(m)s мин назад"
+msgstr "%(m)s min ago"
+
+#: apps/jobs/presenters.py:48
+#, python-format
+msgid "%(h)s ч %(mm)s мин назад"
+msgstr "%(h)s h %(mm)s min ago"
+
+#: apps/jobs/presenters.py:55
+msgid "Свежая"
+msgstr "Fresh"
+
+#: apps/jobs/presenters.py:57
+msgid "Стареет"
+msgstr "Getting old"
+
+#: apps/jobs/presenters.py:86
+msgid "почасовая"
+msgstr "hourly"
+
+#: apps/jobs/presenters.py:89
+msgid "фикс"
+msgstr "fix"
+
+#: apps/jobs/presenters.py:138
+msgid "Низкий риск"
+msgstr "Low risk"
+
+#: apps/jobs/presenters.py:139
+msgid "Средний риск"
+msgstr "Medium risk"
+
+#: apps/jobs/presenters.py:140
+msgid "Высокий риск"
+msgstr "High risk"
+
+#: apps/jobs/presenters.py:144
+msgid "Новая — на ревью"
+msgstr "New - for review"
+
+#: apps/jobs/presenters.py:144
+msgid "Ещё не оценена."
+msgstr "Not rated yet."
+
+#: apps/jobs/presenters.py:145
+msgid "Оценена — на ревью"
+msgstr "Rated - for review"
+
+#: apps/jobs/presenters.py:145
+msgid "Просмотри и одобри или пропусти."
+msgstr "Review and approve or pass."
+
+#: apps/jobs/presenters.py:146
+msgid "Письмо сгенерировано, ждёт одобрения."
+msgstr "The letter has been generated and is awaiting approval."
+
+#: apps/jobs/presenters.py:147
+msgid "В очереди на ручную отправку. Открой на Upwork и отправь."
+msgstr "In queue for manual sending. Open it on Upwork and submit."
+
+#: apps/jobs/presenters.py:148 templates/jobs/detail.html:15
+#: templates/jobs/feed.html:108
+msgid "Отправлено вручную"
+msgstr "Sent manually"
+
+#: apps/jobs/presenters.py:148
+msgid "Отмечено как отправленное. Жди ответа клиента."
+msgstr "Marked as sent. Wait for the client's response."
+
+#: apps/jobs/presenters.py:149 templates/jobs/feed.html:110
+msgid "Пропущено"
+msgstr "Missed"
+
+#: apps/jobs/presenters.py:149
+msgid "Исключена из ленты. Можно вернуть."
+msgstr "Removed from the feed. Can be returned."
+
+#: apps/jobs/presenters.py:150
+msgid "Публикация устарела."
+msgstr "The publication is outdated."
+
+#: apps/jobs/presenters.py:198
+msgid "Подтверждена"
+msgstr "Confirmed"
+
+#: apps/jobs/presenters.py:198
+msgid "Не подтверждена"
+msgstr "Not confirmed"
+
+#: apps/jobs/presenters.py:204
+msgid "нет отзывов"
+msgstr "no reviews"
+
+#: apps/jobs/views.py:45
+msgid "Все"
+msgstr "All"
+
+#: apps/jobs/views.py:139
+#, python-format
+msgid "Неизвестное действие: %(action)s"
+msgstr "Unknown action: %(action)s"
+
+#: apps/letters/presenters.py:21
+#, python-format
+msgid "Взято из %(src)s"
+msgstr "Taken from %(src)s"
+
+#: apps/tracks/forms.py:39
+#, python-format
+msgid "Невалидный JSON: %(err)s"
+msgstr "Invalid JSON: %(err)s"
+
+#: apps/tracks/forms.py:46
+msgid ""
+"Ожидается список объектов вида {\"repo\": \"...\", \"skills\": [\"...\", "
+"...]} (skills — список строк)."
+msgstr ""
+"Expected a list of objects like {\"repo\": \"...\", \"skills\": [\"...\", "
+"...]} (skills — a list of strings)."
+
+#: apps/tracks/forms.py:53
+msgid "По одному навыку в строке."
+msgstr "One skill per line."
+
+#: apps/tracks/forms.py:54
+msgid "По одной фразе в строке."
+msgstr "One phrase per line."
+
+#: apps/tracks/views.py:23
+#, python-format
+msgid "Трек «%(name)s» сохранён."
+msgstr "The track “%(name)s” has been saved."
+
+#: templates/analytics/analytics.html:3
+msgid "Аналитика · Upwork Copilot"
+msgstr "Analytics · Upwork Copilot"
+
+#: templates/analytics/analytics.html:5 templates/base.html:38
+#: templates/jobs/feed.html:11
+msgid "Лента вакансий"
+msgstr "Job feed"
+
+#: templates/analytics/analytics.html:7 templates/analytics/analytics.html:20
+#: templates/base.html:39
+msgid "Аналитика"
+msgstr "Analytics"
+
+#: templates/analytics/analytics.html:9 templates/base.html:40
+msgid "Отправленные"
+msgstr "Sent"
+
+#: templates/analytics/analytics.html:11 templates/base.html:41
+msgid "GitHub-источники"
+msgstr "GitHub sources"
+
+#: templates/analytics/analytics.html:13 templates/base.html:42
+#: templates/tracks/edit.html:3
+msgid "Настройки"
+msgstr "Settings"
+
+#: templates/analytics/analytics.html:22
+msgid "Живые данные · часовой пояс MSK ·"
+msgstr "Live data · MSK time zone ·"
+
+#: templates/analytics/analytics.html:43
+msgid "Воронка"
+msgstr "Funnel"
+
+#: templates/analytics/analytics.html:45
+msgid "найдено → скоринг → черновик → одобрено → отправлено → интервью → найм"
+msgstr "found → scoring → draft → approved → submitted → interview → hiring"
+
+#: templates/analytics/analytics.html:65
+msgid "Конверсия по ключевым словам"
+msgstr "Conversion by keywords"
+
+#: templates/analytics/analytics.html:67
+msgid "доля откликов, дошедших до отправки"
+msgstr "share of responses that reach sending"
+
+#: templates/analytics/analytics.html:79
+msgid "Пока нет данных."
+msgstr "No data yet."
+
+#: templates/analytics/analytics.html:89
+msgid "Когда публикуются лучшие вакансии"
+msgstr "When are the best vacancies published?"
+
+#: templates/analytics/analytics.html:91
+msgid "кол-во вакансий score &gt; 75, по 3-часовым окнам"
+msgstr "number of vacancies score &gt; 75, in 3-hour windows"
+
+#: templates/base.html:64
+msgid "Скрапер активен"
+msgstr "Scrapper is active"
+
+#: templates/jobs/detail.html:9
+msgid "Лента"
+msgstr "Ribbon"
+
+#: templates/jobs/detail.html:13
+msgid "Открыть на Upwork"
+msgstr "Open on Upwork"
+
+#: templates/jobs/detail.html:18
+msgid "Отметить как отправлено"
+msgstr "Mark as sent"
+
+#: templates/jobs/detail.html:44
+#, python-format
+msgid "%(n)s откликов"
+msgstr "%(n)s responses"
+
+#: templates/jobs/detail.html:49
+msgid "match score"
+msgstr "match score"
+
+#: templates/jobs/detail.html:64
+msgid "Почему подходит"
+msgstr "Why is it suitable?"
+
+#: templates/jobs/detail.html:65
+#, python-format
+msgid "скоринг · %(model_name)s"
+msgstr "scoring · %(model_name)s"
+
+#: templates/jobs/detail.html:67
+msgid "итог"
+msgstr "result"
+
+#: templates/jobs/detail.html:83
+msgid "Описание вакансии"
+msgstr "Job Description"
+
+#: templates/jobs/detail.html:87
+msgid "Показать оригинал (EN)"
+msgstr "Show original (EN)"
+
+#: templates/jobs/detail.html:108
+msgid "Карточка клиента"
+msgstr "Customer card"
+
+#: templates/jobs/detail.html:114
+msgid "визитка риска"
+msgstr "risk business card"
+
+#: templates/jobs/detail.html:119
+msgid "Оплата"
+msgstr "Payment"
+
+#: templates/jobs/detail.html:124
+msgid "Всего потрачено"
+msgstr "Total spent"
+
+#: templates/jobs/detail.html:130
+msgid "Hire rate"
+msgstr "Hire rate"
+
+#: templates/jobs/detail.html:137
+msgid "Страна"
+msgstr "Country"
+
+#: templates/jobs/detail.html:142
+msgid "Рейтинг"
+msgstr "Rating"
+
+#: templates/jobs/detail.html:148
+msgid "вакансий"
+msgstr "vacancies"
+
+#: templates/jobs/detail.html:152
+msgid "наймов"
+msgstr "hires"
+
+#: templates/jobs/detail.html:155
+#, python-format
+msgid "На Upwork с %(member_since)s"
+msgstr "On Upwork with %(member_since)s"
+
+#: templates/jobs/detail.html:161
+msgid "Статус в трекере"
+msgstr "Tracker status"
+
+#: templates/jobs/feed.html:3
+msgid "Лента вакансий · Upwork Copilot"
+msgstr "Job Feed · Upwork Copilot"
+
+#: templates/jobs/feed.html:13
+msgid "Upwork · Python / Trading / WebRTC"
+msgstr "Upwork · Python / Trading / WebRTC"
+
+#: templates/jobs/feed.html:17
+msgid "Фильтр по навыку…"
+msgstr "Filter by skill..."
+
+#: templates/jobs/feed.html:22
+msgid "Свежесть"
+msgstr "Freshness"
+
+#: templates/jobs/feed.html:23
+msgid "Score"
+msgstr "Score"
+
+#: templates/jobs/feed.html:44
+msgid "вакансий в очереди на ревью"
+msgstr "vacancies in queue for review"
+
+#: templates/jobs/feed.html:46
+msgid "авто-скрапинг"
+msgstr "auto-scraping"
+
+#: templates/jobs/feed.html:71
+msgid "score"
+msgstr "score"
+
+#: templates/jobs/feed.html:83
+msgid "Оплата подтверждена"
+msgstr "Payment confirmed"
+
+#: templates/jobs/feed.html:84
+msgid "Оплата не подтверждена"
+msgstr "Payment not confirmed"
+
+#: templates/jobs/feed.html:85
+msgid "Нанимает"
+msgstr "Hires"
+
+#: templates/jobs/feed.html:86
+msgid "откликов"
+msgstr "responses"
+
+#: templates/jobs/feed.html:93
+msgid "Одобрить"
+msgstr "Approve"
+
+#: templates/jobs/feed.html:96
+msgid "Пропустить"
+msgstr "Skip"
+
+#: templates/jobs/feed.html:99
+msgid "Открыть"
+msgstr "Open"
+
+#: templates/jobs/feed.html:101
+msgid "В очереди на отправку"
+msgstr "Queue for dispatch"
+
+#: templates/jobs/feed.html:103
+msgid "Отменить"
+msgstr "Cancel"
+
+#: templates/jobs/feed.html:106
+msgid "Открыть детально"
+msgstr "Open in detail"
+
+#: templates/jobs/feed.html:112
+msgid "Вернуть в ленту"
+msgstr "Return to feed"
+
+#: templates/jobs/feed.html:119
+msgid "Ничего не найдено"
+msgstr "Nothing found"
+
+#: templates/jobs/feed.html:119
+#, python-format
+msgid "по фильтру «%(q)s»"
+msgstr "by filter “%(q)s”"
+
+#: templates/jobs/feed.html:128
+msgid "Очередь на отправку"
+msgstr "Queue for dispatch"
+
+#: templates/jobs/feed.html:139
+msgid ""
+"Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на"
+" Upwork."
+msgstr ""
+"Empty for now. Approve the cards on the left - they will go here for manual "
+"submission to Upwork."
+
+#: templates/jobs/feed.html:144
+msgid "Сегодня"
+msgstr "Today"
+
+#: templates/jobs/feed.html:146
+msgid "найдено"
+msgstr "found"
+
+#: templates/jobs/feed.html:147
+msgid "одобрено"
+msgstr "approved"
+
+#: templates/jobs/feed.html:148
+msgid "отправлено"
+msgstr "sent"
+
+#: templates/jobs/feed.html:149
+msgid "пропущено"
+msgstr "missed"
+
+#: templates/letters/_cover.html:4
+msgid "Черновик cover letter"
+msgstr "Draft cover letter"
+
+#: templates/letters/_cover.html:8
+msgid "Подсветка"
+msgstr "Backlight"
+
+#: templates/letters/_cover.html:9
+msgid "Редактировать"
+msgstr "Edit"
+
+#: templates/letters/_cover.html:13
+msgid "Перегенерировать"
+msgstr "Regenerate"
+
+#: templates/letters/_cover.html:13
+msgid "Сгенерировать"
+msgstr "Generate"
+
+#: templates/letters/_cover.html:18
+msgid ""
+"Подсвеченные фрагменты взяты из твоих GitHub-проектов — редактируй перед "
+"отправкой."
+msgstr ""
+"The highlighted fragments are taken from your GitHub projects - edit before "
+"sending."
+
+#: templates/letters/_cover.html:23 templates/tracks/edit.html:29
+msgid "Сохранить"
+msgstr "Save"
+
+#: templates/letters/_cover.html:29
+msgid "Перевод для проверки · клиенту уходит английский оригинал"
+msgstr ""
+"Translation for verification · the English original is sent to the client"
+
+#: templates/letters/_cover.html:37
+msgid "Источники:"
+msgstr "Sources:"
+
+#: templates/letters/_cover.html:47
+msgid "Отправлено на Upwork"
+msgstr "Sent on Upwork"
+
+#: templates/letters/_cover.html:49
+msgid "Вернуть"
+msgstr "Undo"
+
+#: templates/letters/_cover.html:57
+msgid "Скопировать письмо и открыть на Upwork"
+msgstr "Copy letter & open on Upwork"
+
+#: templates/letters/_cover.html:59
+msgid ""
+"Копирует английский оригинал, открывает вакансию и помечает карточку "
+"«Отправлено»."
+msgstr ""
+"Copies the English original, opens the posting, and marks the card as Sent."
+
+#: templates/letters/_cover.html:72
+msgid "Черновик ещё не сгенерирован — нажми «Сгенерировать»."
+msgstr "The draft has not yet been generated - click “Generate”."
+
+#: templates/screening/_screening.html:5
+msgid "Ответы на вопросы клиента"
+msgstr "Answers to client questions"
+
+#: templates/screening/_screening.html:8
+msgid "Черновики ответов сгенерированы автоматически — проверь и поправь."
+msgstr "Draft answers are generated automatically - check and correct."
+
+#: templates/screening/_screening.html:21
+msgid "Сохранить ответы"
+msgstr "Save answers"
+
+#: templates/screening/_screening.html:27
+msgid "Вопросы клиента"
+msgstr "Client Questions"
+
+#: templates/screening/_screening.html:30
+msgid "Сгенерировать ответы"
+msgstr "Generate answers"
+
+#: templates/tracks/edit.html:3 templates/tracks/edit.html:8
+#: templates/tracks/list.html:11
+msgid "Новый трек"
+msgstr "New track"
+
+#: templates/tracks/edit.html:8
+#, python-format
+msgid "Трек: %(name)s"
+msgstr "Track: %(name)s"
+
+#: templates/tracks/edit.html:30
+msgid "Отмена"
+msgstr "Cancel"
+
+#: templates/tracks/list.html:3
+msgid "Настройки · Треки · Upwork Copilot"
+msgstr "Settings · Tracks · Upwork Copilot"
+
+#: templates/tracks/list.html:8
+msgid "Треки — персоны для откликов"
+msgstr "Tracks - persons for responses"
+
+#: templates/tracks/list.html:22
+msgid ""
+"Каждый сохранённый поиск привязан к треку — вакансии из него скорятся и "
+"получают черновик под этой персоной. Привяжите поиск к треку в разделе "
+"поисков (или в /admin)."
+msgstr ""
+"Each saved search is linked to a track - vacancies from it are quick and "
+"receive a draft under this person. Link the search to a track in the search "
+"section (or /admin)."
+
+#: templates/tracks/list.html:31
+msgid "по умолчанию"
+msgstr "default"
+
+#: templates/tracks/list.html:33
+#, python-format
+msgid ""
+"%(role)s · $%(rate)s/час · %(n_skills)s навык(ов) · %(n_filters)s поиск(ов)"
+msgstr ""
+"%(role)s · $%(rate)s/hour · %(n_skills)s skill(s) · %(n_filters)s search(s)"
+
+#: templates/tracks/list.html:38
+msgid "Пока нет ни одного трека. Создайте первый."
+msgstr "There are no tracks yet. Create the first one."

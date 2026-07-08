@@ -15,9 +15,10 @@ class MetricsTests(TestCase):
 
     def test_funnel_found_counts_all(self):
         f = metrics.funnel()
-        self.assertEqual(f[0]["label"], "Найдено")
+        self.assertEqual(str(f[0]["label"]), "Найдено")
         self.assertEqual(f[0]["count"], 3)
-        self.assertEqual(dict(metrics.funnel_counts())["Отправлено"], 1)
+        # funnel_counts now keys by stable slug (language-independent), not label
+        self.assertEqual(dict(metrics.funnel_counts())["applied"], 1)
 
     def test_keywords_and_prometheus(self):
         kws = {k["kw"]: k for k in metrics.keywords()}

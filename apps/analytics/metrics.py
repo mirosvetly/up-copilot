@@ -6,34 +6,41 @@ from collections import Counter
 
 from django.db.models import Avg
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.jobs.models import JobPosting
 from apps.letters.models import CoverLetterDraft
 from apps.scoring.models import JobScore
 
 S = JobPosting.Status
-_DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+_DAYS = [_("Пн"), _("Вт"), _("Ср"), _("Чт"), _("Пт"), _("Сб"), _("Вс")]
 _BUCKETS = ["00", "03", "06", "09", "12", "15", "18", "21"]
 
 
-def funnel_counts() -> list[tuple[str, int]]:
+def _funnel_rows() -> list[tuple[str, object, int]]:
+    """(stable slug, translated label, count) — slug keys the API/metrics, label displays."""
     return [
-        ("Найдено", JobPosting.objects.count()),
-        ("Прошло скоринг", JobScore.objects.values("job").distinct().count()),
-        ("Черновик готов", CoverLetterDraft.objects.values("job").distinct().count()),
-        ("Одобрено", JobPosting.objects.filter(status__in=[S.REVIEWED, S.APPLIED]).count()),
-        ("Отправлено", JobPosting.objects.filter(status=S.APPLIED).count()),
-        ("Интервью", JobPosting.objects.filter(interviewed_at__isnull=False).count()),
-        ("Найм", JobPosting.objects.filter(hired_at__isnull=False).count()),
+        ("found", _("Найдено"), JobPosting.objects.count()),
+        ("scored", _("Прошло скоринг"), JobScore.objects.values("job").distinct().count()),
+        ("drafted", _("Черновик готов"), CoverLetterDraft.objects.values("job").distinct().count()),
+        ("reviewed", _("Одобрено"), JobPosting.objects.filter(status__in=[S.REVIEWED, S.APPLIED]).count()),
+        ("applied", _("Отправлено"), JobPosting.objects.filter(status=S.APPLIED).count()),
+        ("interview", _("Интервью"), JobPosting.objects.filter(interviewed_at__isnull=False).count()),
+        ("hire", _("Найм"), JobPosting.objects.filter(hired_at__isnull=False).count()),
     ]
 
 
+def funnel_counts() -> list[tuple[str, int]]:
+    """Stable (slug, count) for the metrics API/prometheus — language-independent."""
+    return [(slug, count) for slug, _label, count in _funnel_rows()]
+
+
 def funnel() -> list[dict]:
-    steps = funnel_counts()
-    total = steps[0][1] or 1
+    steps = _funnel_rows()
+    total = steps[0][2] or 1
     out = []
-    for i, (label, count) in enumerate(steps):
-        prev = steps[i - 1][1] if i else count
+    for i, (_slug, label, count) in enumerate(steps):
+        prev = steps[i - 1][2] if i else count
         shade = max(0.28, 0.9 - i * 0.1)
         out.append({
             "label": label, "count": count,
@@ -94,19 +101,17 @@ def stat_cards() -> list[dict]:
         job__status__in=[S.REVIEWED, S.APPLIED]
     ).aggregate(a=Avg("score"))["a"]
     return [
-        {"label": "Найдено", "value": JobPosting.objects.count()},
-        {"label": "Отправлено", "value": applied},
-        {"label": "Ответ клиента", "value": f"{round(interview / applied * 100) if applied else 0}%"},
-        {"label": "Найм", "value": JobPosting.objects.filter(hired_at__isnull=False).count()},
-        {"label": "Ср. score одобр.", "value": round(avg) if avg else "—"},
+        {"label": _("Найдено"), "value": JobPosting.objects.count()},
+        {"label": _("Отправлено"), "value": applied},
+        {"label": _("Ответ клиента"), "value": f"{round(interview / applied * 100) if applied else 0}%"},
+        {"label": _("Найм"), "value": JobPosting.objects.filter(hired_at__isnull=False).count()},
+        {"label": _("Ср. score одобр."), "value": round(avg) if avg else "—"},
     ]
 
 
 def prometheus_text() -> str:
     lines = ["# HELP upwork_funnel Jobs reaching each pipeline stage",
              "# TYPE upwork_funnel gauge"]
-    slug = {"Найдено": "found", "Прошло скоринг": "scored", "Черновик готов": "drafted",
-            "Одобрено": "reviewed", "Отправлено": "applied", "Интервью": "interview", "Найм": "hire"}
-    for label, count in funnel_counts():
-        lines.append(f'upwork_funnel{{stage="{slug[label]}"}} {count}')
+    for slug, count in funnel_counts():
+        lines.append(f'upwork_funnel{{stage="{slug}"}} {count}')
     return "\n".join(lines) + "\n"

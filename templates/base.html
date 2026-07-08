@@ -1,4 +1,4 @@
-{% load icons %}<!DOCTYPE html>
+{% load icons i18n %}{% get_current_language as CUR_LANG %}{% get_available_languages as LANGUAGES %}<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -35,22 +35,33 @@
 
     <nav style="flex:1;padding:6px 12px;display:flex;flex-direction:column;gap:3px">
       {% block nav %}
-      {% include "jobs/_nav_item.html" with label="Лента вакансий" ico="layout-grid" href_name="jobs:feed" active=is_feed %}
-      {% include "jobs/_nav_item.html" with label="Аналитика" ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
-      {% include "jobs/_nav_item.html" with label="Отправленные" ico="inbox" disabled=True %}
-      {% include "jobs/_nav_item.html" with label="GitHub-источники" ico="github" disabled=True %}
-      {% include "jobs/_nav_item.html" with label="Настройки" ico="sliders" href_name="tracks:list" active=is_settings %}
+      {% trans "Лента вакансий" as nav_feed %}
+      {% trans "Аналитика" as nav_analytics %}
+      {% trans "Отправленные" as nav_sent %}
+      {% trans "GitHub-источники" as nav_github %}
+      {% trans "Настройки" as nav_settings %}
+      {% include "jobs/_nav_item.html" with label=nav_feed ico="layout-grid" href_name="jobs:feed" active=is_feed %}
+      {% include "jobs/_nav_item.html" with label=nav_analytics ico="bar-chart" href_name="analytics:analytics" active=is_analytics %}
+      {% include "jobs/_nav_item.html" with label=nav_sent ico="inbox" disabled=True %}
+      {% include "jobs/_nav_item.html" with label=nav_github ico="github" disabled=True %}
+      {% include "jobs/_nav_item.html" with label=nav_settings ico="sliders" href_name="tracks:list" active=is_settings %}
       {% endblock %}
     </nav>
 
     <div style="border-top:1px solid #404040;padding:12px 12px 14px">
+      <form action="{% url 'set_language' %}" method="post" style="display:flex;gap:4px;padding:0 8px 10px">{% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+        {% for code, label in LANGUAGES %}
+        <button name="language" value="{{ code }}" title="{{ label }}" style="flex:1;height:26px;border:1px solid #404040;border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;background:{% if code == CUR_LANG %}#b6d086{% else %}#0a0a0a{% endif %};color:{% if code == CUR_LANG %}#171717{% else %}#a3a3a3{% endif %}">{{ code|upper }}</button>
+        {% endfor %}
+      </form>
       <div style="display:flex;align-items:center;gap:10px;padding:6px 8px">
         <span style="width:30px;height:30px;border-radius:20px;background:#262626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:none;color:#d4d4d4">{{ freelancer.initials }}</span>
         <span style="flex:1;min-width:0">
           <span style="display:block;font-size:13px;font-weight:500">{{ freelancer.display_name }}</span>
           <span style="display:block;font-size:11px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ freelancer.headline }}</span>
         </span>
-        <span style="width:7px;height:7px;border-radius:20px;background:#4ade80;flex:none" title="Скрапер активен"></span>
+        <span style="width:7px;height:7px;border-radius:20px;background:#4ade80;flex:none" title="{% trans "Скрапер активен" %}"></span>
       </div>
     </div>
   </aside>

@@ -1,21 +1,21 @@
 {% extends "base.html" %}
-{% load icons %}
+{% load icons i18n %}
 {% block title %}{{ job.title }} · Upwork Copilot{% endblock %}
 {% block main %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
 
   <!-- header -->
   <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
-    <a href="{% url 'jobs:feed' %}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 8px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#d4d4d4;font-size:13px;font-weight:500">{% icon "chevron-left" 16 %}Лента</a>
+    <a href="{% url 'jobs:feed' %}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 8px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#d4d4d4;font-size:13px;font-weight:500">{% icon "chevron-left" 16 %}{% trans "Лента" %}</a>
     <div style="width:1px;height:18px;background:#404040"></div>
     <div style="font-size:12px;color:#a3a3a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px">{{ job.title }}</div>
     <div style="flex:1"></div>
-    <a href="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% icon "arrow-up-right" 14 %}Открыть на Upwork</a>
+    <a href="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% icon "arrow-up-right" 14 %}{% trans "Открыть на Upwork" %}</a>
     {% if job.is_sent %}
-      <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#b6d086;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#b6d086" %}Отправлено вручную</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#b6d086;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#b6d086" %}{% trans "Отправлено вручную" %}</span>
     {% else %}
       <form method="post" action="{% url 'jobs:job_action' pk 'mark_sent' %}"><input type="hidden" name="next" value="/job/{{ pk }}/">{% csrf_token %}
-        <button style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">{% icon "send" 14 "#171717" %}Отметить как отправлено</button>
+        <button style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">{% icon "send" 14 "#171717" %}{% trans "Отметить как отправлено" %}</button>
       </form>
     {% endif %}
   </div>
@@ -41,12 +41,12 @@
                 <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
                 <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:{{ job.fresh_color }}">{% icon "clock" 14 job.fresh_color %}{{ job.posted_text }}</span>
                 {% if job.proposals %}<span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
-                <span style="font-size:13px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.proposals }} откликов</span>{% endif %}
+                <span style="font-size:13px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with n=job.proposals %}{{ n }} откликов{% endblocktrans %}</span>{% endif %}
               </div>
             </div>
             <div style="flex:none;text-align:center;background:#171717;border:1px solid {{ job.score_border }};border-radius:11px;padding:8px 12px;min-width:74px">
               <div style="font-size:24px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};line-height:1">{{ job.score_display }}</div>
-              <div style="font-size:9px;color:#737373;letter-spacing:.06em;text-transform:uppercase;margin-top:2px">match score</div>
+              <div style="font-size:9px;color:#737373;letter-spacing:.06em;text-transform:uppercase;margin-top:2px">{% trans "match score" %}</div>
             </div>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px">
@@ -61,10 +61,10 @@
         <div style="background:rgba(182,208,134,0.05);border:1px solid rgba(182,208,134,0.22);border-radius:14px;padding:18px 20px">
           <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
             <span style="display:inline-flex">{% icon "sparkles" 16 "#b6d086" %}</span>
-            <span style="font-size:14px;font-weight:600">Почему подходит</span>
-            <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace">скоринг · {{ job.model_name }}</span>
+            <span style="font-size:14px;font-weight:600">{% trans "Почему подходит" %}</span>
+            <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with model_name=job.model_name %}скоринг · {{ model_name }}{% endblocktrans %}</span>
             <div style="flex:1"></div>
-            <span style="font-size:12px;color:#a3a3a3">итог <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};font-weight:700">{{ job.score_display }}/100</span></span>
+            <span style="font-size:12px;color:#a3a3a3">{% trans "итог" %} <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};font-weight:700">{{ job.score_display }}/100</span></span>
           </div>
           <div style="display:flex;flex-direction:column;gap:9px">
             {% for r in job.reasons %}
@@ -80,11 +80,11 @@
 
         <!-- description -->
         <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Описание вакансии</div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">{% trans "Описание вакансии" %}</div>
           {% if job.description_ru %}
           <p style="font-size:14px;line-height:1.65;color:#d4d4d4;white-space:pre-wrap;margin:0">{{ job.description_ru }}</p>
           <details style="margin-top:12px">
-            <summary style="cursor:pointer;font-size:12px;color:#737373;list-style:none">Показать оригинал (EN)</summary>
+            <summary style="cursor:pointer;font-size:12px;color:#737373;list-style:none">{% trans "Показать оригинал (EN)" %}</summary>
             <p style="font-size:13px;line-height:1.6;color:#8a8a8a;white-space:pre-wrap;margin:10px 0 0">{{ job.description }}</p>
           </details>
           {% else %}
@@ -105,60 +105,60 @@
         <div style="background:#171717;border:1px solid #404040;border-radius:14px;overflow:hidden">
           <div style="padding:15px 18px;border-bottom:1px solid #262626;display:flex;align-items:center;gap:9px">
             <span style="display:inline-flex">{% icon "users" 15 "#a3a3a3" %}</span>
-            <span style="font-size:13px;font-weight:600">Карточка клиента</span>
+            <span style="font-size:13px;font-weight:600">{% trans "Карточка клиента" %}</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:{{ c.risk_bg }}">
             <span style="display:inline-flex">{% icon c.risk_icon 17 c.risk_color %}</span>
             <span style="font-size:14px;font-weight:700;color:{{ c.risk_color }}">{{ c.risk_label }}</span>
             <div style="flex:1"></div>
-            <span style="font-size:11px;color:#a3a3a3">визитка риска</span>
+            <span style="font-size:11px;color:#a3a3a3">{% trans "визитка риска" %}</span>
           </div>
           <div style="padding:16px 18px">
             <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
               <span style="display:inline-flex;flex:none">{% if c.verified %}{% icon "circle-check" 16 "#4ade80" %}{% else %}{% icon "alert-triangle" 16 "#f87171" %}{% endif %}</span>
-              <span style="flex:1;font-size:13px;color:#a3a3a3">Оплата</span>
+              <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Оплата" %}</span>
               <span style="font-size:13px;font-weight:600;color:{{ c.pay_color }}">{{ c.pay_text }}</span>
             </div>
             <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
               <span style="display:inline-flex;flex:none">{% icon "wallet" 15 "#737373" %}</span>
-              <span style="flex:1;font-size:13px;color:#a3a3a3">Всего потрачено</span>
+              <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Всего потрачено" %}</span>
               <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.spent }}</span>
             </div>
             <div style="padding:10px 0;border-bottom:1px solid #1f1f1f">
               <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
                 <span style="display:inline-flex;flex:none">{% icon "trending-up" 15 "#737373" %}</span>
-                <span style="flex:1;font-size:13px;color:#a3a3a3">Hire rate</span>
+                <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Hire rate" %}</span>
                 <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ c.hire_color }}">{{ c.hire_rate }}%</span>
               </div>
               <div style="height:5px;border-radius:20px;background:#262626;overflow:hidden"><div style="height:100%;width:{{ c.hire_rate }}%;background:{{ c.hire_color }}"></div></div>
             </div>
             <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
               <span style="display:inline-flex;flex:none">{% icon "map-pin" 15 "#737373" %}</span>
-              <span style="flex:1;font-size:13px;color:#a3a3a3">Страна</span>
+              <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Страна" %}</span>
               <span style="font-size:13px;font-weight:500">{{ c.country }}</span>
             </div>
             <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
               <span style="display:inline-flex;flex:none">{% icon "star" 15 "#facc15" %}</span>
-              <span style="flex:1;font-size:13px;color:#a3a3a3">Рейтинг</span>
+              <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Рейтинг" %}</span>
               <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.rating_text }}</span>
             </div>
             <div style="display:flex;gap:10px;padding:12px 0 2px">
               <div style="flex:1;background:#0a0a0a;border:1px solid #262626;border-radius:9px;padding:9px 11px">
                 <div style="font-size:16px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.jobs }}</div>
-                <div style="font-size:10.5px;color:#737373;margin-top:1px">вакансий</div>
+                <div style="font-size:10.5px;color:#737373;margin-top:1px">{% trans "вакансий" %}</div>
               </div>
               <div style="flex:1;background:#0a0a0a;border:1px solid #262626;border-radius:9px;padding:9px 11px">
                 <div style="font-size:16px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.hires }}</div>
-                <div style="font-size:10.5px;color:#737373;margin-top:1px">наймов</div>
+                <div style="font-size:10.5px;color:#737373;margin-top:1px">{% trans "наймов" %}</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;padding-top:12px;font-size:11px;color:#737373">{% icon "clock" 12 "#525252" %}На Upwork с {{ c.member_since }}</div>
+            <div style="display:flex;align-items:center;gap:6px;padding-top:12px;font-size:11px;color:#737373">{% icon "clock" 12 "#525252" %}{% blocktrans with member_since=c.member_since %}На Upwork с {{ member_since }}{% endblocktrans %}</div>
           </div>
         </div>
         {% endwith %}{% endif %}
 
         <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px 18px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">Статус в трекере</div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">{% trans "Статус в трекере" %}</div>
           <div style="display:flex;align-items:center;gap:10px">
             <span style="width:9px;height:9px;border-radius:20px;background:{{ job.status_color }};flex:none"></span>
             <span style="font-size:14px;font-weight:600;color:{{ job.status_color }}">{{ job.status_label }}</span>

@@ -353,6 +353,42 @@ class FeedTrackFilterTests(TestCase):
         self.assertEqual({p["label"]: p["count"] for p in pills}["DevTrack"], 1)
 
 
+class I18nTests(TestCase):
+    def test_feed_defaults_to_russian(self):
+        self.assertContains(self.client.get("/"), "Лента вакансий")
+
+    def test_feed_renders_in_english_via_cookie(self):
+        self.client.cookies["django_language"] = "en"
+        r = self.client.get("/")
+        self.assertContains(r, "Job feed")
+        self.assertNotContains(r, "Лента вакансий")  # no Russian chrome leaking through
+
+    def test_set_language_switches(self):
+        r = self.client.post("/i18n/setlang/", {"language": "en", "next": "/"})
+        self.assertEqual(r.status_code, 302)
+        self.assertContains(self.client.get("/"), "Settings")  # sticks via cookie
+
+
+class UpworkUrlSafetyTests(TestCase):
+    def test_javascript_url_is_stripped(self):
+        from .presenters import job_detail
+
+        job = JobPosting.objects.create(
+            job_id="xss1", title="t", budget_type="fixed",
+            raw={"url": "javascript:alert(document.cookie)"},
+        )
+        self.assertEqual(job_detail(job)["upwork_url"], "")  # not passed to href/window.open
+
+    def test_https_url_passes(self):
+        from .presenters import job_detail
+
+        job = JobPosting.objects.create(
+            job_id="ok1", title="t", budget_type="fixed",
+            raw={"url": "https://www.upwork.com/jobs/~01a"},
+        )
+        self.assertEqual(job_detail(job)["upwork_url"], "https://www.upwork.com/jobs/~01a")
+
+
 class JobActionViewTests(TestCase):
     def _job(self, status=JobPosting.Status.SCORED):
         return JobPosting.objects.create(

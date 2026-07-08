@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% load icons %}
-{% block title %}Настройки · Треки · Upwork Copilot{% endblock %}
+{% load icons i18n %}
+{% block title %}{% trans "Настройки · Треки · Upwork Copilot" %}{% endblock %}
 {% block main %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
   <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
     <span style="display:inline-flex">{% icon "sliders" 17 "#b6d086" %}</span>
-    <div style="font-size:15px;font-weight:600">Треки — персоны для откликов</div>
+    <div style="font-size:15px;font-weight:600">{% trans "Треки — персоны для откликов" %}</div>
     <div style="flex:1"></div>
     <a href="{% url 'tracks:create' %}" style="display:inline-flex;align-items:center;gap:7px;background:#b6d086;color:#141414;font-size:13px;font-weight:600;padding:8px 14px;border-radius:9px">
-      {% icon "plus" 15 "#141414" %} Новый трек
+      {% icon "plus" 15 "#141414" %} {% trans "Новый трек" %}
     </a>
   </div>
 
@@ -19,8 +19,7 @@
       {% endfor %}
 
       <div style="font-size:13px;color:#a3a3a3;line-height:1.5">
-        Каждый сохранённый поиск привязан к треку — вакансии из него скорятся и получают
-        черновик под этой персоной. Привяжите поиск к треку в разделе поисков (или в /admin).
+        {% trans "Каждый сохранённый поиск привязан к треку — вакансии из него скорятся и получают черновик под этой персоной. Привяжите поиск к треку в разделе поисков (или в /admin)." %}
       </div>
 
       {% for t in tracks %}
@@ -29,14 +28,14 @@
         <div style="flex:1;min-width:0">
           <div style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:9px">
             {{ t.name }}
-            {% if t.is_default %}<span style="font-size:11px;font-weight:500;color:#b6d086;background:rgba(182,208,134,0.12);padding:2px 8px;border-radius:6px">по умолчанию</span>{% endif %}
+            {% if t.is_default %}<span style="font-size:11px;font-weight:500;color:#b6d086;background:rgba(182,208,134,0.12);padding:2px 8px;border-radius:6px">{% trans "по умолчанию" %}</span>{% endif %}
           </div>
-          <div style="font-size:12.5px;color:#a3a3a3;margin-top:3px;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ t.scorer_role }} · ${{ t.min_hourly_rate }}/час · {{ t.skills|length }} навык(ов) · {{ t.filters.count }} поиск(ов)</div>
+          <div style="font-size:12.5px;color:#a3a3a3;margin-top:3px;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with role=t.scorer_role rate=t.min_hourly_rate n_skills=t.skills|length n_filters=t.filters.count %}{{ role }} · ${{ rate }}/час · {{ n_skills }} навык(ов) · {{ n_filters }} поиск(ов){% endblocktrans %}</div>
         </div>
         <span style="display:inline-flex;color:#525252">{% icon "chevron-right" 18 "#525252" %}</span>
       </a>
       {% empty %}
-      <div style="color:#a3a3a3;font-size:14px;padding:20px 0">Пока нет ни одного трека. Создайте первый.</div>
+      <div style="color:#a3a3a3;font-size:14px;padding:20px 0">{% trans "Пока нет ни одного трека. Создайте первый." %}</div>
       {% endfor %}
     </div>
   </div>

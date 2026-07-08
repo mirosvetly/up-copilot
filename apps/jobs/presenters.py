@@ -8,10 +8,18 @@ from __future__ import annotations
 from decimal import Decimal
 
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.scoring.profile import resolve_track, track_config
 
 from .models import JobPosting
+
+
+def _safe_url(u) -> str:
+    """Only let http(s) URLs reach href/window.open — a javascript:/data: URL
+    from external job data (API/email) would be an XSS sink otherwise."""
+    u = (u or "").strip()
+    return u if u.lower().startswith(("https://", "http://")) else ""
 
 FRESH_WINDOW_MIN = 60
 _UI_STATE = {
@@ -33,21 +41,21 @@ def _age_minutes(job):
 
 def _age_parts(m):
     if m is None:
-        return "—", "время неизвестно"
+        return "—", _("время неизвестно")
     if m < 60:
-        return f"{m}м", f"{m} мин назад"
+        return f"{m}м", _("%(m)s мин назад") % {"m": m}
     h, mm = divmod(m, 60)
-    return f"{h}ч" + (f" {mm}м" if mm else ""), f"{h} ч {mm} мин назад"
+    return f"{h}ч" + (f" {mm}м" if mm else ""), _("%(h)s ч %(mm)s мин назад") % {"h": h, "mm": mm}
 
 
 def _fresh_meta(m):
     if m is None:
         return "—", "#737373", "rgba(115,115,115,0.16)"
     if m <= 15:
-        return "Свежая", "#b6d086", "rgba(182,208,134,0.14)"
+        return _("Свежая"), "#b6d086", "rgba(182,208,134,0.14)"
     if m <= 45:
-        return "Стареет", "#f59e0b", "rgba(245,158,11,0.14)"
-    return "Устарела", "#737373", "rgba(115,115,115,0.16)"
+        return _("Стареет"), "#f59e0b", "rgba(245,158,11,0.14)"
+    return _("Устарела"), "#737373", "rgba(115,115,115,0.16)"
 
 
 def _score_meta(s):
@@ -75,10 +83,10 @@ def _budget(job):
             return f"${fmt(job.budget_min)}–{fmt(job.budget_max)}/hr"
         if job.budget_min is not None:
             return f"${fmt(job.budget_min)}/hr"
-        return "почасовая"
+        return _("почасовая")
     if job.budget_min is not None:
         return f"${fmt(job.budget_min)} fixed"
-    return "фикс"
+    return _("фикс")
 
 
 def job_card(job, *, my_skills_lc=None):
@@ -127,19 +135,19 @@ _RU_MONTHS = ["", "января", "февраля", "марта", "апреля"
               "августа", "сентября", "октября", "ноября", "декабря"]
 
 _RISK_META = {
-    "low": ("Низкий риск", "#4ade80", "rgba(74,222,128,0.08)", "circle-check"),
-    "med": ("Средний риск", "#f59e0b", "rgba(245,158,11,0.08)", "alert-triangle"),
-    "high": ("Высокий риск", "#f87171", "rgba(248,113,113,0.08)", "alert-triangle"),
+    "low": (_("Низкий риск"), "#4ade80", "rgba(74,222,128,0.08)", "circle-check"),
+    "med": (_("Средний риск"), "#f59e0b", "rgba(245,158,11,0.08)", "alert-triangle"),
+    "high": (_("Высокий риск"), "#f87171", "rgba(248,113,113,0.08)", "alert-triangle"),
 }
 
 _STATUS_TRACKER = {
-    JobPosting.Status.NEW: ("Новая — на ревью", "#a3a3a3", "Ещё не оценена."),
-    JobPosting.Status.SCORED: ("Оценена — на ревью", "#a3a3a3", "Просмотри и одобри или пропусти."),
-    JobPosting.Status.DRAFTED: ("Черновик готов", "#facc15", "Письмо сгенерировано, ждёт одобрения."),
-    JobPosting.Status.REVIEWED: ("Одобрено", "#4ade80", "В очереди на ручную отправку. Открой на Upwork и отправь."),
-    JobPosting.Status.APPLIED: ("Отправлено вручную", "#b6d086", "Отмечено как отправленное. Жди ответа клиента."),
-    JobPosting.Status.SKIPPED: ("Пропущено", "#737373", "Исключена из ленты. Можно вернуть."),
-    JobPosting.Status.EXPIRED: ("Устарела", "#737373", "Публикация устарела."),
+    JobPosting.Status.NEW: (_("Новая — на ревью"), "#a3a3a3", _("Ещё не оценена.")),
+    JobPosting.Status.SCORED: (_("Оценена — на ревью"), "#a3a3a3", _("Просмотри и одобри или пропусти.")),
+    JobPosting.Status.DRAFTED: (_("Черновик готов"), "#facc15", _("Письмо сгенерировано, ждёт одобрения.")),
+    JobPosting.Status.REVIEWED: (_("Одобрено"), "#4ade80", _("В очереди на ручную отправку. Открой на Upwork и отправь.")),
+    JobPosting.Status.APPLIED: (_("Отправлено вручную"), "#b6d086", _("Отмечено как отправленное. Жди ответа клиента.")),
+    JobPosting.Status.SKIPPED: (_("Пропущено"), "#737373", _("Исключена из ленты. Можно вернуть.")),
+    JobPosting.Status.EXPIRED: (_("Устарела"), "#737373", _("Публикация устарела.")),
 }
 
 
@@ -178,7 +186,7 @@ def job_detail(job):
         "description_ru": job.description_ru,
         "title_ru": job.title_ru,
         "reasons": reasons,
-        "upwork_url": (job.raw or {}).get("url", ""),
+        "upwork_url": _safe_url((job.raw or {}).get("url", "")),
         "model_name": score_obj.model_name if score_obj else "—",
         "status_label": tracker[0],
         "status_color": tracker[1],
@@ -187,13 +195,13 @@ def job_detail(job):
         "client_card": None if not client else {
             "risk_label": risk[0], "risk_color": risk[1], "risk_bg": risk[2], "risk_icon": risk[3],
             "verified": client.verified_payment,
-            "pay_text": "Подтверждена" if client.verified_payment else "Не подтверждена",
+            "pay_text": _("Подтверждена") if client.verified_payment else _("Не подтверждена"),
             "pay_color": "#4ade80" if client.verified_payment else "#f87171",
             "spent": _fmt_spent(client.total_spent),
             "hire_rate": client.hire_rate or 0,
             "hire_color": _hire_color(client.hire_rate),
             "country": client.country or "—",
-            "rating_text": f"{client.avg_rating} ★" if client.avg_rating else "нет отзывов",
+            "rating_text": f"{client.avg_rating} ★" if client.avg_rating else _("нет отзывов"),
             "jobs": client.total_jobs if client.total_jobs is not None else "—",
             "hires": client.total_hires if client.total_hires is not None else "—",
             "member_since": _ru_member_since(client.member_since),
