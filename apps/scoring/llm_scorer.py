@@ -11,9 +11,11 @@ def _system(profile: dict) -> str:
     analysis_prompt = profile.get("job_analysis_prompt") or "Score fit 0-100 and justify it."
     return (
         f"You are a freelance-job screener for this freelancer: {role}. "
-        f"{analysis_prompt} Reply with ONLY JSON: "
+        f"{analysis_prompt} "
+        "Output ONLY a single JSON object and NOTHING before or after it (no prose, no code fence): "
         '{"score": int, "reasoning": str, "breakdown": [{"text": str, "w": int, "neg": bool}]}. '
-        "Each breakdown item is one factor; w is its 0-30 weight; neg=true for negatives."
+        "Each breakdown item is one factor; w is its 0-30 weight; neg=true for negatives. "
+        "Keep it compact: at most 6 breakdown items, each text under 15 words, reasoning under 40 words."
     )
 
 
@@ -61,7 +63,7 @@ def _prompt(job: JobPosting, profile: dict, similarity: float) -> str:
 
 
 def llm_compute(job: JobPosting, profile: dict, similarity: float, llm) -> dict:
-    data = llm.complete_json(_system(profile), _prompt(job, profile, similarity), max_tokens=700)
+    data = llm.complete_json(_system(profile), _prompt(job, profile, similarity), max_tokens=1500)
     score = max(0, min(100, int(data.get("score", 0))))
     breakdown = [
         {"text": str(b.get("text", "")), "w": int(b.get("w", 0)), "neg": bool(b.get("neg", False))}
