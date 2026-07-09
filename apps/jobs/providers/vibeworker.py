@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from decimal import Decimal
 from itertools import product
+from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
@@ -20,6 +21,13 @@ LIMIT = 20  # ponytail: modest page size to stretch the free plan's 100 results/
 TIMEOUT = 30
 
 _UPWORK_ID = re.compile(r"~([0-9a-zA-Z]+)")
+
+
+def _is_upwork(url: str) -> bool:
+    # Match the host, not a substring: "notupwork.com" / "upwork.com.evil.com"
+    # both contain "upwork.com" but are not Upwork.
+    host = (urlparse(url or "").hostname or "").lower()
+    return host == "upwork.com" or host.endswith(".upwork.com")
 
 
 def _dec(v) -> Decimal | None:
@@ -58,8 +66,7 @@ class VibeworkerProvider(JobProvider):
                 # Vibeworker occasionally mixes in non-Upwork postings (e.g.
                 # freelancer.com) under the same upworkUrl field — this app is
                 # Upwork-only (connects scoring, proposal flow), so drop them.
-                src_url = (row.get("upworkUrl") or row.get("url") or "").lower()
-                if "upwork.com" not in src_url:
+                if not _is_upwork(row.get("upworkUrl") or row.get("url")):
                     continue
                 job = self._to_raw(row)
                 if saved_filter.require_verified_payment and not job.client.verified_payment:

@@ -231,14 +231,25 @@ class VibeworkerProviderTests(TestCase):
         self.assertEqual(params["sort"], "newest")
 
     def test_non_upwork_rows_are_dropped(self):
-        # Vibeworker sometimes returns freelancer.com etc. — Upwork only.
+        # Vibeworker sometimes returns freelancer.com etc. — Upwork only. The
+        # host must match, not a substring (notupwork.com / upwork.com.evil.com
+        # both contain "upwork.com" but are not Upwork).
+        from apps.jobs.providers.vibeworker import _is_upwork
+
+        self.assertTrue(_is_upwork("https://www.upwork.com/jobs/~01a"))
+        self.assertTrue(_is_upwork("https://upwork.com/jobs/~01a"))
+        self.assertFalse(_is_upwork("https://www.freelancer.com/projects/x"))
+        self.assertFalse(_is_upwork("https://notupwork.com/jobs/~01a"))       # substring bypass
+        self.assertFalse(_is_upwork("https://upwork.com.evil.com/jobs/~01a"))  # subdomain bypass
+        self.assertFalse(_is_upwork("https://evil.com/?u=upwork.com"))         # query bypass
+
         f = SavedFilter.objects.create(name="all", keywords=[])
-        other = dict(VW_ROW, id="vw_fl", upworkUrl="https://www.freelancer.com/projects/x")
+        bad = dict(VW_ROW, id="vw_fl", upworkUrl="https://upwork.com.evil.com/x")
         with patch("apps.jobs.providers.vibeworker.requests.get") as get:
-            get.return_value = _FakeResponse([VW_ROW, other])
+            get.return_value = _FakeResponse([VW_ROW, bad])
             jobs = VibeworkerProvider().fetch_jobs(f)
-        self.assertEqual(len(jobs), 1)  # only the upwork.com one kept
-        self.assertIn("upwork.com", jobs[0].raw["url"])
+        self.assertEqual(len(jobs), 1)  # only the genuine upwork.com host kept
+        self.assertIn("upwork.com/jobs", jobs[0].raw["url"])
 
     def test_maps_upwork_url_for_detail_page(self):
         # The detail presenter reads raw["url"]; Vibeworker calls it upworkUrl.
