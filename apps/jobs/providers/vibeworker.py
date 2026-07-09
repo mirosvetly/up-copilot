@@ -55,6 +55,12 @@ class VibeworkerProvider(JobProvider):
                 log.exception("Vibeworker request failed; keeping %d jobs fetched so far", len(seen))
                 break
             for row in rows:
+                # Vibeworker occasionally mixes in non-Upwork postings (e.g.
+                # freelancer.com) under the same upworkUrl field — this app is
+                # Upwork-only (connects scoring, proposal flow), so drop them.
+                src_url = (row.get("upworkUrl") or row.get("url") or "").lower()
+                if "upwork.com" not in src_url:
+                    continue
                 job = self._to_raw(row)
                 if saved_filter.require_verified_payment and not job.client.verified_payment:
                     continue

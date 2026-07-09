@@ -230,6 +230,16 @@ class VibeworkerProviderTests(TestCase):
         self.assertEqual(params["minBudget"], "500")
         self.assertEqual(params["sort"], "newest")
 
+    def test_non_upwork_rows_are_dropped(self):
+        # Vibeworker sometimes returns freelancer.com etc. — Upwork only.
+        f = SavedFilter.objects.create(name="all", keywords=[])
+        other = dict(VW_ROW, id="vw_fl", upworkUrl="https://www.freelancer.com/projects/x")
+        with patch("apps.jobs.providers.vibeworker.requests.get") as get:
+            get.return_value = _FakeResponse([VW_ROW, other])
+            jobs = VibeworkerProvider().fetch_jobs(f)
+        self.assertEqual(len(jobs), 1)  # only the upwork.com one kept
+        self.assertIn("upwork.com", jobs[0].raw["url"])
+
     def test_maps_upwork_url_for_detail_page(self):
         # The detail presenter reads raw["url"]; Vibeworker calls it upworkUrl.
         f = SavedFilter.objects.create(name="all", keywords=[])
