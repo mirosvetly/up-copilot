@@ -95,6 +95,9 @@ def feed(request, sent=False):
     for c in cards:
         counts[c["state"]] = counts.get(c["state"], 0) + 1
     queue = [c for c in cards if c["state"] == "approved"]
+    # How many visible cards are still waiting for Haiku (reuse the built cards,
+    # no extra query). Drives the "идёт оценка" banner + poll below.
+    pending_scoring = sum(1 for c in cards if c["scoring"])
 
     return render(
         request,
@@ -108,6 +111,7 @@ def feed(request, sent=False):
             "sort": sort,
             "track": track,
             "track_pills": track_pills,
+            "pending_scoring": pending_scoring,
             "sent_view": sent,
             "is_feed": not sent,
             "is_sent": sent,
@@ -221,6 +225,21 @@ def tr_status(request, pk):
 
     job = get_object_or_404(JobPosting.objects.select_related("score"), pk=pk)
     return JsonResponse({"ready": _translations_ready(job)})
+
+
+def score_status(request):
+    """Poll target: how many jobs are still waiting for Haiku (status=new)?
+    Track-scoped to match the feed the banner lives on; the page reloads at 0."""
+    from django.http import JsonResponse
+
+    qs = JobPosting.objects.filter(status=JobPosting.Status.NEW)
+    track = request.GET.get("track", "all")
+    if track and track != "all":
+        try:
+            qs = qs.filter(matched_filter__track_id=int(track))
+        except ValueError:
+            pass
+    return JsonResponse({"pending": qs.count()})
 
 
 def detail(request, pk):

@@ -115,6 +115,9 @@ def job_card(job, *, my_skills_lc=None):
         "bar_pct": bar_pct,
         "score": score,
         "score_display": score if score is not None else "—",
+        # status=new with no JobScore yet -> Haiku hasn't reached it. Drives the
+        # "оценка…" spinner so an unscored card doesn't read as "scored badly".
+        "scoring": score is None and state == "new",
         "score_color": score_color,
         "score_soft": score_soft,
         "score_border": score_border,

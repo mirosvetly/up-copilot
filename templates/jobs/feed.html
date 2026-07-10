@@ -63,6 +63,31 @@
           <a href="{{ request.get_full_path }}" style="color:#b6d086;font-weight:600;text-decoration:underline;cursor:pointer">{% trans "показать" %}</a>
         </div>
 
+        {% if pending_scoring %}
+        <div id="uc-scorebanner" data-track="{{ track }}" style="display:flex;align-items:center;gap:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:10px 14px;font-size:13px;color:#f0c67a">
+          <span style="display:inline-flex;flex:none;animation:ucSpin .8s linear infinite">{% icon "refresh" 15 "#f59e0b" %}</span>
+          <span>Haiku {% trans "оценивает вакансии" %}: <span class="uc-sp" style="font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ pending_scoring }}</span> {% trans "в очереди" %}</span>
+          <span style="color:#a3a3a3;font-size:12px">{% trans "страница обновится сама" %}</span>
+        </div>
+        <script>
+        (function(){
+          var el=document.getElementById('uc-scorebanner'); if(!el) return;
+          var url="{% url 'jobs:score_status' %}?track="+encodeURIComponent(el.getAttribute('data-track')||'all');
+          var tries=0, MAX=60;  // ~3 min at 3s; stop nagging if the scorer stalled
+          var t=setInterval(function(){
+            if(++tries>MAX){clearInterval(t);return;}
+            fetch(url,{headers:{'X-Requested-With':'XMLHttpRequest'}})
+              .then(function(r){return r.json();})
+              .then(function(d){
+                if(!d) return;
+                if(d.pending===0){clearInterval(t);location.reload();return;}
+                var s=el.querySelector('.uc-sp'); if(s&&d.pending!=null){s.textContent=d.pending;}
+              }).catch(function(){});
+          },3000);
+        })();
+        </script>
+        {% endif %}
+
         {% if messages %}
         {% for m in messages %}
         <div style="border-radius:10px;padding:10px 14px;font-size:13px;{% if m.tags == 'error' %}background:rgba(248,113,113,0.1);border:1px solid #f87171;color:#fca5a5{% else %}background:rgba(182,208,134,0.12);border:1px solid #b6d086;color:#d9ecc0{% endif %}">{{ m }}</div>
@@ -111,11 +136,19 @@
                 <div style="font-size:12px;color:#737373;margin-top:3px;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.posted_text }}</div>
               </div>
               <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                {% if job.scoring %}
+                <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:9px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.32)">
+                  <span style="display:inline-flex;animation:ucSpin .8s linear infinite">{% icon "refresh" 12 "#f59e0b" %}</span>
+                  <span style="font-size:11.5px;font-weight:600;color:#f59e0b">{% trans "оценка…" %}</span>
+                </div>
+                <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">Haiku</span>
+                {% else %}
                 <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:9px;background:{{ job.score_soft }};border:1px solid {{ job.score_border }}">
                   <span style="width:7px;height:7px;border-radius:20px;background:{{ job.score_color }}"></span>
                   <span style="font-size:15px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};line-height:1">{{ job.score_display }}</span>
                 </div>
                 <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">{% trans "score" %}</span>
+                {% endif %}
               </div>
             </div>
 
