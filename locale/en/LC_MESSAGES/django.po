@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 00:33+0300\n"
+"POT-Creation-Date: 2026-07-10 21:22+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,11 +55,11 @@ msgid "Прошло скоринг"
 msgstr "Passed scoring"
 
 #: apps/analytics/metrics.py:25 apps/jobs/models.py:84
-#: apps/jobs/presenters.py:146
+#: apps/jobs/presenters.py:149
 msgid "Черновик готов"
 msgstr "Draft ready"
 
-#: apps/analytics/metrics.py:26 apps/jobs/presenters.py:147
+#: apps/analytics/metrics.py:26 apps/jobs/presenters.py:150
 msgid "Одобрено"
 msgstr "Approved"
 
@@ -104,7 +104,7 @@ msgid "Пропущена"
 msgstr "Missed"
 
 #: apps/jobs/models.py:88 apps/jobs/presenters.py:58
-#: apps/jobs/presenters.py:150
+#: apps/jobs/presenters.py:153
 msgid "Устарела"
 msgstr "Outdated"
 
@@ -146,72 +146,72 @@ msgstr "hourly"
 msgid "фикс"
 msgstr "fix"
 
-#: apps/jobs/presenters.py:138
+#: apps/jobs/presenters.py:141
 msgid "Низкий риск"
 msgstr "Low risk"
 
-#: apps/jobs/presenters.py:139
+#: apps/jobs/presenters.py:142
 msgid "Средний риск"
 msgstr "Medium risk"
 
-#: apps/jobs/presenters.py:140
+#: apps/jobs/presenters.py:143
 msgid "Высокий риск"
 msgstr "High risk"
 
-#: apps/jobs/presenters.py:144
+#: apps/jobs/presenters.py:147
 msgid "Новая — на ревью"
 msgstr "New - for review"
 
-#: apps/jobs/presenters.py:144
+#: apps/jobs/presenters.py:147
 msgid "Ещё не оценена."
 msgstr "Not rated yet."
 
-#: apps/jobs/presenters.py:145
+#: apps/jobs/presenters.py:148
 msgid "Оценена — на ревью"
 msgstr "Rated - for review"
 
-#: apps/jobs/presenters.py:145
+#: apps/jobs/presenters.py:148
 msgid "Просмотри и одобри или пропусти."
 msgstr "Review and approve or pass."
 
-#: apps/jobs/presenters.py:146
+#: apps/jobs/presenters.py:149
 msgid "Письмо сгенерировано, ждёт одобрения."
 msgstr "The letter has been generated and is awaiting approval."
 
-#: apps/jobs/presenters.py:147
+#: apps/jobs/presenters.py:150
 msgid "В очереди на ручную отправку. Открой на Upwork и отправь."
 msgstr "In queue for manual sending. Open it on Upwork and submit."
 
-#: apps/jobs/presenters.py:148 templates/jobs/detail.html:29
-#: templates/jobs/feed.html:155
+#: apps/jobs/presenters.py:151 templates/jobs/detail.html:29
+#: templates/jobs/feed.html:188
 msgid "Отправлено вручную"
 msgstr "Sent manually"
 
-#: apps/jobs/presenters.py:148
+#: apps/jobs/presenters.py:151
 msgid "Отмечено как отправленное. Жди ответа клиента."
 msgstr "Marked as sent. Wait for the client's response."
 
-#: apps/jobs/presenters.py:149 templates/jobs/feed.html:157
+#: apps/jobs/presenters.py:152 templates/jobs/feed.html:190
 msgid "Пропущено"
 msgstr "Missed"
 
-#: apps/jobs/presenters.py:149
+#: apps/jobs/presenters.py:152
 msgid "Исключена из ленты. Можно вернуть."
 msgstr "Removed from the feed. Can be returned."
 
-#: apps/jobs/presenters.py:150
+#: apps/jobs/presenters.py:153
 msgid "Публикация устарела."
 msgstr "The publication is outdated."
 
-#: apps/jobs/presenters.py:206
+#: apps/jobs/presenters.py:209
 msgid "Подтверждена"
 msgstr "Confirmed"
 
-#: apps/jobs/presenters.py:206
+#: apps/jobs/presenters.py:209
 msgid "Не подтверждена"
 msgstr "Not confirmed"
 
-#: apps/jobs/presenters.py:212
+#: apps/jobs/presenters.py:215
 msgid "нет отзывов"
 msgstr "no reviews"
 
@@ -219,23 +219,23 @@ msgstr "no reviews"
 msgid "Все"
 msgstr "All"
 
-#: apps/jobs/views.py:158
+#: apps/jobs/views.py:162
 msgid "Не удалось получить вакансии из API. Проверь ключ и подключение."
 msgstr "Failed to retrieve jobs from API. Check the key and connection."
 
-#: apps/jobs/views.py:161
+#: apps/jobs/views.py:165
 #, python-format
 msgid "Собрано новых: %(n)s. Идёт оценка — обнови страницу через минуту."
 msgstr ""
 "New ones collected: %(n)s. Evaluation in progress - refresh the page in a "
 "minute."
 
-#: apps/jobs/views.py:185
+#: apps/jobs/views.py:189
 #, python-format
 msgid "Удалено вакансий из ленты: %(n)s."
 msgstr "Vacancies removed from feed: %(n)s."
 
-#: apps/jobs/views.py:277
+#: apps/jobs/views.py:296
 #, python-format
 msgid "Неизвестное действие: %(action)s"
 msgstr "Unknown action: %(action)s"
@@ -252,11 +252,11 @@ msgstr "Invalid JSON: %(err)s"
 
 #: apps/tracks/forms.py:46
 msgid ""
-"Ожидается список объектов вида {\"repo\": \"...\", \"skills\": [\"...\", "
-"...]} (skills — список строк)."
+"Ожидается список объектов вида {\"repo\": \"...\", \"skills\": [\"..."
+"\", ...]} (skills — список строк)."
 msgstr ""
-"Expected a list of objects like {\"repo\": \"...\", \"skills\": [\"...\", "
-"...]} (skills — a list of strings)."
+"Expected a list of objects like {\"repo\": \"...\", \"skills\": [\"..."
+"\", ...]} (skills — a list of strings)."
 
 #: apps/tracks/forms.py:53
 msgid "По одному навыку в строке."
@@ -482,121 +482,137 @@ msgstr "Job feed"
 msgid "показать"
 msgstr "show"
 
-#: templates/jobs/feed.html:83
+#: templates/jobs/feed.html:69
+msgid "оценивает вакансии"
+msgstr "is scoring jobs"
+
+#: templates/jobs/feed.html:69
+msgid "в очереди"
+msgstr "in queue"
+
+#: templates/jobs/feed.html:70
+msgid "страница обновится сама"
+msgstr "the page reloads automatically"
+
+#: templates/jobs/feed.html:108
 #, fuzzy
 #| msgid "Отправлено вручную"
 msgid "отправлено вручную"
 msgstr "sent manually"
 
-#: templates/jobs/feed.html:83
+#: templates/jobs/feed.html:108
 msgid "вакансий в очереди на ревью"
 msgstr "vacancies in queue for review"
 
-#: templates/jobs/feed.html:85
+#: templates/jobs/feed.html:110
 msgid "авто-скрапинг"
 msgstr "auto-scraping"
 
-#: templates/jobs/feed.html:88
+#: templates/jobs/feed.html:113
 msgid "Удалить все непросмотренные вакансии из ленты? Действие необратимо."
 msgstr ""
 "Delete all unviewed vacancies from your feed? The action is irreversible."
 
-#: templates/jobs/feed.html:91
+#: templates/jobs/feed.html:116
 msgid "Удаляет непросмотренные (new/scored) из базы"
 msgstr "Removes unwatched (new/scored) items from the database"
 
-#: templates/jobs/feed.html:91
+#: templates/jobs/feed.html:116
 #, fuzzy
 #| msgid "Пропустить"
 msgid "Пропустить все"
 msgstr "Skip all"
 
-#: templates/jobs/feed.html:118
+#: templates/jobs/feed.html:142
+msgid "оценка…"
+msgstr "scoring…"
+
+#: templates/jobs/feed.html:150
 msgid "score"
 msgstr "score"
 
-#: templates/jobs/feed.html:130
+#: templates/jobs/feed.html:163
 msgid "Оплата подтверждена"
 msgstr "Payment confirmed"
 
-#: templates/jobs/feed.html:131
+#: templates/jobs/feed.html:164
 msgid "Оплата не подтверждена"
 msgstr "Payment not confirmed"
 
-#: templates/jobs/feed.html:132
+#: templates/jobs/feed.html:165
 msgid "Нанимает"
 msgstr "Hires"
 
-#: templates/jobs/feed.html:133
+#: templates/jobs/feed.html:166
 msgid "откликов"
 msgstr "responses"
 
-#: templates/jobs/feed.html:140
+#: templates/jobs/feed.html:173
 msgid "Одобрить"
 msgstr "Approve"
 
-#: templates/jobs/feed.html:143
+#: templates/jobs/feed.html:176
 msgid "Пропустить"
 msgstr "Skip"
 
-#: templates/jobs/feed.html:146
+#: templates/jobs/feed.html:179
 msgid "Открыть"
 msgstr "Open"
 
-#: templates/jobs/feed.html:148
+#: templates/jobs/feed.html:181
 msgid "В очереди на отправку"
 msgstr "Queue for dispatch"
 
-#: templates/jobs/feed.html:150
+#: templates/jobs/feed.html:183
 msgid "Отменить"
 msgstr "Cancel"
 
-#: templates/jobs/feed.html:153
+#: templates/jobs/feed.html:186
 msgid "Открыть детально"
 msgstr "Open in detail"
 
-#: templates/jobs/feed.html:159
+#: templates/jobs/feed.html:192
 msgid "Вернуть в ленту"
 msgstr "Return to feed"
 
-#: templates/jobs/feed.html:166
+#: templates/jobs/feed.html:199
 msgid "Ничего не найдено"
 msgstr "Nothing found"
 
-#: templates/jobs/feed.html:166
+#: templates/jobs/feed.html:199
 #, python-format
 msgid "по фильтру «%(q)s»"
 msgstr "by filter “%(q)s”"
 
-#: templates/jobs/feed.html:175
+#: templates/jobs/feed.html:208
 msgid "Очередь на отправку"
 msgstr "Queue for dispatch"
 
-#: templates/jobs/feed.html:186
+#: templates/jobs/feed.html:219
 msgid ""
-"Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на"
-" Upwork."
+"Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на "
+"Upwork."
 msgstr ""
 "Empty for now. Approve the cards on the left - they will go here for manual "
 "submission to Upwork."
 
-#: templates/jobs/feed.html:191
+#: templates/jobs/feed.html:224
 msgid "Сегодня"
 msgstr "Today"
 
-#: templates/jobs/feed.html:193
+#: templates/jobs/feed.html:226
 msgid "найдено"
 msgstr "found"
 
-#: templates/jobs/feed.html:194
+#: templates/jobs/feed.html:227
 msgid "одобрено"
 msgstr "approved"
 
-#: templates/jobs/feed.html:195
+#: templates/jobs/feed.html:228
 msgid "отправлено"
 msgstr "sent"
 
-#: templates/jobs/feed.html:196
+#: templates/jobs/feed.html:229
 msgid "пропущено"
 msgstr "missed"
 
@@ -640,8 +656,7 @@ msgstr "Save"
 #, fuzzy
 #| msgid "Перевод для проверки · клиенту уходит английский оригинал"
 msgid ""
-"Перевод для чтения · клиенту уходит английский оригинал (кнопка копирует "
-"его)"
+"Перевод для чтения · клиенту уходит английский оригинал (кнопка копирует его)"
 msgstr ""
 "Translation for verification · the English original is sent to the client"
 
