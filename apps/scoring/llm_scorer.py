@@ -12,6 +12,13 @@ def _system(profile: dict) -> str:
     return (
         f"You are a freelance-job screener for this freelancer: {role}. "
         f"{analysis_prompt} "
+        "HARD GATE — eligibility: if the job text requires a location, country, region, "
+        "timezone, work authorization, or a spoken language the freelancer does NOT have "
+        "(compare against the freelancer's location and languages given in the prompt), "
+        "then the proposal literally cannot be submitted on Upwork — set score to at most 15 "
+        "and add a negative breakdown item naming the exact barrier (e.g. 'requires US location'). "
+        "A client merely being located somewhere is NOT a barrier; only a requirement ON the "
+        "freelancer counts. If no such requirement is stated, do not penalize on this axis. "
         "Output ONLY a single JSON object and NOTHING before or after it (no prose, no code fence): "
         '{"score": int, "reasoning": str, "breakdown": [{"text": str, "w": int, "neg": bool}]}. '
         "Each breakdown item is one factor; w is its 0-30 weight; neg=true for negatives. "
@@ -53,6 +60,8 @@ def _prompt(job: JobPosting, profile: dict, similarity: float) -> str:
     return (
         f"My stack: {', '.join(profile.get('skills', []))}. "
         f"Min rate: ${profile.get('min_hourly_rate')}/hr.\n"
+        f"My location: {profile.get('freelancer_location') or 'unspecified'}. "
+        f"My languages: {profile.get('freelancer_languages') or 'unspecified'}.\n"
         f"Profile↔job embedding cosine: {similarity:.2f}\n"
         f"{_client_line(job)}\n"
         f"{_competition_line(job)}\n\n"

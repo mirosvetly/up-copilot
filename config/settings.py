@@ -19,6 +19,11 @@ env = environ.Env(
     TRANSLATE_PROVIDER=(str, "google"),  # google (free, no key) | mock (off)
     DRAFT_MIN_SCORE=(int, 50),  # only auto-draft cover letters at/above this score
     MAX_JOB_AGE_HOURS=(int, 24),  # ignore API jobs older than this (API window is ~7 days)
+    # Who I am for geo/language gating: jobs whose text demands a location or
+    # language I can't meet (e.g. "US only", "native German") can't be applied
+    # to, so the scorer kills them. Global, not per-track (single user).
+    FREELANCER_LOCATION=(str, "Europe (EU), UTC+1 to UTC+3"),
+    FREELANCER_LANGUAGES=(str, "English, Russian"),
     VIBEWORKER_API_KEY=(str, ""),  # tryvibeworker.com/settings -> Developer
     GMAIL_IMAP_USER=(str, ""),  # JOB_PROVIDER=gmail: mailbox receiving Upwork job alerts
     GMAIL_IMAP_PASSWORD=(str, ""),  # Google app password (myaccount.google.com/apppasswords)
@@ -126,6 +131,8 @@ EMBEDDING_PROVIDER = env("EMBEDDING_PROVIDER")
 JOB_SCORER = env("JOB_SCORER")
 TRANSLATE_PROVIDER = env("TRANSLATE_PROVIDER")
 MAX_JOB_AGE_HOURS = env("MAX_JOB_AGE_HOURS")
+FREELANCER_LOCATION = env("FREELANCER_LOCATION")
+FREELANCER_LANGUAGES = env("FREELANCER_LANGUAGES")
 VIBEWORKER_API_KEY = env("VIBEWORKER_API_KEY")
 GMAIL_IMAP_USER = env("GMAIL_IMAP_USER")
 GMAIL_IMAP_PASSWORD = env("GMAIL_IMAP_PASSWORD")

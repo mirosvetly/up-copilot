@@ -36,6 +36,11 @@ def track_config(track) -> dict[str, Any]:
     Same shape the old global load_profile() returned, so downstream code is
     unchanged. `track` may be None (fresh DB with no tracks) — safe defaults.
     """
+    # Geo/language identity is global (single user), same for every track.
+    geo = {
+        "freelancer_location": settings.FREELANCER_LOCATION,
+        "freelancer_languages": settings.FREELANCER_LANGUAGES,
+    }
     if track is None:
         return {
             "skills": [], "min_hourly_rate": 0, "red_flag_phrases": [], "projects": [],
@@ -44,8 +49,10 @@ def track_config(track) -> dict[str, Any]:
             "cover_letter_instructions": "Write a concise, specific Upwork cover letter.",
             "screening_instructions": "Answer Upwork screening questions honestly, first person.",
             "signoff": "Best,\nFreelancer",
+            **geo,
         }
     return {
+        **geo,
         "skills": track.skills or [],
         "min_hourly_rate": track.min_hourly_rate,
         "red_flag_phrases": track.red_flag_phrases or [],

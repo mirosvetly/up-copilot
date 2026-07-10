@@ -46,6 +46,25 @@ class ScorerTests(TestCase):
         self.assertIn("20 connects", p)          # competition signal now fed to the scorer
         self.assertIn("cleanliness 9/10", p)
 
+    def test_geo_language_gate_reaches_prompt_and_system(self):
+        from .llm_scorer import _prompt, _system
+
+        prof = {**PROFILE, "freelancer_location": "Europe (EU), UTC+1 to UTC+3",
+                "freelancer_languages": "English, Russian"}
+        p = _prompt(self._job(skills=["Django"]), prof, 0.4)
+        self.assertIn("Europe (EU)", p)              # my location fed to the scorer
+        self.assertIn("English, Russian", p)         # my languages fed to the scorer
+        s = _system(prof)
+        self.assertIn("HARD GATE", s)                # eligibility gate instructed
+        self.assertIn("at most 15", s)               # un-appliable jobs sink to the bottom
+
+    def test_track_config_carries_freelancer_geo(self):
+        from apps.scoring.profile import track_config
+
+        cfg = track_config(None)  # even the empty-DB default must carry geo/lang
+        self.assertIn("freelancer_location", cfg)
+        self.assertIn("freelancer_languages", cfg)
+
     @override_settings(JOB_SCORER="llm")
     def test_llm_json_error_falls_back_to_rule_scorer(self):
         # A malformed-JSON response (seen ~1.6% of the time) must not crash or
