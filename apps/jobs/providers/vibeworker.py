@@ -30,6 +30,20 @@ def _is_upwork(url: str) -> bool:
     return host == "upwork.com" or host.endswith(".upwork.com")
 
 
+def _too_crowded(row: dict) -> bool:
+    """Skip contested postings at collect time: required connects >= the cap.
+    Proxy for "too many proposals" — Upwork hides the count but raises the apply
+    price on crowded jobs. Cap of 0 disables the filter."""
+    cap = settings.COLLECT_MAX_CONNECTS
+    if not cap:
+        return False
+    c = row.get("connects")
+    try:
+        return c is not None and int(c) >= cap
+    except (TypeError, ValueError):
+        return False
+
+
 def _dec(v) -> Decimal | None:
     return Decimal(str(v)) if v is not None else None
 
@@ -67,6 +81,8 @@ class VibeworkerProvider(JobProvider):
                 # freelancer.com) under the same upworkUrl field — this app is
                 # Upwork-only (connects scoring, proposal flow), so drop them.
                 if not _is_upwork(row.get("upworkUrl") or row.get("url")):
+                    continue
+                if _too_crowded(row):
                     continue
                 job = self._to_raw(row)
                 if saved_filter.require_verified_payment and not job.client.verified_payment:

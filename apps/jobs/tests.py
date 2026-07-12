@@ -280,6 +280,23 @@ class VibeworkerProviderTests(TestCase):
         jobs, _ = self._fetch([VW_ROW], f)
         self.assertEqual(jobs[0].raw["url"], VW_ROW["upworkUrl"])
 
+    @override_settings(COLLECT_MAX_CONNECTS=16)
+    def test_crowded_rows_dropped_at_collect(self):
+        f = SavedFilter.objects.create(name="all", keywords=[])
+        crowded = dict(VW_ROW, id="vw_hot", upworkUrl="https://upwork.com/jobs/~02hot",
+                       connects=20)
+        jobs, _ = self._fetch([VW_ROW, crowded], f)  # VW_ROW has connects 11
+        self.assertEqual(len(jobs), 1)  # the 20-connect posting never enters the DB
+        self.assertEqual(jobs[0].job_id, "01abc234def567")
+
+    @override_settings(COLLECT_MAX_CONNECTS=0)
+    def test_crowd_filter_off_keeps_everything(self):
+        f = SavedFilter.objects.create(name="all", keywords=[])
+        crowded = dict(VW_ROW, id="vw_hot", upworkUrl="https://upwork.com/jobs/~02hot",
+                       connects=99)
+        jobs, _ = self._fetch([VW_ROW, crowded], f)
+        self.assertEqual(len(jobs), 2)  # 0 disables the cap
+
     def test_missing_key_raises(self):
         f = SavedFilter.objects.create(name="all", keywords=[])
         with override_settings(VIBEWORKER_API_KEY=""):
