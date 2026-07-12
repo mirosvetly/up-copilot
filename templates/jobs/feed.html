@@ -123,48 +123,45 @@
           <div style="height:4px;width:100%;background:#232323"><div style="height:100%;width:{{ job.bar_pct }}%;background:{{ job.fresh_color }}"></div></div>
           <div style="padding:15px 18px 16px">
 
-            <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:11px">
-              <div style="display:flex;flex-direction:column;gap:5px;flex:none">
-                <div style="display:flex;align-items:center;gap:7px">
-                  <span style="display:inline-flex">{% icon "clock" 15 job.fresh_color %}</span>
-                  <span style="font-size:20px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.fresh_color }};line-height:1;letter-spacing:-0.02em">{{ job.age_big }}</span>
-                </div>
-                <span style="display:inline-flex;align-items:center;align-self:flex-start;gap:5px;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:20px;color:{{ job.fresh_color }};background:{{ job.fresh_soft }}">{{ job.fresh_label }}</span>
-              </div>
-              <div style="flex:1;min-width:0;padding-top:1px">
+            <div style="display:flex;align-items:flex-start;gap:16px">
+              <!-- left: title + budget/verified/hire meta -->
+              <div style="flex:1;min-width:0">
                 <a href="{% url 'jobs:detail' job.id %}" style="display:block;font-size:15.5px;font-weight:600;line-height:1.35;color:#fafafa">{{ job.title }}</a>
-                <div style="font-size:12px;color:#737373;margin-top:3px;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.posted_text }}</div>
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:11px">
+                  <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#fafafa">{% icon "dollar" 14 "#b6d086" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
+                  {% if job.verified %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#4ade80">{% icon "circle-check" 13 "#4ade80" %}{% trans "Оплата подтверждена" %}</span>
+                  {% else %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#f87171">{% icon "alert-triangle" 13 "#f87171" %}{% trans "Оплата не подтверждена" %}</span>{% endif %}
+                  {% if job.hire_rate is not None %}<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{% icon "trending-up" 13 "#737373" %}{% trans "Нанимает" %} <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.hire_color }};font-weight:600">{{ job.hire_rate }}%</span></span>{% endif %}
+                  {% if job.overheated %}<span title="{% blocktrans with c=job.connects %}Upwork требует {{ c }} коннектов за отклик, признак высокой конкуренции{% endblocktrans %}" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#f59e0b">{% icon "users" 13 "#f59e0b" %}{% trans "Перегрета откликами" %}</span>{% endif %}
+                </div>
               </div>
-              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+              <!-- right: score, then the age timer under it -->
+              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:11px">
                 {% if job.scoring %}
-                <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:9px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.32)">
-                  <span style="display:inline-flex;animation:ucSpin .8s linear infinite">{% icon "refresh" 12 "#f59e0b" %}</span>
-                  <span style="font-size:11.5px;font-weight:600;color:#f59e0b">{% trans "оценка…" %}</span>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                  <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:9px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.32)">
+                    <span style="display:inline-flex;animation:ucSpin .8s linear infinite">{% icon "refresh" 12 "#f59e0b" %}</span>
+                    <span style="font-size:11.5px;font-weight:600;color:#f59e0b">{% trans "оценка…" %}</span>
+                  </div>
+                  <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">Haiku</span>
                 </div>
-                <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">Haiku</span>
                 {% else %}
-                <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:9px;background:{{ job.score_soft }};border:1px solid {{ job.score_border }}">
-                  <span style="width:7px;height:7px;border-radius:20px;background:{{ job.score_color }}"></span>
-                  <span style="font-size:15px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};line-height:1">{{ job.score_display }}</span>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                  <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:9px;background:{{ job.score_soft }};border:1px solid {{ job.score_border }}">
+                    <span style="width:7px;height:7px;border-radius:20px;background:{{ job.score_color }}"></span>
+                    <span style="font-size:15px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};line-height:1">{{ job.score_display }}</span>
+                  </div>
+                  <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">{% trans "score" %}</span>
                 </div>
-                <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">{% trans "score" %}</span>
                 {% endif %}
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <span style="display:inline-flex">{% icon "clock" 14 job.fresh_color %}</span>
+                    <span style="font-size:16px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.fresh_color }};line-height:1;letter-spacing:-0.02em">{{ job.age_big }}</span>
+                  </div>
+                  <span style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:20px;color:{{ job.fresh_color }};background:{{ job.fresh_soft }}">{{ job.fresh_label }}</span>
+                </div>
               </div>
-            </div>
-
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
-              {% for tag in job.tags %}
-              <span style="font-size:11.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:6px;{% if tag.mine %}background:rgba(182,208,134,0.1);border:1px solid rgba(182,208,134,0.28);color:#c5dc9f{% else %}background:#1f1f1f;border:1px solid #303030;color:#a3a3a3{% endif %}">{{ tag.label }}</span>
-              {% endfor %}
-            </div>
-
-            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:11px 0 0;border-top:1px solid #262626">
-              <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#fafafa">{% icon "dollar" 14 "#b6d086" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
-              {% if job.verified %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#4ade80">{% icon "circle-check" 13 "#4ade80" %}{% trans "Оплата подтверждена" %}</span>
-              {% else %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#f87171">{% icon "alert-triangle" 13 "#f87171" %}{% trans "Оплата не подтверждена" %}</span>{% endif %}
-              {% if job.hire_rate is not None %}<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{% icon "trending-up" 13 "#737373" %}{% trans "Нанимает" %} <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.hire_color }};font-weight:600">{{ job.hire_rate }}%</span></span>{% endif %}
-              {% if job.proposals %}<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3">{% icon "users" 13 "#737373" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#d4d4d4">{{ job.proposals }}</span> {% trans "откликов" %}</span>{% endif %}
-              {% if job.overheated %}<span title="{% blocktrans with c=job.connects %}Upwork требует {{ c }} коннектов за отклик, признак высокой конкуренции{% endblocktrans %}" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#f59e0b">{% icon "users" 13 "#f59e0b" %}{% trans "Перегрета откликами" %}</span>{% endif %}
             </div>
 
             <!-- actions -->
@@ -176,8 +173,6 @@
                 <form method="post" action="{% url 'jobs:job_action' job.id 'skip' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
                   <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:13.5px;font-weight:500;cursor:pointer">{% icon "x" 15 %}{% trans "Пропустить" %}</button>
                 </form>
-                <div style="flex:1"></div>
-                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:9px;color:#a3a3a3;font-size:13px;font-weight:500">{% trans "Открыть" %} {% icon "arrow-up-right" 14 %}</a>
               {% elif job.state == "approved" %}
                 <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#4ade80" %}{% trans "В очереди на отправку" %}</span>
                 <form method="post" action="{% url 'jobs:job_action' job.id 'undo' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
