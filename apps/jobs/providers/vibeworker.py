@@ -44,6 +44,18 @@ def _too_crowded(row: dict) -> bool:
         return False
 
 
+def _is_excluded(row: dict) -> bool:
+    """Drop jobs whose TITLE mentions an EXCLUDE_KEYWORDS term (e.g. WordPress,
+    Webflow) — a no-code job a code-first freelancer won't take. Title only, not
+    skills: clients tag "WordPress" onto plenty of real Next.js/React jobs, and
+    matching those tags would throw away exactly the code work we want."""
+    stop = settings.EXCLUDE_KEYWORDS
+    if not stop:
+        return False
+    title = (row.get("title") or "").lower()
+    return any(kw in title for kw in stop)
+
+
 def _dec(v) -> Decimal | None:
     return Decimal(str(v)) if v is not None else None
 
@@ -82,7 +94,7 @@ class VibeworkerProvider(JobProvider):
                 # Upwork-only (connects scoring, proposal flow), so drop them.
                 if not _is_upwork(row.get("upworkUrl") or row.get("url")):
                     continue
-                if _too_crowded(row):
+                if _too_crowded(row) or _is_excluded(row):
                     continue
                 job = self._to_raw(row)
                 if saved_filter.require_verified_payment and not job.client.verified_payment:

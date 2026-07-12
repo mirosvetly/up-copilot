@@ -297,6 +297,17 @@ class VibeworkerProviderTests(TestCase):
         jobs, _ = self._fetch([VW_ROW, crowded], f)
         self.assertEqual(len(jobs), 2)  # 0 disables the cap
 
+    @override_settings(EXCLUDE_KEYWORDS=["wordpress", "webflow"])
+    def test_excluded_by_title_not_by_skill_tag(self):
+        f = SavedFilter.objects.create(name="all", keywords=[])
+        nocode = dict(VW_ROW, id="vw_wp", upworkUrl="https://upwork.com/jobs/~02wp",
+                      title="WordPress + Elementor Landing Page", skills=["PHP"])
+        # A real Next.js job that merely TAGS WordPress must survive.
+        codejob = dict(VW_ROW, id="vw_code", upworkUrl="https://upwork.com/jobs/~03code",
+                       title="Next.js Full-Stack Developer", skills=["Next.js", "WordPress"])
+        jobs, _ = self._fetch([nocode, codejob], f)
+        self.assertEqual({j.job_id for j in jobs}, {"03code"})  # only the no-code title dropped
+
     def test_missing_key_raises(self):
         f = SavedFilter.objects.create(name="all", keywords=[])
         with override_settings(VIBEWORKER_API_KEY=""):
@@ -470,12 +481,15 @@ class SkipAllViewTests(TestCase):
                                                  status=JobPosting.Status.DRAFTED, matched_filter=self.fdev)
         self.applied = JobPosting.objects.create(job_id="sa-ap", title="t", budget_type="fixed",
                                                  status=JobPosting.Status.APPLIED, matched_filter=self.fdev)
+        self.skipped = JobPosting.objects.create(job_id="sa-sk", title="t", budget_type="fixed",
+                                                 status=JobPosting.Status.SKIPPED, matched_filter=self.fdev)
 
     def test_skip_all_deletes_only_untouched(self):
         r = self.client.post("/skip-all/", {"track": "all", "next": "/"})
         self.assertEqual(r.status_code, 302)
         ids = set(JobPosting.objects.values_list("job_id", flat=True))
-        self.assertEqual(ids, {"sa-dr", "sa-ap"})  # new+scored deleted; drafted/applied kept
+        # new+scored+skipped deleted (skipped cards must clear too); drafted/applied kept
+        self.assertEqual(ids, {"sa-dr", "sa-ap"})
 
     def test_skip_all_respects_track_filter(self):
         from apps.tracks.models import Track

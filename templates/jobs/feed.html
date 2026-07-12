@@ -187,6 +187,8 @@
                 <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% trans "Открыть детально" %} {% icon "arrow-up-right" 14 %}</a>
               {% elif job.state == "sent" %}
                 <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.3);color:#b6d086;font-size:13px;font-weight:600">{% icon "send" 14 "#b6d086" %}{% trans "Отправлено вручную" %}</span>
+                <div style="flex:1"></div>
+                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% trans "Открыть детально" %} {% icon "arrow-up-right" 14 %}</a>
               {% elif job.state == "skipped" %}
                 <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#737373">{% icon "x" 15 %}{% trans "Пропущено" %}</span>
                 <form method="post" action="{% url 'jobs:job_action' job.id 'undo' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}

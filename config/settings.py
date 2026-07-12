@@ -31,6 +31,9 @@ env = environ.Env(
     # Don't even fetch jobs whose required connects is at/above this (a crowded
     # posting proxy — no proposal count exists). 0 = collect everything.
     COLLECT_MAX_CONNECTS=(int, 0),
+    # Drop jobs at collect time if any of these words is in the title or skills
+    # (no-code platforms a code-first freelancer doesn't want). Comma-separated.
+    EXCLUDE_KEYWORDS=(list, []),
     VIBEWORKER_API_KEY=(str, ""),  # tryvibeworker.com/settings -> Developer
     GMAIL_IMAP_USER=(str, ""),  # JOB_PROVIDER=gmail: mailbox receiving Upwork job alerts
     GMAIL_IMAP_PASSWORD=(str, ""),  # Google app password (myaccount.google.com/apppasswords)
@@ -142,6 +145,7 @@ FREELANCER_LOCATION = env("FREELANCER_LOCATION")
 FREELANCER_LANGUAGES = env("FREELANCER_LANGUAGES")
 HOT_CONNECTS_THRESHOLD = env("HOT_CONNECTS_THRESHOLD")
 COLLECT_MAX_CONNECTS = env("COLLECT_MAX_CONNECTS")
+EXCLUDE_KEYWORDS = [k.strip().lower() for k in env("EXCLUDE_KEYWORDS") if k.strip()]
 VIBEWORKER_API_KEY = env("VIBEWORKER_API_KEY")
 GMAIL_IMAP_USER = env("GMAIL_IMAP_USER")
 GMAIL_IMAP_PASSWORD = env("GMAIL_IMAP_PASSWORD")
@@ -171,3 +175,4 @@ if "test" in sys.argv:
     # that exercise these use @override_settings.
     MAX_JOB_AGE_HOURS = 24
     COLLECT_MAX_CONNECTS = 0
+    EXCLUDE_KEYWORDS = []

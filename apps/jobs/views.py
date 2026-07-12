@@ -169,14 +169,16 @@ def refresh(request):
 
 @require_POST
 def skip_all(request):
-    """Bulk-clear the untouched review backlog (status new/scored) for the current
-    track, deleting the rows so the DB doesn't bloat. Drafts, approved and sent
-    jobs are kept — only never-touched ones go."""
+    """Bulk-clear the review backlog (status new/scored, plus already-skipped) for
+    the current track, deleting the rows so the DB doesn't bloat. Drafts, approved
+    and sent jobs are kept — only un-progressed ones go. Skipped is included so a
+    feed full of greyed-out "Пропущено" cards actually clears."""
     from apps.jobs.models import ClientProfile
 
     track = request.POST.get("track", "all")
     qs = JobPosting.objects.filter(
-        status__in=[JobPosting.Status.NEW, JobPosting.Status.SCORED]
+        status__in=[JobPosting.Status.NEW, JobPosting.Status.SCORED,
+                    JobPosting.Status.SKIPPED]
     )
     if track != "all":
         try:
