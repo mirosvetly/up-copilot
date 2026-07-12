@@ -24,6 +24,10 @@ env = environ.Env(
     # to, so the scorer kills them. Global, not per-track (single user).
     FREELANCER_LOCATION=(str, "Europe (EU), UTC+1 to UTC+3"),
     FREELANCER_LANGUAGES=(str, "English, Russian"),
+    # Vibeworker doesn't expose proposal counts, so "overheated by proposals" is
+    # proxied by required connects: Upwork raises the apply price for contested
+    # postings. >=16 is the top third in practice (a clear gap above the 8-14 pack).
+    HOT_CONNECTS_THRESHOLD=(int, 16),
     VIBEWORKER_API_KEY=(str, ""),  # tryvibeworker.com/settings -> Developer
     GMAIL_IMAP_USER=(str, ""),  # JOB_PROVIDER=gmail: mailbox receiving Upwork job alerts
     GMAIL_IMAP_PASSWORD=(str, ""),  # Google app password (myaccount.google.com/apppasswords)
@@ -133,6 +137,7 @@ TRANSLATE_PROVIDER = env("TRANSLATE_PROVIDER")
 MAX_JOB_AGE_HOURS = env("MAX_JOB_AGE_HOURS")
 FREELANCER_LOCATION = env("FREELANCER_LOCATION")
 FREELANCER_LANGUAGES = env("FREELANCER_LANGUAGES")
+HOT_CONNECTS_THRESHOLD = env("HOT_CONNECTS_THRESHOLD")
 VIBEWORKER_API_KEY = env("VIBEWORKER_API_KEY")
 GMAIL_IMAP_USER = env("GMAIL_IMAP_USER")
 GMAIL_IMAP_PASSWORD = env("GMAIL_IMAP_PASSWORD")

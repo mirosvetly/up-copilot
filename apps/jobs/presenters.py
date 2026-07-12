@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -101,6 +102,14 @@ def job_card(job, *, my_skills_lc=None):
     score_color, score_soft, score_border = _score_meta(score)
     state = _UI_STATE[JobPosting.Status(job.status)]
     bar_pct = 0 if m is None else max(2, min(100, round((1 - m / FRESH_WINDOW_MIN) * 100)))
+    # No proposal count from Vibeworker; required connects is the competition
+    # proxy (Upwork raises the apply price on contested postings).
+    connects = (job.raw or {}).get("connects")
+    try:
+        connects = int(connects) if connects is not None else None
+    except (TypeError, ValueError):
+        connects = None
+    overheated = connects is not None and connects >= settings.HOT_CONNECTS_THRESHOLD
     client = job.client
     return {
         "id": job.pk,
@@ -127,6 +136,8 @@ def job_card(job, *, my_skills_lc=None):
         "hire_rate": client.hire_rate if client else None,
         "hire_color": _hire_color(client.hire_rate if client else 0),
         "proposals": job.proposals_bucket,
+        "connects": connects,
+        "overheated": overheated,
         "state": state,
         "card_border": "rgba(74,222,128,0.4)" if state == "approved"
         else "rgba(182,208,134,0.4)" if state == "sent" else "#404040",

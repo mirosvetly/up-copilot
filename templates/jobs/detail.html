@@ -51,6 +51,8 @@
                 <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:{{ job.fresh_color }}">{% icon "clock" 14 job.fresh_color %}{{ job.posted_text }}</span>
                 {% if job.proposals %}<span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
                 <span style="font-size:13px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with n=job.proposals %}{{ n }} откликов{% endblocktrans %}</span>{% endif %}
+                {% if job.overheated %}<span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
+                <span title="{% blocktrans with c=job.connects %}Upwork требует {{ c }} коннектов за отклик, признак высокой конкуренции{% endblocktrans %}" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#f59e0b">{% icon "users" 14 "#f59e0b" %}{% trans "Перегрета откликами" %}</span>{% endif %}
               </div>
             </div>
             <div style="flex:none;text-align:center;background:#171717;border:1px solid {{ job.score_border }};border-radius:11px;padding:8px 12px;min-width:74px">

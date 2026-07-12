@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 21:22+0300\n"
+"POT-Creation-Date: 2026-07-13 00:45+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,11 +55,11 @@ msgid "Прошло скоринг"
 msgstr "Passed scoring"
 
 #: apps/analytics/metrics.py:25 apps/jobs/models.py:84
-#: apps/jobs/presenters.py:149
+#: apps/jobs/presenters.py:160
 msgid "Черновик готов"
 msgstr "Draft ready"
 
-#: apps/analytics/metrics.py:26 apps/jobs/presenters.py:150
+#: apps/analytics/metrics.py:26 apps/jobs/presenters.py:161
 msgid "Одобрено"
 msgstr "Approved"
 
@@ -103,8 +103,8 @@ msgstr "Sent"
 msgid "Пропущена"
 msgstr "Missed"
 
-#: apps/jobs/models.py:88 apps/jobs/presenters.py:58
-#: apps/jobs/presenters.py:153
+#: apps/jobs/models.py:88 apps/jobs/presenters.py:59
+#: apps/jobs/presenters.py:164
 msgid "Устарела"
 msgstr "Outdated"
 
@@ -116,102 +116,102 @@ msgstr "Hourly"
 msgid "Фикс"
 msgstr "Fix"
 
-#: apps/jobs/presenters.py:44
+#: apps/jobs/presenters.py:45
 msgid "время неизвестно"
 msgstr "time unknown"
 
-#: apps/jobs/presenters.py:46
+#: apps/jobs/presenters.py:47
 #, python-format
 msgid "%(m)s мин назад"
 msgstr "%(m)s min ago"
 
-#: apps/jobs/presenters.py:48
+#: apps/jobs/presenters.py:49
 #, python-format
 msgid "%(h)s ч %(mm)s мин назад"
 msgstr "%(h)s h %(mm)s min ago"
 
-#: apps/jobs/presenters.py:55
+#: apps/jobs/presenters.py:56
 msgid "Свежая"
 msgstr "Fresh"
 
-#: apps/jobs/presenters.py:57
+#: apps/jobs/presenters.py:58
 msgid "Стареет"
 msgstr "Getting old"
 
-#: apps/jobs/presenters.py:86
+#: apps/jobs/presenters.py:87
 msgid "почасовая"
 msgstr "hourly"
 
-#: apps/jobs/presenters.py:89
+#: apps/jobs/presenters.py:90
 msgid "фикс"
 msgstr "fix"
 
-#: apps/jobs/presenters.py:141
+#: apps/jobs/presenters.py:152
 msgid "Низкий риск"
 msgstr "Low risk"
 
-#: apps/jobs/presenters.py:142
+#: apps/jobs/presenters.py:153
 msgid "Средний риск"
 msgstr "Medium risk"
 
-#: apps/jobs/presenters.py:143
+#: apps/jobs/presenters.py:154
 msgid "Высокий риск"
 msgstr "High risk"
 
-#: apps/jobs/presenters.py:147
+#: apps/jobs/presenters.py:158
 msgid "Новая — на ревью"
 msgstr "New - for review"
 
-#: apps/jobs/presenters.py:147
+#: apps/jobs/presenters.py:158
 msgid "Ещё не оценена."
 msgstr "Not rated yet."
 
-#: apps/jobs/presenters.py:148
+#: apps/jobs/presenters.py:159
 msgid "Оценена — на ревью"
 msgstr "Rated - for review"
 
-#: apps/jobs/presenters.py:148
+#: apps/jobs/presenters.py:159
 msgid "Просмотри и одобри или пропусти."
 msgstr "Review and approve or pass."
 
-#: apps/jobs/presenters.py:149
+#: apps/jobs/presenters.py:160
 msgid "Письмо сгенерировано, ждёт одобрения."
 msgstr "The letter has been generated and is awaiting approval."
 
-#: apps/jobs/presenters.py:150
+#: apps/jobs/presenters.py:161
 msgid "В очереди на ручную отправку. Открой на Upwork и отправь."
 msgstr "In queue for manual sending. Open it on Upwork and submit."
 
-#: apps/jobs/presenters.py:151 templates/jobs/detail.html:29
-#: templates/jobs/feed.html:188
+#: apps/jobs/presenters.py:162 templates/jobs/detail.html:29
+#: templates/jobs/feed.html:189
 msgid "Отправлено вручную"
 msgstr "Sent manually"
 
-#: apps/jobs/presenters.py:151
+#: apps/jobs/presenters.py:162
 msgid "Отмечено как отправленное. Жди ответа клиента."
 msgstr "Marked as sent. Wait for the client's response."
 
-#: apps/jobs/presenters.py:152 templates/jobs/feed.html:190
+#: apps/jobs/presenters.py:163 templates/jobs/feed.html:191
 msgid "Пропущено"
 msgstr "Missed"
 
-#: apps/jobs/presenters.py:152
+#: apps/jobs/presenters.py:163
 msgid "Исключена из ленты. Можно вернуть."
 msgstr "Removed from the feed. Can be returned."
 
-#: apps/jobs/presenters.py:153
+#: apps/jobs/presenters.py:164
 msgid "Публикация устарела."
 msgstr "The publication is outdated."
 
-#: apps/jobs/presenters.py:209
+#: apps/jobs/presenters.py:220
 msgid "Подтверждена"
 msgstr "Confirmed"
 
-#: apps/jobs/presenters.py:209
+#: apps/jobs/presenters.py:220
 msgid "Не подтверждена"
 msgstr "Not confirmed"
 
-#: apps/jobs/presenters.py:215
+#: apps/jobs/presenters.py:226
 msgid "нет отзывов"
 msgstr "no reviews"
 
@@ -364,69 +364,78 @@ msgstr "Mark as sent"
 msgid "%(n)s откликов"
 msgstr "%(n)s responses"
 
-#: templates/jobs/detail.html:58
+#: templates/jobs/detail.html:55 templates/jobs/feed.html:167
+#, python-format
+msgid "Upwork требует %(c)s коннектов за отклик, признак высокой конкуренции"
+msgstr "Upwork charges %(c)s connects to apply, a sign of high competition"
+
+#: templates/jobs/detail.html:55 templates/jobs/feed.html:167
+msgid "Перегрета откликами"
+msgstr "Overheated with proposals"
+
+#: templates/jobs/detail.html:60
 msgid "match score"
 msgstr "match score"
 
-#: templates/jobs/detail.html:73
+#: templates/jobs/detail.html:75
 msgid "Почему подходит"
 msgstr "Why is it suitable?"
 
-#: templates/jobs/detail.html:74
+#: templates/jobs/detail.html:76
 #, python-format
 msgid "скоринг · %(model_name)s"
 msgstr "scoring · %(model_name)s"
 
-#: templates/jobs/detail.html:76
+#: templates/jobs/detail.html:78
 msgid "итог"
 msgstr "result"
 
-#: templates/jobs/detail.html:92
+#: templates/jobs/detail.html:94
 msgid "Описание вакансии"
 msgstr "Job Description"
 
-#: templates/jobs/detail.html:109
+#: templates/jobs/detail.html:111
 msgid "Карточка клиента"
 msgstr "Customer card"
 
-#: templates/jobs/detail.html:115
+#: templates/jobs/detail.html:117
 msgid "визитка риска"
 msgstr "risk business card"
 
-#: templates/jobs/detail.html:120
+#: templates/jobs/detail.html:122
 msgid "Оплата"
 msgstr "Payment"
 
-#: templates/jobs/detail.html:125
+#: templates/jobs/detail.html:127
 msgid "Всего потрачено"
 msgstr "Total spent"
 
-#: templates/jobs/detail.html:131
+#: templates/jobs/detail.html:133
 msgid "Hire rate"
 msgstr "Hire rate"
 
-#: templates/jobs/detail.html:138
+#: templates/jobs/detail.html:140
 msgid "Страна"
 msgstr "Country"
 
-#: templates/jobs/detail.html:143
+#: templates/jobs/detail.html:145
 msgid "Рейтинг"
 msgstr "Rating"
 
-#: templates/jobs/detail.html:149
+#: templates/jobs/detail.html:151
 msgid "вакансий"
 msgstr "vacancies"
 
-#: templates/jobs/detail.html:153
+#: templates/jobs/detail.html:155
 msgid "наймов"
 msgstr "hires"
 
-#: templates/jobs/detail.html:156
+#: templates/jobs/detail.html:158
 #, python-format
 msgid "На Upwork с %(member_since)s"
 msgstr "On Upwork with %(member_since)s"
 
-#: templates/jobs/detail.html:162
+#: templates/jobs/detail.html:164
 msgid "Статус в трекере"
 msgstr "Tracker status"
 
@@ -547,48 +556,48 @@ msgstr "Hires"
 msgid "откликов"
 msgstr "responses"
 
-#: templates/jobs/feed.html:173
+#: templates/jobs/feed.html:174
 msgid "Одобрить"
 msgstr "Approve"
 
-#: templates/jobs/feed.html:176
+#: templates/jobs/feed.html:177
 msgid "Пропустить"
 msgstr "Skip"
 
-#: templates/jobs/feed.html:179
+#: templates/jobs/feed.html:180
 msgid "Открыть"
 msgstr "Open"
 
-#: templates/jobs/feed.html:181
+#: templates/jobs/feed.html:182
 msgid "В очереди на отправку"
 msgstr "Queue for dispatch"
 
-#: templates/jobs/feed.html:183
+#: templates/jobs/feed.html:184
 msgid "Отменить"
 msgstr "Cancel"
 
-#: templates/jobs/feed.html:186
+#: templates/jobs/feed.html:187
 msgid "Открыть детально"
 msgstr "Open in detail"
 
-#: templates/jobs/feed.html:192
+#: templates/jobs/feed.html:193
 msgid "Вернуть в ленту"
 msgstr "Return to feed"
 
-#: templates/jobs/feed.html:199
+#: templates/jobs/feed.html:200
 msgid "Ничего не найдено"
 msgstr "Nothing found"
 
-#: templates/jobs/feed.html:199
+#: templates/jobs/feed.html:200
 #, python-format
 msgid "по фильтру «%(q)s»"
 msgstr "by filter “%(q)s”"
 
-#: templates/jobs/feed.html:208
+#: templates/jobs/feed.html:209
 msgid "Очередь на отправку"
 msgstr "Queue for dispatch"
 
-#: templates/jobs/feed.html:219
+#: templates/jobs/feed.html:220
 msgid ""
 "Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на "
 "Upwork."
@@ -596,23 +605,23 @@ msgstr ""
 "Empty for now. Approve the cards on the left - they will go here for manual "
 "submission to Upwork."
 
-#: templates/jobs/feed.html:224
+#: templates/jobs/feed.html:225
 msgid "Сегодня"
 msgstr "Today"
 
-#: templates/jobs/feed.html:226
+#: templates/jobs/feed.html:227
 msgid "найдено"
 msgstr "found"
 
-#: templates/jobs/feed.html:227
+#: templates/jobs/feed.html:228
 msgid "одобрено"
 msgstr "approved"
 
-#: templates/jobs/feed.html:228
+#: templates/jobs/feed.html:229
 msgid "отправлено"
 msgstr "sent"
 
-#: templates/jobs/feed.html:229
+#: templates/jobs/feed.html:230
 msgid "пропущено"
 msgstr "missed"
 

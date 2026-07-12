@@ -5,11 +5,34 @@ from unittest.mock import patch
 from django.test import TestCase, override_settings
 
 from .models import JobPosting, SavedFilter
-from .presenters import _budget, _fmt_spent
+from .presenters import _budget, _fmt_spent, job_card
 from .providers.gmail import parse_alert
 from .providers.mock import MockProvider
 from .providers.vibeworker import VibeworkerProvider
 from .tasks import collect_for_filter
+
+
+class OverheatedTests(TestCase):
+    def _card(self, connects):
+        job = JobPosting(job_id="o1", title="t", budget_type="hourly", skills=[],
+                         raw={"connects": connects} if connects is not None else {})
+        return job_card(job, my_skills_lc=set())
+
+    @override_settings(HOT_CONNECTS_THRESHOLD=16)
+    def test_high_connects_marks_overheated(self):
+        c = self._card(20)
+        self.assertTrue(c["overheated"])
+        self.assertEqual(c["connects"], 20)
+
+    @override_settings(HOT_CONNECTS_THRESHOLD=16)
+    def test_low_connects_not_overheated(self):
+        self.assertFalse(self._card(8)["overheated"])
+
+    @override_settings(HOT_CONNECTS_THRESHOLD=16)
+    def test_missing_connects_not_overheated(self):
+        c = self._card(None)  # Gmail jobs / older rows have no connects field
+        self.assertFalse(c["overheated"])
+        self.assertIsNone(c["connects"])
 
 
 class BudgetFormatTests(TestCase):
