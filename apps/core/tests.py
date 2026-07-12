@@ -15,15 +15,24 @@ class TranslateTests(TestCase):
         self.assertEqual(translate_ru("   "), "")
 
     @override_settings(TRANSLATE_PROVIDER="google")
-    def test_google_path_calls_engine(self):
-        with patch("apps.core.translate._google", return_value="Панель") as g:
+    def test_real_path_calls_engine(self):
+        with patch("apps.core.translate._translate", return_value="Панель") as g:
             self.assertEqual(translate_ru("Dashboard"), "Панель")
         g.assert_called_once()
 
     @override_settings(TRANSLATE_PROVIDER="google")
     def test_failure_falls_back_to_empty(self):
-        with patch("apps.core.translate._google", side_effect=RuntimeError("blocked")):
+        with patch("apps.core.translate._translate", side_effect=RuntimeError("blocked")):
             self.assertEqual(translate_ru("Dashboard"), "")  # no crash
+
+    @override_settings(TRANSLATE_PROVIDER="google")
+    def test_hung_engine_times_out_to_empty(self):
+        import time
+        # A translator that never returns must not hang the page — the daemon
+        # timeout kicks in and the caller falls back to English.
+        with patch("apps.core.translate._TIMEOUT_S", 0.3), \
+             patch("apps.core.translate._translate", side_effect=lambda t: time.sleep(30)):
+            self.assertEqual(translate_ru("Dashboard"), "")
 
     def test_chunks_respect_size_and_cover_text(self):
         text = "\n".join(["para " + str(i) * 100 for i in range(10)])

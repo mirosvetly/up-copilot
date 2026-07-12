@@ -17,6 +17,7 @@ env = environ.Env(
     EMBEDDING_PROVIDER=(str, "mock"),  # mock | voyage
     JOB_SCORER=(str, "rule"),  # rule | llm
     TRANSLATE_PROVIDER=(str, "google"),  # google (free, no key) | mock (off)
+    TRANSLATE_ENGINE=(str, "mymemory"),  # mymemory (works where Google is blocked) | google
     DRAFT_MIN_SCORE=(int, 50),  # only auto-draft cover letters at/above this score
     MAX_JOB_AGE_HOURS=(int, 24),  # ignore API jobs older than this (API window is ~7 days)
     # Who I am for geo/language gating: jobs whose text demands a location or
@@ -140,6 +141,7 @@ GITHUB_PROVIDER = env("GITHUB_PROVIDER")
 EMBEDDING_PROVIDER = env("EMBEDDING_PROVIDER")
 JOB_SCORER = env("JOB_SCORER")
 TRANSLATE_PROVIDER = env("TRANSLATE_PROVIDER")
+TRANSLATE_ENGINE = env("TRANSLATE_ENGINE")
 MAX_JOB_AGE_HOURS = env("MAX_JOB_AGE_HOURS")
 FREELANCER_LOCATION = env("FREELANCER_LOCATION")
 FREELANCER_LANGUAGES = env("FREELANCER_LANGUAGES")

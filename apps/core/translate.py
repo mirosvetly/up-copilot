@@ -7,12 +7,40 @@ fall back to the original English, so translation never breaks a page.
 from __future__ import annotations
 
 import logging
+import threading
 
 from django.conf import settings
 
 log = logging.getLogger(__name__)
 
-_MAX = 4500  # Google's request cap is ~5000 chars; chunk below it
+_GOOGLE_MAX = 4500   # Google's request cap is ~5000 chars; chunk below it
+_MYMEMORY_MAX = 480  # MyMemory caps each request near 500 chars
+# deep-translator 1.9 has no timeout knob and its requests.get can hang forever
+# (the free Google endpoint sometimes just never answers), which left the "RU
+# loading" spinner spinning for good. Bound every call so it always resolves;
+# on timeout we fall back to the English original like any other failure.
+_TIMEOUT_S = 8
+
+
+def _timed(fn, arg):
+    # A daemon worker so a hung request never blocks process exit; join() caps
+    # the wait, and TimeoutError makes translate_ru fall back to English.
+    box: dict = {}
+
+    def run():
+        try:
+            box["v"] = fn(arg)
+        except Exception as exc:  # noqa: BLE001 — surfaced to the caller below
+            box["e"] = exc
+
+    th = threading.Thread(target=run, daemon=True)
+    th.start()
+    th.join(_TIMEOUT_S)
+    if th.is_alive():
+        raise TimeoutError("translation timed out")
+    if "e" in box:
+        raise box["e"]
+    return box.get("v", "")
 
 
 def _chunks(text: str, size: int) -> list[str]:
@@ -35,14 +63,23 @@ def _chunks(text: str, size: int) -> list[str]:
     return chunks
 
 
-def _google(text: str) -> str:
-    from deep_translator import GoogleTranslator  # lazy: only on the real path
+def _make_translator():
+    """Return (translator, chunk_size). MyMemory is the default: it answers from
+    networks where Google's free endpoint is blocked or just hangs. Set
+    TRANSLATE_ENGINE=google for accounts where Google is reachable (no daily cap)."""
+    from deep_translator import GoogleTranslator, MyMemoryTranslator
 
-    # auto source: reasons may already be Russian (rule scorer) — don't force EN
-    tr = GoogleTranslator(source="auto", target="ru")
-    if len(text) <= _MAX:
+    if settings.TRANSLATE_ENGINE == "google":
+        # auto source: reasons may already be Russian (rule scorer) — don't force EN
+        return GoogleTranslator(source="auto", target="ru"), _GOOGLE_MAX
+    return MyMemoryTranslator(source="en-GB", target="ru-RU"), _MYMEMORY_MAX
+
+
+def _translate(text: str) -> str:
+    tr, cap = _make_translator()
+    if len(text) <= cap:
         return tr.translate(text) or ""
-    return "\n".join(tr.translate(c) or "" for c in _chunks(text, _MAX))
+    return "\n".join(tr.translate(c) or "" for c in _chunks(text, cap))
 
 
 def translate_ru(text: str) -> str:
@@ -50,10 +87,15 @@ def translate_ru(text: str) -> str:
     if not text or settings.TRANSLATE_PROVIDER == "mock":
         return ""
     try:
-        return _google(text)
+        return _timed(_translate, text)
     except Exception:
         log.exception("Translation failed")
         return ""
+
+
+def _translate_batch(items: list[str]) -> list[str]:
+    tr, _ = _make_translator()
+    return tr.translate_batch(items)
 
 
 def translate_ru_batch(texts: list[str]) -> list[str]:
@@ -64,9 +106,7 @@ def translate_ru_batch(texts: list[str]) -> list[str]:
     if not idx or settings.TRANSLATE_PROVIDER == "mock":
         return ["" for _ in texts]
     try:
-        from deep_translator import GoogleTranslator
-
-        got = GoogleTranslator(source="auto", target="ru").translate_batch([texts[i] for i in idx])
+        got = _timed(_translate_batch, [texts[i] for i in idx])
         out = ["" for _ in texts]
         for k, i in enumerate(idx):
             out[i] = got[k] or ""
