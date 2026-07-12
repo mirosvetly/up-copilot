@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-13 00:45+0300\n"
+"POT-Creation-Date: 2026-07-13 01:25+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,11 +55,11 @@ msgid "Прошло скоринг"
 msgstr "Passed scoring"
 
 #: apps/analytics/metrics.py:25 apps/jobs/models.py:84
-#: apps/jobs/presenters.py:160
+#: apps/jobs/presenters.py:165
 msgid "Черновик готов"
 msgstr "Draft ready"
 
-#: apps/analytics/metrics.py:26 apps/jobs/presenters.py:161
+#: apps/analytics/metrics.py:26 apps/jobs/presenters.py:166
 msgid "Одобрено"
 msgstr "Approved"
 
@@ -104,7 +104,7 @@ msgid "Пропущена"
 msgstr "Missed"
 
 #: apps/jobs/models.py:88 apps/jobs/presenters.py:59
-#: apps/jobs/presenters.py:164
+#: apps/jobs/presenters.py:169
 msgid "Устарела"
 msgstr "Outdated"
 
@@ -146,72 +146,72 @@ msgstr "hourly"
 msgid "фикс"
 msgstr "fix"
 
-#: apps/jobs/presenters.py:152
+#: apps/jobs/presenters.py:157
 msgid "Низкий риск"
 msgstr "Low risk"
 
-#: apps/jobs/presenters.py:153
+#: apps/jobs/presenters.py:158
 msgid "Средний риск"
 msgstr "Medium risk"
 
-#: apps/jobs/presenters.py:154
+#: apps/jobs/presenters.py:159
 msgid "Высокий риск"
 msgstr "High risk"
 
-#: apps/jobs/presenters.py:158
+#: apps/jobs/presenters.py:163
 msgid "Новая — на ревью"
 msgstr "New - for review"
 
-#: apps/jobs/presenters.py:158
+#: apps/jobs/presenters.py:163
 msgid "Ещё не оценена."
 msgstr "Not rated yet."
 
-#: apps/jobs/presenters.py:159
+#: apps/jobs/presenters.py:164
 msgid "Оценена — на ревью"
 msgstr "Rated - for review"
 
-#: apps/jobs/presenters.py:159
+#: apps/jobs/presenters.py:164
 msgid "Просмотри и одобри или пропусти."
 msgstr "Review and approve or pass."
 
-#: apps/jobs/presenters.py:160
+#: apps/jobs/presenters.py:165
 msgid "Письмо сгенерировано, ждёт одобрения."
 msgstr "The letter has been generated and is awaiting approval."
 
-#: apps/jobs/presenters.py:161
+#: apps/jobs/presenters.py:166
 msgid "В очереди на ручную отправку. Открой на Upwork и отправь."
 msgstr "In queue for manual sending. Open it on Upwork and submit."
 
-#: apps/jobs/presenters.py:162 templates/jobs/detail.html:29
-#: templates/jobs/feed.html:189
+#: apps/jobs/presenters.py:167 templates/jobs/detail.html:29
+#: templates/jobs/feed.html:184
 msgid "Отправлено вручную"
 msgstr "Sent manually"
 
-#: apps/jobs/presenters.py:162
+#: apps/jobs/presenters.py:167
 msgid "Отмечено как отправленное. Жди ответа клиента."
 msgstr "Marked as sent. Wait for the client's response."
 
-#: apps/jobs/presenters.py:163 templates/jobs/feed.html:191
+#: apps/jobs/presenters.py:168 templates/jobs/feed.html:188
 msgid "Пропущено"
 msgstr "Missed"
 
-#: apps/jobs/presenters.py:163
+#: apps/jobs/presenters.py:168
 msgid "Исключена из ленты. Можно вернуть."
 msgstr "Removed from the feed. Can be returned."
 
-#: apps/jobs/presenters.py:164
+#: apps/jobs/presenters.py:169
 msgid "Публикация устарела."
 msgstr "The publication is outdated."
 
-#: apps/jobs/presenters.py:220
+#: apps/jobs/presenters.py:225
 msgid "Подтверждена"
 msgstr "Confirmed"
 
-#: apps/jobs/presenters.py:220
+#: apps/jobs/presenters.py:225
 msgid "Не подтверждена"
 msgstr "Not confirmed"
 
-#: apps/jobs/presenters.py:226
+#: apps/jobs/presenters.py:231
 msgid "нет отзывов"
 msgstr "no reviews"
 
@@ -230,12 +230,28 @@ msgstr ""
 "New ones collected: %(n)s. Evaluation in progress - refresh the page in a "
 "minute."
 
-#: apps/jobs/views.py:189
+#: apps/jobs/views.py:191
 #, python-format
 msgid "Удалено вакансий из ленты: %(n)s."
 msgstr "Vacancies removed from feed: %(n)s."
 
-#: apps/jobs/views.py:296
+#: apps/jobs/views.py:303
+msgid "У вакансии нет привязанного поиска — добавить ключевик некуда."
+msgstr "This job has no linked search, nowhere to add the keyword."
+
+#: apps/jobs/views.py:310
+#, python-format
+msgid "Убрано из поиска «%(f)s»: %(k)s"
+msgstr "Removed from search “%(f)s”: %(k)s"
+
+#: apps/jobs/views.py:314
+#, python-format
+msgid ""
+"Добавлено в поиск «%(f)s»: %(k)s. Новые сборы будут цеплять вакансии по нему."
+msgstr ""
+"Added to search “%(f)s”: %(k)s. New polls will pull jobs matching it."
+
+#: apps/jobs/views.py:326
 #, python-format
 msgid "Неизвестное действие: %(action)s"
 msgstr "Unknown action: %(action)s"
@@ -364,12 +380,12 @@ msgstr "Mark as sent"
 msgid "%(n)s откликов"
 msgstr "%(n)s responses"
 
-#: templates/jobs/detail.html:55 templates/jobs/feed.html:167
+#: templates/jobs/detail.html:55 templates/jobs/feed.html:135
 #, python-format
 msgid "Upwork требует %(c)s коннектов за отклик, признак высокой конкуренции"
 msgstr "Upwork charges %(c)s connects to apply, a sign of high competition"
 
-#: templates/jobs/detail.html:55 templates/jobs/feed.html:167
+#: templates/jobs/detail.html:55 templates/jobs/feed.html:135
 msgid "Перегрета откликами"
 msgstr "Overheated with proposals"
 
@@ -377,65 +393,78 @@ msgstr "Overheated with proposals"
 msgid "match score"
 msgstr "match score"
 
-#: templates/jobs/detail.html:75
+#: templates/jobs/detail.html:63
+msgid ""
+"Навыки вакансии — нажми, чтобы добавить в поиск (и цеплять такие вакансии)"
+msgstr "Job skills — click one to add it to your search (and pull jobs like this)"
+
+#: templates/jobs/detail.html:69
+msgid "В поиске — нажми, чтобы убрать"
+msgstr "In search — click to remove"
+
+#: templates/jobs/detail.html:69
+msgid "Добавить в поиск"
+msgstr "Add to search"
+
+#: templates/jobs/detail.html:80
 msgid "Почему подходит"
 msgstr "Why is it suitable?"
 
-#: templates/jobs/detail.html:76
+#: templates/jobs/detail.html:81
 #, python-format
 msgid "скоринг · %(model_name)s"
 msgstr "scoring · %(model_name)s"
 
-#: templates/jobs/detail.html:78
+#: templates/jobs/detail.html:83
 msgid "итог"
 msgstr "result"
 
-#: templates/jobs/detail.html:94
+#: templates/jobs/detail.html:99
 msgid "Описание вакансии"
 msgstr "Job Description"
 
-#: templates/jobs/detail.html:111
+#: templates/jobs/detail.html:116
 msgid "Карточка клиента"
 msgstr "Customer card"
 
-#: templates/jobs/detail.html:117
+#: templates/jobs/detail.html:122
 msgid "визитка риска"
 msgstr "risk business card"
 
-#: templates/jobs/detail.html:122
+#: templates/jobs/detail.html:127
 msgid "Оплата"
 msgstr "Payment"
 
-#: templates/jobs/detail.html:127
+#: templates/jobs/detail.html:132
 msgid "Всего потрачено"
 msgstr "Total spent"
 
-#: templates/jobs/detail.html:133
+#: templates/jobs/detail.html:138
 msgid "Hire rate"
 msgstr "Hire rate"
 
-#: templates/jobs/detail.html:140
+#: templates/jobs/detail.html:145
 msgid "Страна"
 msgstr "Country"
 
-#: templates/jobs/detail.html:145
+#: templates/jobs/detail.html:150
 msgid "Рейтинг"
 msgstr "Rating"
 
-#: templates/jobs/detail.html:151
+#: templates/jobs/detail.html:156
 msgid "вакансий"
 msgstr "vacancies"
 
-#: templates/jobs/detail.html:155
+#: templates/jobs/detail.html:160
 msgid "наймов"
 msgstr "hires"
 
-#: templates/jobs/detail.html:158
+#: templates/jobs/detail.html:163
 #, python-format
 msgid "На Upwork с %(member_since)s"
 msgstr "On Upwork with %(member_since)s"
 
-#: templates/jobs/detail.html:164
+#: templates/jobs/detail.html:169
 msgid "Статус в трекере"
 msgstr "Tracker status"
 
@@ -532,72 +561,64 @@ msgstr "Removes unwatched (new/scored) items from the database"
 msgid "Пропустить все"
 msgstr "Skip all"
 
-#: templates/jobs/feed.html:142
-msgid "оценка…"
-msgstr "scoring…"
-
-#: templates/jobs/feed.html:150
-msgid "score"
-msgstr "score"
-
-#: templates/jobs/feed.html:163
+#: templates/jobs/feed.html:132
 msgid "Оплата подтверждена"
 msgstr "Payment confirmed"
 
-#: templates/jobs/feed.html:164
+#: templates/jobs/feed.html:133
 msgid "Оплата не подтверждена"
 msgstr "Payment not confirmed"
 
-#: templates/jobs/feed.html:165
+#: templates/jobs/feed.html:134
 msgid "Нанимает"
 msgstr "Hires"
 
-#: templates/jobs/feed.html:166
-msgid "откликов"
-msgstr "responses"
+#: templates/jobs/feed.html:144
+msgid "оценка…"
+msgstr "scoring…"
 
-#: templates/jobs/feed.html:174
+#: templates/jobs/feed.html:154
+msgid "score"
+msgstr "score"
+
+#: templates/jobs/feed.html:171
 msgid "Одобрить"
 msgstr "Approve"
 
-#: templates/jobs/feed.html:177
+#: templates/jobs/feed.html:174
 msgid "Пропустить"
 msgstr "Skip"
 
-#: templates/jobs/feed.html:180
-msgid "Открыть"
-msgstr "Open"
-
-#: templates/jobs/feed.html:182
+#: templates/jobs/feed.html:177
 msgid "В очереди на отправку"
 msgstr "Queue for dispatch"
 
-#: templates/jobs/feed.html:184
+#: templates/jobs/feed.html:179
 msgid "Отменить"
 msgstr "Cancel"
 
-#: templates/jobs/feed.html:187
+#: templates/jobs/feed.html:182 templates/jobs/feed.html:186
 msgid "Открыть детально"
 msgstr "Open in detail"
 
-#: templates/jobs/feed.html:193
+#: templates/jobs/feed.html:190
 msgid "Вернуть в ленту"
 msgstr "Return to feed"
 
-#: templates/jobs/feed.html:200
+#: templates/jobs/feed.html:197
 msgid "Ничего не найдено"
 msgstr "Nothing found"
 
-#: templates/jobs/feed.html:200
+#: templates/jobs/feed.html:197
 #, python-format
 msgid "по фильтру «%(q)s»"
 msgstr "by filter “%(q)s”"
 
-#: templates/jobs/feed.html:209
+#: templates/jobs/feed.html:206
 msgid "Очередь на отправку"
 msgstr "Queue for dispatch"
 
-#: templates/jobs/feed.html:220
+#: templates/jobs/feed.html:217
 msgid ""
 "Пока пусто. Одобряй карточки слева — они встанут сюда для ручной отправки на "
 "Upwork."
@@ -605,23 +626,23 @@ msgstr ""
 "Empty for now. Approve the cards on the left - they will go here for manual "
 "submission to Upwork."
 
-#: templates/jobs/feed.html:225
+#: templates/jobs/feed.html:222
 msgid "Сегодня"
 msgstr "Today"
 
-#: templates/jobs/feed.html:227
+#: templates/jobs/feed.html:224
 msgid "найдено"
 msgstr "found"
 
-#: templates/jobs/feed.html:228
+#: templates/jobs/feed.html:225
 msgid "одобрено"
 msgstr "approved"
 
-#: templates/jobs/feed.html:229
+#: templates/jobs/feed.html:226
 msgid "отправлено"
 msgstr "sent"
 
-#: templates/jobs/feed.html:230
+#: templates/jobs/feed.html:227
 msgid "пропущено"
 msgstr "missed"
 
@@ -762,6 +783,12 @@ msgstr ""
 #: templates/tracks/list.html:38
 msgid "Пока нет ни одного трека. Создайте первый."
 msgstr "There are no tracks yet. Create the first one."
+
+#~ msgid "откликов"
+#~ msgstr "responses"
+
+#~ msgid "Открыть"
+#~ msgstr "Open"
 
 #, python-format
 #~ msgid "Обновлено: %(n)s новых, оценено %(m)s."

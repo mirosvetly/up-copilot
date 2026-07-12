@@ -60,9 +60,14 @@
               <div style="font-size:9px;color:#737373;letter-spacing:.06em;text-transform:uppercase;margin-top:2px">{% trans "match score" %}</div>
             </div>
           </div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px">
+          <div style="font-size:11px;color:#737373;margin-top:16px;display:flex;align-items:center;gap:6px">{% icon "search" 12 "#737373" %}{% trans "Навыки вакансии — нажми, чтобы добавить в поиск (и цеплять такие вакансии)" %}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
             {% for tag in job.tags %}
-            <span style="font-size:11.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:6px;{% if tag.mine %}background:rgba(182,208,134,0.1);border:1px solid rgba(182,208,134,0.28);color:#c5dc9f{% else %}background:#1f1f1f;border:1px solid #303030;color:#a3a3a3{% endif %}">{{ tag.label }}</span>
+            <form method="post" action="{% url 'jobs:toggle_keyword' pk %}" style="display:inline;margin:0">{% csrf_token %}
+              <input type="hidden" name="kw" value="{{ tag.label }}">
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" title="{% if tag.in_search %}{% trans 'В поиске — нажми, чтобы убрать' %}{% else %}{% trans 'Добавить в поиск' %}{% endif %}" style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:6px;cursor:pointer;{% if tag.in_search %}background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.42);color:#4ade80{% elif tag.mine %}background:rgba(182,208,134,0.1);border:1px solid rgba(182,208,134,0.28);color:#c5dc9f{% else %}background:#1f1f1f;border:1px solid #303030;color:#a3a3a3{% endif %}">{% if tag.in_search %}{% icon "check" 12 "#4ade80" %}{% else %}<span style="opacity:.5">+</span>{% endif %}{{ tag.label }}</button>
+            </form>
             {% endfor %}
           </div>
         </div>

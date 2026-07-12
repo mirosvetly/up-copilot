@@ -35,6 +35,37 @@ class OverheatedTests(TestCase):
         self.assertIsNone(c["connects"])
 
 
+class ToggleKeywordTests(TestCase):
+    def _job(self):
+        from apps.tracks.models import Track
+        t = Track.objects.create(name="Dev", is_default=True)
+        f = SavedFilter.objects.create(name="dev", track=t, keywords=["react"])
+        return JobPosting.objects.create(job_id="kw", title="t", budget_type="fixed",
+                                         status=JobPosting.Status.SCORED,
+                                         skills=["Strapi", "React"], matched_filter=f), f
+
+    def test_tag_in_search_flag(self):
+        job, _ = self._job()
+        tags = {t["label"]: t["in_search"] for t in job_card(job, my_skills_lc=set())["tags"]}
+        self.assertTrue(tags["React"])    # keyword "react" already in the search
+        self.assertFalse(tags["Strapi"])  # not yet
+
+    def test_toggle_adds_then_removes_keyword(self):
+        job, f = self._job()
+        self.client.post(f"/job/{job.pk}/toggle-keyword/", {"kw": "Strapi", "next": "/"})
+        f.refresh_from_db()
+        self.assertIn("Strapi", f.keywords)
+        self.client.post(f"/job/{job.pk}/toggle-keyword/", {"kw": "Strapi", "next": "/"})
+        f.refresh_from_db()
+        self.assertNotIn("Strapi", f.keywords)  # second click removes it
+
+    def test_toggle_dedups_case_insensitively(self):
+        job, f = self._job()
+        self.client.post(f"/job/{job.pk}/toggle-keyword/", {"kw": "React", "next": "/"})
+        f.refresh_from_db()
+        self.assertEqual(f.keywords, [])  # "React" matched existing "react" -> removed, not doubled
+
+
 class BudgetFormatTests(TestCase):
     def test_fixed_keeps_trailing_zeros(self):
         j = JobPosting(budget_type="fixed", budget_min=Decimal("2500"))

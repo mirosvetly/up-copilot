@@ -110,6 +110,8 @@ def job_card(job, *, my_skills_lc=None):
     except (TypeError, ValueError):
         connects = None
     overheated = connects is not None and connects >= settings.HOT_CONNECTS_THRESHOLD
+    f = job.matched_filter
+    search_kw_lc = {k.lower() for k in ((f.keywords if f else []) or [])}
     client = job.client
     return {
         "id": job.pk,
@@ -130,7 +132,10 @@ def job_card(job, *, my_skills_lc=None):
         "score_color": score_color,
         "score_soft": score_soft,
         "score_border": score_border,
-        "tags": [{"label": t, "mine": t.lower() in my_skills_lc} for t in job.skills],
+        "tags": [
+            {"label": t, "mine": t.lower() in my_skills_lc, "in_search": t.lower() in search_kw_lc}
+            for t in job.skills
+        ],
         "budget": _budget(job),
         "verified": bool(client and client.verified_payment),
         "hire_rate": client.hire_rate if client else None,

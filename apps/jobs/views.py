@@ -291,6 +291,34 @@ def detail(request, pk):
 
 
 @require_POST
+def toggle_keyword(request, pk):
+    """Add (or remove) a job's tag to its track's saved search, so future polls
+    fetch more jobs matching it. Each keyword is one more API fan-out request per
+    poll, so this is opt-in per tag, not automatic."""
+    job = get_object_or_404(JobPosting.objects.select_related("matched_filter"), pk=pk)
+    f = job.matched_filter
+    kw = (request.POST.get("kw") or "").strip()
+    nxt = _safe_next(request) if request.POST.get("next") else reverse("jobs:detail", args=[pk])
+    if not f:
+        messages.warning(request, _("У вакансии нет привязанного поиска — добавить ключевик некуда."))
+        return redirect(nxt)
+    if not kw:
+        return redirect(nxt)
+    kws = list(f.keywords or [])
+    if kw.lower() in {k.lower() for k in kws}:
+        kws = [k for k in kws if k.lower() != kw.lower()]
+        messages.success(request, _("Убрано из поиска «%(f)s»: %(k)s") % {"f": f.name, "k": kw})
+    else:
+        kws.append(kw)
+        messages.success(request, _(
+            "Добавлено в поиск «%(f)s»: %(k)s. Новые сборы будут цеплять вакансии по нему."
+        ) % {"f": f.name, "k": kw})
+    f.keywords = kws
+    f.save(update_fields=["keywords", "updated_at"])
+    return redirect(nxt)
+
+
+@require_POST
 def job_action(request, pk, action):
     job = get_object_or_404(JobPosting, pk=pk)
     target = _ACTIONS.get(action)
