@@ -155,12 +155,15 @@ def score_job(job: JobPosting, *, profile: dict | None = None, track=None) -> Jo
     job_vec = provider.embed_one(_job_text(job))
     similarity = cosine(_profile_embedding(provider, profile), job_vec)
 
-    # Bulk scoring runs on the cheaper/faster model; letters keep the default.
-    llm = get_llm(settings.ANTHROPIC_SCORER_MODEL) if settings.JOB_SCORER == "llm" else None
+    # Bulk scoring can run on a different (e.g. free local Ollama) backend than
+    # letters; falls back to LLM_PROVIDER when SCORER_LLM_PROVIDER is unset.
+    scorer_provider = settings.SCORER_LLM_PROVIDER or None
+    llm = get_llm(settings.ANTHROPIC_SCORER_MODEL, provider=scorer_provider) \
+        if settings.JOB_SCORER == "llm" else None
     if llm:
         try:
             result = llm_compute(job, profile, similarity, llm)
-            model_name = "anthropic"
+            model_name = scorer_provider or settings.LLM_PROVIDER  # "ollama" / "anthropic"
         except Exception:
             # Malformed JSON, API/rate-limit errors: degrade to the deterministic
             # rule scorer so one bad response can't stall the job in `new` forever.

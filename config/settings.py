@@ -41,6 +41,12 @@ env = environ.Env(
     ANTHROPIC_API_KEY=(str, ""),
     ANTHROPIC_MODEL=(str, "claude-sonnet-5"),  # cover letters / screening (quality)
     ANTHROPIC_SCORER_MODEL=(str, "claude-haiku-4-5-20251001"),  # bulk scoring (cheap/fast)
+    # Scoring can run on a different backend than letters (free local model for
+    # the bulk work, Sonnet kept for letters). "" = same as LLM_PROVIDER.
+    SCORER_LLM_PROVIDER=(str, ""),  # "" | ollama | anthropic
+    OLLAMA_BASE_URL=(str, "http://localhost:11434"),
+    OLLAMA_MODEL=(str, "qwen2.5:14b"),  # free local scoring; good JSON on 24GB M-series
+    OLLAMA_TIMEOUT=(int, 120),  # a local 14B can take tens of seconds per job
     VOYAGE_API_KEY=(str, ""),
     GITHUB_TOKEN=(str, ""),
     GITHUB_USER=(str, ""),
@@ -142,6 +148,10 @@ EMBEDDING_PROVIDER = env("EMBEDDING_PROVIDER")
 JOB_SCORER = env("JOB_SCORER")
 TRANSLATE_PROVIDER = env("TRANSLATE_PROVIDER")
 TRANSLATE_ENGINE = env("TRANSLATE_ENGINE")
+SCORER_LLM_PROVIDER = env("SCORER_LLM_PROVIDER")
+OLLAMA_BASE_URL = env("OLLAMA_BASE_URL")
+OLLAMA_MODEL = env("OLLAMA_MODEL")
+OLLAMA_TIMEOUT = env("OLLAMA_TIMEOUT")
 MAX_JOB_AGE_HOURS = env("MAX_JOB_AGE_HOURS")
 FREELANCER_LOCATION = env("FREELANCER_LOCATION")
 FREELANCER_LANGUAGES = env("FREELANCER_LANGUAGES")
@@ -171,6 +181,7 @@ if "test" in sys.argv:
     GITHUB_PROVIDER = "mock"
     EMBEDDING_PROVIDER = "mock"
     JOB_SCORER = "rule"
+    SCORER_LLM_PROVIDER = ""  # scoring stays on the rule path; never hit a real backend
     TRANSLATE_PROVIDER = "mock"
     # Collect-time filters come from .env in real runs; pin them to schema
     # defaults so a local .env (e.g. a 2h window) can't skew fixtures. Tests

@@ -32,10 +32,49 @@ class AnthropicLLM:
         return _extract_json(self.complete(system, user, max_tokens))
 
 
-def get_llm(model: str | None = None):
-    """Real client on the anthropic path, else None. `model` overrides the
-    default (letters/screening use the default; scoring passes a cheaper one)."""
-    if settings.LLM_PROVIDER == "anthropic" and settings.ANTHROPIC_API_KEY:
+class OllamaLLM:
+    """Local model via Ollama's native API — no key, no cloud, works offline and
+    on networks where hosted APIs are blocked. Free, so it's the cheap path for
+    bulk scoring. Uses format=json so the verdict is always valid JSON."""
+
+    def __init__(self, model: str | None = None):
+        self._model = model or settings.OLLAMA_MODEL
+        self._url = settings.OLLAMA_BASE_URL.rstrip("/") + "/api/chat"
+
+    def _chat(self, system: str, user: str, max_tokens: int, fmt: str | None = None) -> str:
+        import requests  # lazy: only on the real path
+
+        body = {
+            "model": self._model,
+            "stream": False,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "options": {"num_predict": max_tokens, "temperature": 0},
+        }
+        if fmt:
+            body["format"] = fmt
+        resp = requests.post(self._url, json=body, timeout=settings.OLLAMA_TIMEOUT)
+        resp.raise_for_status()
+        return resp.json().get("message", {}).get("content", "") or ""
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> str:
+        return self._chat(system, user, max_tokens)
+
+    def complete_json(self, system: str, user: str, max_tokens: int = 1024) -> dict:
+        return _extract_json(self._chat(system, user, max_tokens, fmt="json"))
+
+
+def get_llm(model: str | None = None, provider: str | None = None):
+    """Real client for the given provider (defaults to LLM_PROVIDER), else None.
+    `model` overrides the Anthropic model (ignored by Ollama, which uses
+    OLLAMA_MODEL). `provider` lets scoring pick a different backend than letters
+    — e.g. free local Ollama for scoring, Anthropic Sonnet for cover letters."""
+    provider = provider or settings.LLM_PROVIDER
+    if provider == "ollama":
+        return OllamaLLM()
+    if provider == "anthropic" and settings.ANTHROPIC_API_KEY:
         return AnthropicLLM(model)
     return None
 

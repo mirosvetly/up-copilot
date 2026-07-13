@@ -21,14 +21,15 @@ class ScorerTests(TestCase):
         defaults.update(kw)
         return JobPosting.objects.create(**defaults)
 
-    @override_settings(JOB_SCORER="llm", ANTHROPIC_SCORER_MODEL="claude-haiku-4-5-20251001")
+    @override_settings(JOB_SCORER="llm", ANTHROPIC_SCORER_MODEL="claude-haiku-4-5-20251001",
+                       SCORER_LLM_PROVIDER="")
     def test_llm_scoring_uses_the_cheaper_scorer_model(self):
         with patch("apps.scoring.scorer.get_llm") as gl, \
              patch("apps.scoring.scorer.llm_compute") as lc:
             gl.return_value = object()  # truthy -> take the LLM path
             lc.return_value = {"score": 60, "breakdown": [], "reasoning": "ok"}
             score_job(self._job(skills=["Django"]))
-        gl.assert_called_once_with("claude-haiku-4-5-20251001")
+        gl.assert_called_once_with("claude-haiku-4-5-20251001", provider=None)
 
     def test_llm_prompt_includes_client_and_competition(self):
         from .llm_scorer import _prompt

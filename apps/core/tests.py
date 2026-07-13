@@ -42,6 +42,33 @@ class TranslateTests(TestCase):
         self.assertIn("0" * 100, "".join(chunks))
 
 
+class GetLlmRoutingTests(TestCase):
+    @override_settings(SCORER_LLM_PROVIDER="", LLM_PROVIDER="mock")
+    def test_none_without_real_provider(self):
+        from apps.core.llm import get_llm
+        self.assertIsNone(get_llm())
+
+    @override_settings(LLM_PROVIDER="anthropic", ANTHROPIC_API_KEY="k")
+    def test_ollama_provider_overrides_llm_provider(self):
+        from apps.core.llm import get_llm, OllamaLLM
+        # scoring can ask for ollama even while letters stay on anthropic
+        self.assertIsInstance(get_llm(provider="ollama"), OllamaLLM)
+
+    @override_settings(OLLAMA_MODEL="qwen2.5:14b", OLLAMA_BASE_URL="http://localhost:11434",
+                       OLLAMA_TIMEOUT=120)
+    def test_ollama_complete_json_parses_message(self):
+        from apps.core.llm import OllamaLLM
+        with patch("requests.post") as post:
+            post.return_value.json.return_value = {"message": {"content": '{"score": 71}'}}
+            post.return_value.raise_for_status.return_value = None
+            out = OllamaLLM().complete_json("sys", "user", max_tokens=500)
+        self.assertEqual(out["score"], 71)
+        # asked Ollama for strict JSON and the configured model
+        body = post.call_args.kwargs["json"]
+        self.assertEqual(body["format"], "json")
+        self.assertEqual(body["model"], "qwen2.5:14b")
+
+
 class JobEnsureRuTests(TestCase):
     def _job(self):
         return JobPosting.objects.create(
