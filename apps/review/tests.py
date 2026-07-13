@@ -80,12 +80,22 @@ class NotifyScoredTests(TestCase):
             self.assertEqual(notify_scored_jobs()["sent"], 0)  # second run pings nobody
         send2.assert_not_called()
 
-    def test_buttons_include_upwork_and_card_links(self):
+    def test_buttons_include_upwork_and_card_on_public_site(self):
         from .notify import _buttons
-        row = _buttons(self._job(80))[0]
+        row = _buttons(self._job(80))[0]  # SITE_URL=http://testhost is public
         urls = [b["url"] for b in row]
         self.assertTrue(any("upwork.com" in u for u in urls))
         self.assertTrue(any("testhost/job/" in u for u in urls))
+
+    @override_settings(SITE_URL="http://localhost:8012")
+    def test_localhost_card_not_a_button_but_in_text(self):
+        from .notify import _buttons, _text
+        job = self._job(80)
+        # Telegram rejects localhost button URLs — only the Upwork button remains
+        row = _buttons(job)[0]
+        self.assertTrue(all("localhost" not in b["url"] for b in row))
+        self.assertTrue(any("upwork.com" in b["url"] for b in row))
+        self.assertIn("localhost:8012/job/", _text(job))  # card link lives in the text
 
     @override_settings(TELEGRAM_BOT_TOKEN="", TELEGRAM_CHAT_ID="")
     def test_noop_without_token(self):

@@ -39,16 +39,28 @@ def _text(job: JobPosting) -> str:
         lines.append("")
         lines.append(score.reasoning)
     lines.append("")
+    # Card link in the text (not a button) — Telegram rejects localhost in
+    # inline-button URLs, but accepts it as plain text.
+    lines.append(f"📄 Карточка: {settings.SITE_URL}/job/{job.pk}/")
     lines.append("Зайди, сгенерь письмо и отправь, пока не перебили.")
     return "\n".join(lines)
 
 
-def _buttons(job: JobPosting) -> list[list[dict]]:
-    row = [{"text": "📄 Карточка", "url": f"{settings.SITE_URL}/job/{job.pk}/"}]
+def _is_public_url(u: str) -> bool:
+    return u.startswith("https://") or (
+        u.startswith("http://") and "localhost" not in u and "127.0.0.1" not in u
+    )
+
+
+def _buttons(job: JobPosting) -> list[list[dict]] | None:
+    row = []
     upwork = _safe_url((job.raw or {}).get("url", ""))
     if upwork:
-        row.append({"text": "🔗 Upwork", "url": upwork})
-    return [row]
+        row.append({"text": "🔗 Открыть на Upwork", "url": upwork})
+    # Telegram inline-button URLs must be public; skip the card button on localhost.
+    if _is_public_url(settings.SITE_URL):
+        row.append({"text": "📄 Карточка", "url": f"{settings.SITE_URL}/job/{job.pk}/"})
+    return [row] if row else None
 
 
 def send_telegram(text: str, buttons: list | None = None) -> bool:
