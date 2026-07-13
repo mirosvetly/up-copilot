@@ -1,9 +1,12 @@
+from unittest.mock import patch
+
 from django.test import TestCase, override_settings
 
 from apps.jobs.models import ClientProfile, JobPosting
 from apps.scoring.models import JobScore
 
 from .card import card_text, keyboard_spec
+from .notify import notify_scored_jobs
 
 
 @override_settings(SITE_URL="http://testhost")
@@ -33,3 +36,48 @@ class CardTests(TestCase):
         self.assertEqual(spec[0][0]["cb"], "approve:7")
         self.assertEqual(spec[0][1]["cb"], "skip:7")
         self.assertIn("edit=1", spec[1][0]["url"])
+
+
+@override_settings(TELEGRAM_BOT_TOKEN="t", TELEGRAM_CHAT_ID="1", NOTIFY_MIN_SCORE=70,
+                   SITE_URL="http://testhost")
+class NotifyScoredTests(TestCase):
+    def _job(self, score, job_id="n1"):
+        job = JobPosting.objects.create(job_id=job_id, title="React dev", budget_type="fixed",
+                                        status=JobPosting.Status.SCORED,
+                                        raw={"url": "https://www.upwork.com/jobs/~01x"})
+        JobScore.objects.create(job=job, score=score, reasoning="fits")
+        return job
+
+    def test_pings_high_score_and_marks_notified(self):
+        job = self._job(85)
+        with patch("apps.review.notify.send_telegram", return_value=True) as send:
+            self.assertEqual(notify_scored_jobs()["sent"], 1)
+        send.assert_called_once()
+        job.refresh_from_db()
+        self.assertIsNotNone(job.review_notified_at)  # dedup marker set
+
+    def test_skips_low_score(self):
+        self._job(55)
+        with patch("apps.review.notify.send_telegram", return_value=True) as send:
+            self.assertEqual(notify_scored_jobs()["sent"], 0)
+        send.assert_not_called()
+
+    def test_does_not_reping_already_notified(self):
+        self._job(90)
+        with patch("apps.review.notify.send_telegram", return_value=True):
+            notify_scored_jobs()
+        with patch("apps.review.notify.send_telegram", return_value=True) as send2:
+            self.assertEqual(notify_scored_jobs()["sent"], 0)  # second run pings nobody
+        send2.assert_not_called()
+
+    def test_buttons_include_upwork_and_card_links(self):
+        from .notify import _buttons
+        row = _buttons(self._job(80))[0]
+        urls = [b["url"] for b in row]
+        self.assertTrue(any("upwork.com" in u for u in urls))
+        self.assertTrue(any("testhost/job/" in u for u in urls))
+
+    @override_settings(TELEGRAM_BOT_TOKEN="", TELEGRAM_CHAT_ID="")
+    def test_noop_without_token(self):
+        self._job(95)
+        self.assertEqual(notify_scored_jobs()["sent"], 0)  # skipped, not crashed

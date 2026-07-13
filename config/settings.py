@@ -19,6 +19,7 @@ env = environ.Env(
     TRANSLATE_PROVIDER=(str, "google"),  # google (free, no key) | mock (off)
     TRANSLATE_ENGINE=(str, "mymemory"),  # mymemory (works where Google is blocked) | google
     DRAFT_MIN_SCORE=(int, 50),  # only auto-draft cover letters at/above this score
+    NOTIFY_MIN_SCORE=(int, 70),  # Telegram-ping a scored job at/above this score
     MAX_JOB_AGE_HOURS=(int, 24),  # ignore API jobs older than this (API window is ~7 days)
     # Who I am for geo/language gating: jobs whose text demands a location or
     # language I can't meet (e.g. "US only", "native German") can't be applied
@@ -155,6 +156,7 @@ OLLAMA_MODEL = env("OLLAMA_MODEL")
 OLLAMA_TIMEOUT = env("OLLAMA_TIMEOUT")
 OLLAMA_KEEP_ALIVE = env("OLLAMA_KEEP_ALIVE")
 MAX_JOB_AGE_HOURS = env("MAX_JOB_AGE_HOURS")
+NOTIFY_MIN_SCORE = env("NOTIFY_MIN_SCORE")
 FREELANCER_LOCATION = env("FREELANCER_LOCATION")
 FREELANCER_LANGUAGES = env("FREELANCER_LANGUAGES")
 HOT_CONNECTS_THRESHOLD = env("HOT_CONNECTS_THRESHOLD")
