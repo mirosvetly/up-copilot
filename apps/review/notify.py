@@ -80,11 +80,17 @@ def notify_scored_jobs() -> dict:
     Dedup is review_notified_at, so a job alerts once even across re-runs."""
     if not _configured():
         return {"sent": 0, "skipped": "telegram not configured"}
+    # Only ping fresh postings — a job that scored well but sat unnotified past the
+    # freshness window is already buried, no point racing to it.
+    from datetime import timedelta
+
+    cutoff = timezone.now() - timedelta(hours=settings.MAX_JOB_AGE_HOURS)
     jobs = (
         JobPosting.objects.filter(
             status=JobPosting.Status.SCORED,
             review_notified_at__isnull=True,
             score__score__gte=settings.NOTIFY_MIN_SCORE,
+            posted_at__gte=cutoff,
         )
         .select_related("client", "score")
         .order_by("-score__score")

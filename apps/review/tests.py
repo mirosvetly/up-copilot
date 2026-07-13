@@ -42,11 +42,21 @@ class CardTests(TestCase):
                    SITE_URL="http://testhost")
 class NotifyScoredTests(TestCase):
     def _job(self, score, job_id="n1"):
+        from django.utils import timezone
         job = JobPosting.objects.create(job_id=job_id, title="React dev", budget_type="fixed",
-                                        status=JobPosting.Status.SCORED,
+                                        status=JobPosting.Status.SCORED, posted_at=timezone.now(),
                                         raw={"url": "https://www.upwork.com/jobs/~01x"})
         JobScore.objects.create(job=job, score=score, reasoning="fits")
         return job
+
+    def test_skips_stale_posting(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        job = self._job(90, "stale")
+        JobPosting.objects.filter(pk=job.pk).update(posted_at=timezone.now() - timedelta(hours=48))
+        with patch("apps.review.notify.send_telegram", return_value=True) as send:
+            self.assertEqual(notify_scored_jobs()["sent"], 0)  # too old to race to
+        send.assert_not_called()
 
     def test_pings_high_score_and_marks_notified(self):
         job = self._job(85)
