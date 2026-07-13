@@ -66,7 +66,7 @@
         {% if pending_scoring %}
         <div id="uc-scorebanner" data-track="{{ track }}" style="display:flex;align-items:center;gap:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:10px 14px;font-size:13px;color:#f0c67a">
           <span style="display:inline-flex;flex:none;animation:ucSpin .8s linear infinite">{% icon "refresh" 15 "#f59e0b" %}</span>
-          <span>Haiku {% trans "оценивает вакансии" %}: <span class="uc-sp" style="font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ pending_scoring }}</span> {% trans "в очереди" %}</span>
+          <span>{% trans "Идёт оценка вакансий" %}: <span class="uc-sp" style="font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ pending_scoring }}</span> {% trans "в очереди" %}</span>
           <span style="color:#a3a3a3;font-size:12px">{% trans "страница обновится сама" %}</span>
         </div>
         <script>
@@ -143,7 +143,6 @@
                     <span style="display:inline-flex;animation:ucSpin .8s linear infinite">{% icon "refresh" 12 "#f59e0b" %}</span>
                     <span style="font-size:11.5px;font-weight:600;color:#f59e0b">{% trans "оценка…" %}</span>
                   </div>
-                  <span style="font-size:9.5px;color:#737373;letter-spacing:.06em;text-transform:uppercase;padding-right:2px">Haiku</span>
                 </div>
                 {% else %}
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
