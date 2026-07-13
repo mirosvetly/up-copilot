@@ -47,6 +47,9 @@ class OllamaLLM:
         body = {
             "model": self._model,
             "stream": False,
+            # Keep the model resident between jobs so a batch doesn't pay the
+            # ~15s cold-load on every call.
+            "keep_alive": settings.OLLAMA_KEEP_ALIVE,
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
