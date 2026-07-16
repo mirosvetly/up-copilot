@@ -7,9 +7,12 @@ mock path. This keeps the whole app runnable with zero credentials.
 from __future__ import annotations
 
 import json
+import logging
 import re
 
 from django.conf import settings
+
+log = logging.getLogger(__name__)
 
 
 class AnthropicLLM:
@@ -26,7 +29,15 @@ class AnthropicLLM:
             system=system,
             messages=[{"role": "user", "content": user}],
         )
-        return "".join(b.text for b in msg.content if b.type == "text")
+        text = "".join(b.text for b in msg.content if b.type == "text")
+        if not text and msg.content:
+            # Sonnet-5's extended thinking can eat the whole max_tokens budget,
+            # leaving no text block. Surface it instead of returning "" silently.
+            log.warning(
+                "Empty text from %s (stop=%s, blocks=%s) — max_tokens=%d likely too low",
+                self._model, msg.stop_reason, [b.type for b in msg.content], max_tokens,
+            )
+        return text
 
     def complete_json(self, system: str, user: str, max_tokens: int = 1024) -> dict:
         return _extract_json(self.complete(system, user, max_tokens))

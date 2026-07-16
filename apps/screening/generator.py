@@ -38,8 +38,10 @@ def generate_answer(question: ScreeningQuestion) -> ScreeningAnswer:
     llm = get_llm()
     if llm:
         ctx = "\n".join(f"- {f.content}" for f in facts) or "(no facts on file)"
+        # 1024, not 200: claude-sonnet-5's extended thinking eats the budget first,
+        # and a 200-token cap left nothing for the actual answer (empty reply).
         body = llm.complete(
-            _system(question.job), f"Facts:\n{ctx}\n\nQuestion: {question.text}", max_tokens=200
+            _system(question.job), f"Facts:\n{ctx}\n\nQuestion: {question.text}", max_tokens=1024
         )
         model_name = "anthropic"
     else:
