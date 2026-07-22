@@ -37,6 +37,9 @@ env = environ.Env(
     # (no-code platforms a code-first freelancer doesn't want). Comma-separated.
     EXCLUDE_KEYWORDS=(list, []),
     VIBEWORKER_API_KEY=(str, ""),  # tryvibeworker.com/settings -> Developer
+    # Optional allowlist for the push webhook (comma-separated IPs). Empty =
+    # accept from anywhere; there's no token/signature check yet.
+    VIBEWORKER_WEBHOOK_ALLOWED_IPS=(list, []),
     GMAIL_IMAP_USER=(str, ""),  # JOB_PROVIDER=gmail: mailbox receiving Upwork job alerts
     GMAIL_IMAP_PASSWORD=(str, ""),  # Google app password (myaccount.google.com/apppasswords)
     ANTHROPIC_API_KEY=(str, ""),
@@ -163,6 +166,7 @@ HOT_CONNECTS_THRESHOLD = env("HOT_CONNECTS_THRESHOLD")
 COLLECT_MAX_CONNECTS = env("COLLECT_MAX_CONNECTS")
 EXCLUDE_KEYWORDS = [k.strip().lower() for k in env("EXCLUDE_KEYWORDS") if k.strip()]
 VIBEWORKER_API_KEY = env("VIBEWORKER_API_KEY")
+VIBEWORKER_WEBHOOK_ALLOWED_IPS = env("VIBEWORKER_WEBHOOK_ALLOWED_IPS")
 GMAIL_IMAP_USER = env("GMAIL_IMAP_USER")
 GMAIL_IMAP_PASSWORD = env("GMAIL_IMAP_PASSWORD")
 DRAFT_MIN_SCORE = env("DRAFT_MIN_SCORE")

@@ -5,9 +5,9 @@ from .models import ClientProfile, JobPosting, SavedFilter
 
 @admin.register(SavedFilter)
 class SavedFilterAdmin(admin.ModelAdmin):
-    list_display = ("name", "is_active", "poll_interval_min", "require_verified_payment", "last_polled_at")
+    list_display = ("name", "is_active", "poll_interval_min", "require_verified_payment", "vibeworker_filter_id", "last_polled_at")
     list_filter = ("is_active", "require_verified_payment")
-    search_fields = ("name",)
+    search_fields = ("name", "vibeworker_filter_id")
 
 
 @admin.register(ClientProfile)
