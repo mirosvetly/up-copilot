@@ -10,13 +10,18 @@ Every stage is idempotent and status-gated, so it is safe to re-run.
 
 ## What it does
 
-1. **Collect.** Pulls fresh Upwork jobs from a provider. Primary source is the
-   Vibeworker REST API (an Upwork wrapper); fallback is Upwork alert emails over
-   IMAP (Gmail). Upwork only (the source host must be `upwork.com`, matched by
-   parsed host, not a substring), fresh only (nothing older than
-   `MAX_JOB_AGE_HOURS`, default 24h), and de-duplicated against a `SeenJob`
-   ledger that survives deletion, so cleared jobs are never re-imported or
-   re-scored (no paying twice).
+1. **Collect.** Pulls fresh Upwork jobs from a provider. Primary source is
+   [Vibeworker](https://tryvibeworker.com) — Upwork's own Jobs API is
+   OAuth-gated and requires an app approval Upwork hasn't granted, so
+   Vibeworker provides real, structured Upwork data (client hire rate,
+   verified payment, total spent, connects) with nothing more than an API
+   key, no approval wait. Fallback is Upwork alert emails over IMAP
+   (Gmail) for anyone who'd rather not use an API key at all, at the cost of
+   truncated titles and no client stats. Upwork only (the source host must be
+   `upwork.com`, matched by parsed host, not a substring), fresh only (nothing
+   older than `MAX_JOB_AGE_HOURS`, default 24h), and de-duplicated against a
+   `SeenJob` ledger that survives deletion, so cleared jobs are never
+   re-imported or re-scored (no paying twice).
 2. **Score.** Claude Haiku scores each job 0 to 100 against the editable prompt
    of the job's track: stack match, budget vs floor, competition (Upwork
    `connects` as a crowdedness proxy, since proposal counts are not exposed),
@@ -130,13 +135,26 @@ button and the **Авто** toggle poll the API on demand from the browser.
 
 ## Going live
 
-- **Vibeworker** (primary): key from tryvibeworker.com/settings into
-  `VIBEWORKER_API_KEY`, set `JOB_PROVIDER=vibeworker`. Free plan is 100 results
-  per day (charged per returned result, duplicates included); premium removes
-  the limit and enables webhooks.
-- **Gmail** (fallback): enable Upwork job alerts on your saved searches, create
-  a Google app password, set `GMAIL_IMAP_USER` + `GMAIL_IMAP_PASSWORD`,
-  `JOB_PROVIDER=gmail`. Emails give truncated titles and no client hire rate.
+- **[Vibeworker](https://tryvibeworker.com)** (primary, recommended): grab a
+  key from [tryvibeworker.com/settings](https://tryvibeworker.com/settings),
+  set `VIBEWORKER_API_KEY` + `JOB_PROVIDER=vibeworker`.
+  Real Upwork job data (title, description, skills, budget, connects) plus
+  client signals the Gmail path doesn't have (verified payment, hire rate,
+  total spent, country), all without waiting on Upwork's own OAuth approval.
+  Free plan is 100 results per day (charged per returned result, duplicates
+  included); premium removes the limit and enables webhooks.
+  - Polling is the right integration for the normal case — running up-copilot
+    on your own machine. It needs no public URL and works from behind any
+    NAT/firewall, which is most self-hosted setups.
+  - The webhook (`POST /webhooks/vibeworker/`, premium) is an optional,
+    secondary path — only useful if you've deployed up-copilot somewhere with
+    a real public URL. Point a Vibeworker filter's webhook at that URL and set
+    the same id on the matching `SavedFilter.vibeworker_filter_id` (admin).
+    Not needed, and not recommended, for a local/laptop install.
+- **Gmail** (fallback): enable Upwork job alerts on your saved searches,
+  create a Google app password, set `GMAIL_IMAP_USER` + `GMAIL_IMAP_PASSWORD`,
+  `JOB_PROVIDER=gmail`. Works with zero third-party signup, but emails give
+  truncated titles and no client hire rate, verified payment, or spend.
 - **Claude**: `ANTHROPIC_API_KEY`, `LLM_PROVIDER=anthropic`, `JOB_SCORER=llm`.
   Scoring uses Haiku, letters use Sonnet.
 - **Tracks**: edit personas, prompts, skills, rate, and keywords at
@@ -149,4 +167,4 @@ button and the **Авто** toggle poll the API on demand from the browser.
 python manage.py test
 ```
 
-106 tests, hermetic (no network, no paid API calls).
+141 tests, hermetic (no network, no paid API calls).
