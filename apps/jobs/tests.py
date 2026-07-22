@@ -376,6 +376,106 @@ class VibeworkerProviderTests(TestCase):
         self.assertIsNotNone(f.last_polled_at)  # failure still counts as a poll
 
 
+class VibeworkerWebhookTests(TestCase):
+    """POST /webhooks/vibeworker/ — the push alternative to polling. One job
+    per request, same row schema as the /public-jobs API."""
+
+    def _post(self, row):
+        import json
+
+        return self.client.post(
+            "/webhooks/vibeworker/", data=json.dumps(row), content_type="application/json"
+        )
+
+    def _fresh_row(self, **overrides):
+        from django.utils import timezone
+
+        # VW_ROW's postedAt is a fixed fixture date, long past MAX_JOB_AGE_HOURS
+        # by now — bump it to "just posted" for tests where staleness isn't
+        # the thing under test.
+        return dict(VW_ROW, postedAt=timezone.now().isoformat(), **overrides)
+
+    def test_creates_job_and_client(self):
+        r = self._post(self._fresh_row())
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json(), {"status": "created"})
+        job = JobPosting.objects.get(job_id="01abc234def567")
+        self.assertEqual(job.title, VW_ROW["title"])
+        self.assertTrue(job.client.verified_payment)
+
+    def test_maps_filter_id_to_saved_filter(self):
+        f = SavedFilter.objects.create(name="react-jobs", vibeworker_filter_id="vw_filter_42")
+        self._post(self._fresh_row(filterId="vw_filter_42"))
+        job = JobPosting.objects.get(job_id="01abc234def567")
+        self.assertEqual(job.matched_filter_id, f.id)
+
+    def test_unknown_filter_id_still_ingests_without_match(self):
+        r = self._post(self._fresh_row(filterId="not_registered_anywhere"))
+        self.assertEqual(r.json(), {"status": "created"})
+        job = JobPosting.objects.get(job_id="01abc234def567")
+        self.assertIsNone(job.matched_filter)
+
+    def test_duplicate_delivery_is_deduped(self):
+        row = self._fresh_row()
+        self._post(row)
+        r = self._post(row)  # same job pushed twice (at-least-once delivery)
+        self.assertEqual(r.json(), {"status": "duplicate"})
+        self.assertEqual(JobPosting.objects.filter(job_id="01abc234def567").count(), 1)
+
+    def test_non_upwork_row_ignored(self):
+        row = dict(VW_ROW, id="vw_fl", upworkUrl="https://www.freelancer.com/projects/x")
+        r = self._post(row)
+        self.assertEqual(r.json(), {"status": "ignored", "reason": "not upwork"})
+        self.assertFalse(JobPosting.objects.filter(raw__url__icontains="freelancer").exists())
+
+    @override_settings(COLLECT_MAX_CONNECTS=16)
+    def test_crowded_row_ignored(self):
+        row = dict(VW_ROW, connects=20)
+        r = self._post(row)
+        self.assertEqual(r.json(), {"status": "ignored", "reason": "filtered"})
+        self.assertFalse(JobPosting.objects.exists())
+
+    def test_verified_payment_requirement_from_matched_filter(self):
+        SavedFilter.objects.create(
+            name="strict", vibeworker_filter_id="vw_strict", require_verified_payment=True
+        )
+        row = dict(VW_ROW, filterId="vw_strict", clientPaymentVerified=False)
+        r = self._post(row)
+        self.assertEqual(r.json(), {"status": "ignored", "reason": "unverified payment"})
+        self.assertFalse(JobPosting.objects.exists())
+
+    @override_settings(MAX_JOB_AGE_HOURS=24)
+    def test_stale_job_ignored(self):
+        row = dict(VW_ROW, postedAt="2020-01-01T00:00:00+00:00")
+        r = self._post(row)
+        self.assertEqual(r.json(), {"status": "stale"})
+        self.assertFalse(JobPosting.objects.exists())
+
+    def test_get_not_allowed(self):
+        r = self.client.get("/webhooks/vibeworker/")
+        self.assertEqual(r.status_code, 405)
+
+    def test_invalid_json_rejected(self):
+        r = self.client.post(
+            "/webhooks/vibeworker/", data="not json", content_type="application/json"
+        )
+        self.assertEqual(r.status_code, 400)
+
+    def test_missing_fields_rejected(self):
+        r = self._post({"title": "no id or url"})
+        self.assertEqual(r.status_code, 400)
+
+    @override_settings(VIBEWORKER_WEBHOOK_ALLOWED_IPS=["10.0.0.1"])
+    def test_ip_allowlist_blocks_unlisted_ip(self):
+        r = self._post(VW_ROW)
+        self.assertEqual(r.status_code, 403)
+
+    @override_settings(VIBEWORKER_WEBHOOK_ALLOWED_IPS=["127.0.0.1"])
+    def test_ip_allowlist_accepts_listed_ip(self):
+        r = self._post(VW_ROW)  # Django test client defaults REMOTE_ADDR to 127.0.0.1
+        self.assertEqual(r.status_code, 200)
+
+
 ALERT_FIXTURE = Path(__file__).resolve().parent / "fixtures" / "upwork_alert_email.txt"
 
 

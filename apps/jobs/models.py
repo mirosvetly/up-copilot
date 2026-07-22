@@ -19,6 +19,11 @@ class SavedFilter(TimeStampedModel):
     track = models.ForeignKey(
         "tracks.Track", null=True, blank=True, on_delete=models.SET_NULL, related_name="filters"
     )
+    # Vibeworker-side filter id, when this search is configured there instead of
+    # (or in addition to) here. The push webhook tags each job with the filter
+    # that matched it; this is how we map that id back to a local SavedFilter
+    # (for track assignment). Blank for filters that only ever poll.
+    vibeworker_filter_id = models.CharField(max_length=64, blank=True, db_index=True)
 
     def __str__(self):
         return self.name

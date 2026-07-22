@@ -33,6 +33,37 @@ def _upsert_client(rc: RawClient) -> ClientProfile:
     return obj
 
 
+def _persist_job(rj, *, matched_filter: SavedFilter | None) -> bool:
+    """Create a JobPosting (+ upsert its client) from one RawJob. Returns True if
+    a new JobPosting row was created. Shared by both ingestion paths — polling
+    (collect_for_filter, many jobs/call) and the push webhook (one job/call) —
+    so a job looks identical in the DB no matter which path delivered it."""
+    client = _upsert_client(rj.client)
+    _, is_new = JobPosting.objects.get_or_create(
+        job_id=rj.job_id,
+        defaults={
+            "title": rj.title,
+            "description": rj.description,
+            "skills": rj.skills,
+            "budget_type": rj.budget_type,
+            "budget_min": rj.budget_min,
+            "budget_max": rj.budget_max,
+            "currency": rj.currency,
+            "proposals_bucket": rj.proposals_bucket,
+            "client": client,
+            "matched_filter": matched_filter,
+            "posted_at": rj.posted_at,
+            "raw": rj.raw,
+        },
+    )
+    return is_new
+
+
+def _is_stale(rj) -> bool:
+    cutoff = timezone.now() - timedelta(hours=settings.MAX_JOB_AGE_HOURS)
+    return bool(rj.posted_at and rj.posted_at < cutoff)
+
+
 def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
     """Fetch + dedup-persist jobs for one filter. Returns {created, seen}.
 
@@ -43,33 +74,14 @@ def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
     raw_jobs = provider.fetch_jobs(saved_filter)
     # Only keep fresh jobs: the API returns a ~7-day window, but week-old postings
     # already have a crowd of applicants — not worth importing or scoring.
-    cutoff = timezone.now() - timedelta(hours=settings.MAX_JOB_AGE_HOURS)
-    raw_jobs = [rj for rj in raw_jobs if not (rj.posted_at and rj.posted_at < cutoff)]
+    raw_jobs = [rj for rj in raw_jobs if not _is_stale(rj)]
     ids = [rj.job_id for rj in raw_jobs]
     already = set(SeenJob.objects.filter(job_id__in=ids).values_list("job_id", flat=True))
     created = 0
     for rj in raw_jobs:
         if rj.job_id in already:
             continue  # seen before (maybe since deleted) — don't re-import or re-score
-        client = _upsert_client(rj.client)
-        _, is_new = JobPosting.objects.get_or_create(
-            job_id=rj.job_id,
-            defaults={
-                "title": rj.title,
-                "description": rj.description,
-                "skills": rj.skills,
-                "budget_type": rj.budget_type,
-                "budget_min": rj.budget_min,
-                "budget_max": rj.budget_max,
-                "currency": rj.currency,
-                "proposals_bucket": rj.proposals_bucket,
-                "client": client,
-                "matched_filter": saved_filter,
-                "posted_at": rj.posted_at,
-                "raw": rj.raw,
-            },
-        )
-        created += int(is_new)
+        created += int(_persist_job(rj, matched_filter=saved_filter))
     # Remember every id we just saw so the next poll skips them; prune the tail.
     SeenJob.objects.bulk_create(
         [SeenJob(job_id=i) for i in ids if i not in already], ignore_conflicts=True
@@ -80,6 +92,20 @@ def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
     saved_filter.last_polled_at = timezone.now()
     saved_filter.save(update_fields=["last_polled_at", "updated_at"])
     return {"created": created, "seen": len(raw_jobs)}
+
+
+def ingest_pushed_job(rj, *, matched_filter: SavedFilter | None) -> str:
+    """Single-job ingest for the Vibeworker push webhook. Returns "created",
+    "duplicate", or "stale". Dedup rides the same SeenJob ledger as polling, so
+    a job delivered via both the webhook and a still-running poll of the same
+    filter is only ever imported once, in whichever order they arrive."""
+    if _is_stale(rj):
+        return "stale"
+    if SeenJob.objects.filter(job_id=rj.job_id).exists():
+        return "duplicate"
+    is_new = _persist_job(rj, matched_filter=matched_filter)
+    SeenJob.objects.get_or_create(job_id=rj.job_id)
+    return "created" if is_new else "duplicate"
 
 
 def _is_due(f: SavedFilter, now) -> bool:

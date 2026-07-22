@@ -1,10 +1,11 @@
 from django.urls import path
 
-from . import views
+from . import views, webhooks
 
 app_name = "jobs"
 
 urlpatterns = [
+    path("webhooks/vibeworker/", webhooks.vibeworker_webhook, name="webhook_vibeworker"),
     path("", views.feed, name="feed"),
     path("sent/", views.feed, {"sent": True}, name="sent"),
     path("refresh/", views.refresh, name="refresh"),

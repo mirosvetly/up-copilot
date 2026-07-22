@@ -133,36 +133,43 @@ class VibeworkerProvider(JobProvider):
         return body.get("data", []), quota
 
     def _to_raw(self, row: dict) -> RawJob:
-        # Prefer the real Upwork id from the job URL so dedup keys survive a
-        # later switch to the official API; fall back to Vibeworker's stable id.
-        m = _UPWORK_ID.search(row.get("upworkUrl") or "")
-        job_id = m.group(1) if m else row["id"]
-        client = RawClient(
-            # ponytail: API exposes no client id — one profile per job, keyed off it
-            upwork_client_id=f"vw:{job_id}",
-            verified_payment=bool(row.get("clientPaymentVerified")),
-            hire_rate=row.get("clientHireRate"),
-            total_spent=_dec(row.get("clientTotalSpent")),
-            country=row.get("clientLocation") or "",
-            avg_rating=_dec(row.get("clientRating")),
-            raw={k: v for k, v in row.items() if k.startswith("client")},
-        )
-        # Downstream (presenters, job detail page) reads raw["url"] for the
-        # "open on Upwork" link; Vibeworker names the field upworkUrl.
-        row.setdefault("url", row.get("upworkUrl") or "")
-        row.setdefault("source", "vibeworker")  # re-poll guard keys on raw["source"]
-        posted = row.get("postedAt")
-        return RawJob(
-            job_id=job_id,
-            title=row["title"],
-            description=row.get("description") or "",
-            skills=row.get("skills") or [],
-            budget_type=row.get("jobType") or "",
-            budget_min=_dec(row.get("budget")),
-            budget_max=_dec(row.get("budgetMax")),
-            currency="USD",  # the API quotes all budgets in USD
-            proposals_bucket="",  # not exposed by Vibeworker
-            posted_at=datetime.fromisoformat(posted) if posted else None,
-            client=client,
-            raw=row,
-        )
+        return raw_job_from_row(row)
+
+
+def raw_job_from_row(row: dict) -> RawJob:
+    """Map one Vibeworker job row to a RawJob — shared by the polling fetch
+    (fetch_jobs, many rows per API response) and the push webhook (one row
+    per request), since both sides speak the same row schema."""
+    # Prefer the real Upwork id from the job URL so dedup keys survive a
+    # later switch to the official API; fall back to Vibeworker's stable id.
+    m = _UPWORK_ID.search(row.get("upworkUrl") or "")
+    job_id = m.group(1) if m else row["id"]
+    client = RawClient(
+        # ponytail: API exposes no client id — one profile per job, keyed off it
+        upwork_client_id=f"vw:{job_id}",
+        verified_payment=bool(row.get("clientPaymentVerified")),
+        hire_rate=row.get("clientHireRate"),
+        total_spent=_dec(row.get("clientTotalSpent")),
+        country=row.get("clientLocation") or "",
+        avg_rating=_dec(row.get("clientRating")),
+        raw={k: v for k, v in row.items() if k.startswith("client")},
+    )
+    # Downstream (presenters, job detail page) reads raw["url"] for the
+    # "open on Upwork" link; Vibeworker names the field upworkUrl.
+    row.setdefault("url", row.get("upworkUrl") or "")
+    row.setdefault("source", "vibeworker")  # re-poll guard keys on raw["source"]
+    posted = row.get("postedAt")
+    return RawJob(
+        job_id=job_id,
+        title=row["title"],
+        description=row.get("description") or "",
+        skills=row.get("skills") or [],
+        budget_type=row.get("jobType") or "",
+        budget_min=_dec(row.get("budget")),
+        budget_max=_dec(row.get("budgetMax")),
+        currency="USD",  # the API quotes all budgets in USD
+        proposals_bucket="",  # not exposed by Vibeworker
+        posted_at=datetime.fromisoformat(posted) if posted else None,
+        client=client,
+        raw=row,
+    )
