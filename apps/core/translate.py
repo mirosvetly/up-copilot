@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import threading
+import time
 
 from django.conf import settings
 
@@ -19,7 +20,9 @@ _MYMEMORY_MAX = 480  # MyMemory caps each request near 500 chars
 # (the free Google endpoint sometimes just never answers), which left the "RU
 # loading" spinner spinning for good. Bound every call so it always resolves;
 # on timeout we fall back to the English original like any other failure.
-_TIMEOUT_S = 8
+def _timeout_s() -> int:
+    # Local Ollama generation is far slower than a hosted MT call — give it room.
+    return 90 if settings.TRANSLATE_ENGINE not in ("google", "mymemory") else 15
 
 
 def _timed(fn, arg):
@@ -35,7 +38,7 @@ def _timed(fn, arg):
 
     th = threading.Thread(target=run, daemon=True)
     th.start()
-    th.join(_TIMEOUT_S)
+    th.join(_timeout_s())
     if th.is_alive():
         raise TimeoutError("translation timed out")
     if "e" in box:
@@ -63,23 +66,54 @@ def _chunks(text: str, size: int) -> list[str]:
     return chunks
 
 
-def _make_translator():
-    """Return (translator, chunk_size). MyMemory is the default: it answers from
-    networks where Google's free endpoint is blocked or just hangs. Set
-    TRANSLATE_ENGINE=google for accounts where Google is reachable (no daily cap)."""
-    from deep_translator import GoogleTranslator, MyMemoryTranslator
+class _OllamaTranslator:
+    """Local translation via the same Ollama model used for scoring. No key, no
+    rate limit, works offline / on blocked networks. Slower and a bit rougher on
+    technical terms than a hosted MT engine, but it never fails on quota."""
 
-    if settings.TRANSLATE_ENGINE == "google":
+    def translate(self, text: str) -> str:
+        from apps.core.llm import OllamaLLM
+
+        return OllamaLLM().complete(
+            "You are a translator. Translate the user's text from English to Russian. "
+            "Output ONLY the Russian translation, no notes, no preface.",
+            text, max_tokens=2048,
+        ) or ""
+
+    def translate_batch(self, items: list[str]) -> list[str]:
+        return [self.translate(t) for t in items]
+
+
+def _make_translator():
+    """Return (translator, chunk_size). ollama is the default: local, no quota,
+    works where Google is blocked and where MyMemory's tiny free cap runs out.
+    TRANSLATE_ENGINE=google or =mymemory switch to the hosted engines."""
+    eng = settings.TRANSLATE_ENGINE
+    if eng == "google":
+        from deep_translator import GoogleTranslator
         # auto source: reasons may already be Russian (rule scorer) — don't force EN
         return GoogleTranslator(source="auto", target="ru"), _GOOGLE_MAX
-    return MyMemoryTranslator(source="en-GB", target="ru-RU"), _MYMEMORY_MAX
+    if eng == "mymemory":
+        from deep_translator import MyMemoryTranslator
+        return MyMemoryTranslator(source="en-GB", target="ru-RU"), _MYMEMORY_MAX
+    return _OllamaTranslator(), 100_000  # no chunking — the model takes the whole text
 
 
 def _translate(text: str) -> str:
     tr, cap = _make_translator()
-    if len(text) <= cap:
+    chunks = _chunks(text, cap)
+    if len(chunks) <= 1:
         return tr.translate(text) or ""
-    return "\n".join(tr.translate(c) or "" for c in _chunks(text, cap))
+    # MyMemory caps at 5 req/sec — a 7-chunk description fired back-to-back trips
+    # TooManyRequests and returns empty. Space the requests out (Google has no
+    # such cap and takes the whole text in one chunk anyway).
+    throttle = 0.25 if settings.TRANSLATE_ENGINE != "google" else 0
+    parts = []
+    for i, c in enumerate(chunks):
+        if i and throttle:
+            time.sleep(throttle)
+        parts.append(tr.translate(c) or "")
+    return "\n".join(parts)
 
 
 def translate_ru(text: str) -> str:

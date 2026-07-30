@@ -30,7 +30,7 @@ class TranslateTests(TestCase):
         import time
         # A translator that never returns must not hang the page — the daemon
         # timeout kicks in and the caller falls back to English.
-        with patch("apps.core.translate._TIMEOUT_S", 0.3), \
+        with patch("apps.core.translate._timeout_s", return_value=0.3), \
              patch("apps.core.translate._translate", side_effect=lambda t: time.sleep(30)):
             self.assertEqual(translate_ru("Dashboard"), "")
 
