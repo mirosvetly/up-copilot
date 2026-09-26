@@ -12,7 +12,7 @@ from django.conf import settings
 
 from apps.jobs.models import SavedFilter
 
-from .base import JobProvider, RawClient, RawJob
+from .base import JobProvider, RawClient, RawJob, below_min_budget
 
 log = logging.getLogger(__name__)
 
@@ -99,6 +99,8 @@ class VibeworkerProvider(JobProvider):
                 job = self._to_raw(row)
                 if saved_filter.require_verified_payment and not job.client.verified_payment:
                     continue
+                if below_min_budget(job, saved_filter):
+                    continue
                 seen.setdefault(job.job_id, job)
             if quota == 0:
                 log.warning("Vibeworker daily quota exhausted; stopping fan-out early")
@@ -106,9 +108,9 @@ class VibeworkerProvider(JobProvider):
         return list(seen.values())
 
     def _param_sets(self, f: SavedFilter):
+        # min_budget is applied locally (below_min_budget), not as the API's minBudget:
+        # its effect on hourly rates is undocumented and could drop all hourly work.
         base = {"sort": "newest", "limit": LIMIT}
-        if f.min_budget is not None:
-            base["minBudget"] = str(f.min_budget)
         for kw, cat in product(f.keywords or [None], f.categories or [None]):
             params = dict(base)
             if kw:

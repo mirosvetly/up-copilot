@@ -29,6 +29,8 @@
           <div style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:9px">
             {{ t.name }}
             {% if t.is_default %}<span style="font-size:11px;font-weight:500;color:#b6d086;background:rgba(182,208,134,0.12);padding:2px 8px;border-radius:6px">{% trans "по умолчанию" %}</span>{% endif %}
+            {% if t.mode == "autopilot" %}<span style="font-size:11px;font-weight:500;color:#fbbf24;background:rgba(251,191,36,0.12);padding:2px 8px;border-radius:6px">{% trans "автопилот" %}</span>{% elif t.mode == "off" %}<span style="font-size:11px;font-weight:500;color:#737373;background:rgba(115,115,115,0.15);padding:2px 8px;border-radius:6px">{% trans "выключен" %}</span>{% endif %}
+            {% if t.newcomer_mode %}<span style="font-size:11px;font-weight:500;color:#6cc4ff;background:rgba(108,196,255,0.12);padding:2px 8px;border-radius:6px">{% trans "режим новичка" %}</span>{% endif %}
           </div>
           <div style="font-size:12.5px;color:#a3a3a3;margin-top:3px;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with role=t.scorer_role rate=t.min_hourly_rate n_skills=t.skills|length n_filters=t.filters.count %}{{ role }} · ${{ rate }}/час · {{ n_skills }} навык(ов) · {{ n_filters }} поиск(ов){% endblocktrans %}</div>
         </div>

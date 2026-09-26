@@ -47,11 +47,24 @@ class JobProvider(ABC):
         raise NotImplementedError
 
 
+def below_min_budget(job: RawJob, f: SavedFilter) -> bool:
+    """A fixed-price job whose known budget is under the filter's floor.
+
+    Fixed only: an hourly job's budget is a rate ($15-30/hr), not a project total,
+    so the same floor would wipe out all hourly work. No budget -> keep."""
+    return (
+        f.min_budget is not None
+        and job.budget_type == "fixed"
+        and job.budget_min is not None
+        and job.budget_min < f.min_budget
+    )
+
+
 def matches_filter(job: RawJob, f: SavedFilter) -> bool:
     """Loose client-side SavedFilter check for providers that can't filter server-side."""
     if f.require_verified_payment and not job.client.verified_payment:
         return False
-    if f.min_budget is not None and (job.budget_min or Decimal(0)) < f.min_budget:
+    if below_min_budget(job, f):
         return False
     if f.keywords:
         haystack = (job.title + " " + " ".join(job.skills)).lower()

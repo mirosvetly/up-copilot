@@ -149,3 +149,15 @@ class LLMScorerTests(TestCase):
         r = llm_compute(job, {"skills": []}, 0.5, Fake())
         self.assertEqual(r["score"], 100)  # clamped to 0-100
         self.assertEqual(r["breakdown"][0]["text"], "x")
+
+
+class NewcomerModeTests(TestCase):
+    def test_newcomer_block_only_when_on_and_experience_level_passed(self):
+        from apps.jobs.models import JobPosting
+
+        from .llm_scorer import _competition_line, _system
+
+        self.assertIn("NEWCOMER MODE", _system({"newcomer_mode": True}))
+        self.assertNotIn("NEWCOMER MODE", _system({"newcomer_mode": False}))
+        job = JobPosting(job_id="x", title="t", raw={"experienceLevel": "Expert"})
+        self.assertIn("experience level: Expert", _competition_line(job))

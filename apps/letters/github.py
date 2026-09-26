@@ -60,7 +60,7 @@ class MockGitHub(GitHubProvider):
                 name=p["repo"],
                 skills=skills,
                 color=color,
-                description=f"{', '.join(skills[:3])} project",
+                description=p.get("description") or f"{', '.join(skills[:3])} project",
                 languages=skills[:3],
             ))
         return out

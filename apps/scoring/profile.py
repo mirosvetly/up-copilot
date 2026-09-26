@@ -67,6 +67,7 @@ def track_config(track) -> dict[str, Any]:
             or "Answer Upwork screening questions honestly, first person."
         ),
         "signoff": track.signoff or "Best,\nFreelancer",
+        "newcomer_mode": track.newcomer_mode,
         "track_id": track.id,
     }
 

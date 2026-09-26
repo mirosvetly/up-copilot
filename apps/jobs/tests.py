@@ -281,7 +281,7 @@ class VibeworkerProviderTests(TestCase):
         jobs, get = self._fetch([row], f)
         self.assertEqual(jobs, [])  # unverified client filtered client-side
         params = get.call_args.kwargs["params"]
-        self.assertEqual(params["minBudget"], "500")
+        self.assertNotIn("minBudget", params)  # applied locally, fixed-price only
         self.assertEqual(params["sort"], "newest")
 
     def test_non_upwork_rows_are_dropped(self):
@@ -691,3 +691,60 @@ class JobActionViewTests(TestCase):
         self.assertEqual(r.status_code, 302)  # handled, no crash
         job.refresh_from_db()
         self.assertEqual(job.status, JobPosting.Status.APPLIED)
+
+
+@override_settings(NOTIFY_MIN_SCORE=50, TRANSLATE_PROVIDER="google")
+class PretranslateTests(TestCase):
+    def test_translates_good_fresh_jobs_only(self):
+        from django.utils import timezone
+
+        from apps.scoring.models import JobScore
+
+        from .tasks import pretranslate_top_jobs
+
+        def job(job_id, score):
+            j = JobPosting.objects.create(job_id=job_id, title="T", description="D", budget_type="fixed",
+                                          status=JobPosting.Status.SCORED, posted_at=timezone.now())
+            JobScore.objects.create(job=j, score=score, reasoning="r", breakdown=[{"text": "fit"}])
+            return j
+
+        good, weak = job("g1", 80), job("w1", 20)
+        with patch("apps.core.translate.translate_ru", return_value="RU"), \
+             patch("apps.core.translate.translate_ru_batch", return_value=["RU"]):
+            self.assertEqual(pretranslate_top_jobs(), 1)
+            self.assertEqual(pretranslate_top_jobs(), 0)  # already cached, nothing to redo
+        good.refresh_from_db(); weak.refresh_from_db()
+        self.assertEqual(good.description_ru, "RU")
+        self.assertEqual(good.score.breakdown_ru[0]["text"], "RU")
+        self.assertEqual(weak.description_ru, "")
+
+
+class MinBudgetTests(TestCase):
+    def test_floor_drops_cheap_fixed_only(self):
+        from .providers.base import RawClient, RawJob, below_min_budget
+
+        f = SavedFilter(name="s", min_budget=Decimal("100"))
+
+        def raw(kind, amount):
+            return RawJob(job_id="x", title="t", description="", skills=[], budget_type=kind,
+                          budget_min=amount, budget_max=None, currency="USD",
+                          proposals_bucket="", posted_at=None, client=RawClient(upwork_client_id="c"))
+
+        self.assertTrue(below_min_budget(raw("fixed", Decimal("40")), f))
+        self.assertFalse(below_min_budget(raw("fixed", Decimal("150")), f))
+        self.assertFalse(below_min_budget(raw("hourly", Decimal("25")), f))  # a rate, not a total
+        self.assertFalse(below_min_budget(raw("fixed", None), f))  # unknown budget stays
+
+    def test_job_deleted_mid_translation_does_not_crash(self):
+        from django.utils import timezone
+
+        j = JobPosting.objects.create(job_id="d1", title="T", description="D", budget_type="fixed",
+                                      status=JobPosting.Status.SCORED, posted_at=timezone.now())
+
+        def slow_translate(text):
+            JobPosting.objects.filter(pk=j.pk).delete()  # "Пропустить все" clicked meanwhile
+            return "RU"
+
+        with patch("apps.core.translate.translate_ru", side_effect=slow_translate):
+            j.ensure_ru()  # must not raise
+        self.assertFalse(JobPosting.objects.filter(pk=j.pk).exists())

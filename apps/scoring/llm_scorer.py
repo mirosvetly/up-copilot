@@ -9,9 +9,19 @@ from apps.jobs.models import JobPosting
 def _system(profile: dict) -> str:
     role = profile.get("scorer_role") or "freelancer"
     analysis_prompt = profile.get("job_analysis_prompt") or "Score fit 0-100 and justify it."
+    newcomer = (
+        "NEWCOMER MODE: I have zero Upwork reviews, so the goal right now is the first "
+        "reviews, not the biggest jobs. Strongly prefer jobs I can realistically win: "
+        "Entry or Intermediate experience level, small bounded scope (about $100 to $800 "
+        "fixed, or a short hourly task), few connects required. Penalize hard: Expert "
+        "experience level, budgets of $2,000+ that attract veterans with hundreds of jobs, "
+        "high connects (crowded postings). "
+        if profile.get("newcomer_mode") else ""
+    )
     return (
         f"You are a freelance-job screener for this freelancer: {role}. "
         f"{analysis_prompt} "
+        f"{newcomer}"
         "HARD GATE — eligibility: if the job text requires a location, country, region, "
         "timezone, work authorization, or a spoken language the freelancer does NOT have "
         "(compare against the freelancer's location and languages given in the prompt), "
@@ -43,6 +53,8 @@ def _client_line(job: JobPosting) -> str:
 def _competition_line(job: JobPosting) -> str:
     raw = job.raw or {}
     bits = []
+    if raw.get("experienceLevel"):
+        bits.append(f"client wants experience level: {raw['experienceLevel']}")
     if raw.get("connects") is not None:
         bits.append(f"{raw['connects']} connects required to apply "
                     "(higher usually means a more contested / premium posting)")

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
@@ -22,6 +23,12 @@ class SavedFilter(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def live(cls):
+        """Filters to poll: active, and not under a track switched off."""
+        # ponytail: a track-less filter falls back to the default track, whose mode isn't checked here
+        return cls.objects.filter(is_active=True).exclude(track__mode="off")
 
 
 class SeenJob(models.Model):
@@ -152,7 +159,11 @@ class JobPosting(TimeStampedModel):
         if ru:  # only cache a real result, so a transient failure retries later
             self.title_ru = translate_ru(self.title)
             self.description_ru = ru
-            self.save(update_fields=["title_ru", "description_ru", "updated_at"])
+            # update(), not save(): the row may be deleted ("Пропустить все") during
+            # the slow translation, and save(update_fields) would raise on 0 rows.
+            type(self).objects.filter(pk=self.pk).update(
+                title_ru=self.title_ru, description_ru=ru, updated_at=timezone.now()
+            )
 
     def transition_to(self, new_status, *, save=True):
         """Move to new_status if the transition is allowed, else raise ValueError."""

@@ -30,6 +30,10 @@ class AnthropicLLM:
             messages=[{"role": "user", "content": user}],
         )
         text = "".join(b.text for b in msg.content if b.type == "text")
+        if msg.stop_reason == "max_tokens":
+            # Cut off mid-text: a half letter or half JSON is worse than none, callers redo on "".
+            log.warning("Truncated output from %s at max_tokens=%d, discarding", self._model, max_tokens)
+            return ""
         if not text and msg.content:
             # Sonnet-5's extended thinking can eat the whole max_tokens budget,
             # leaving no text block. Surface it instead of returning "" silently.

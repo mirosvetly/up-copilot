@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from apps.core.models import TimeStampedModel
 from apps.jobs.models import JobPosting
@@ -35,4 +36,7 @@ class JobScore(TimeStampedModel):
             self.breakdown_ru = [
                 {**b, "text": r or b.get("text", "")} for b, r in zip(self.breakdown, ru)
             ]
-            self.save(update_fields=["breakdown_ru", "updated_at"])
+            # update(), not save(): the job (and this score) may be deleted mid-translation.
+            type(self).objects.filter(pk=self.pk).update(
+                breakdown_ru=self.breakdown_ru, updated_at=timezone.now()
+            )

@@ -57,7 +57,7 @@ class TrackForm(forms.ModelForm):
     class Meta:
         model = Track
         fields = [
-            "name", "is_default", "scorer_role", "job_analysis_prompt",
+            "name", "mode", "newcomer_mode", "telegram_chat_id", "is_default", "scorer_role", "job_analysis_prompt",
             "cover_letter_instructions", "screening_instructions", "signoff",
             "skills", "min_hourly_rate", "projects", "red_flag_phrases",
         ]

@@ -128,9 +128,11 @@ def _score_in_background():
 
     def run():
         try:
+            from apps.jobs.tasks import pretranslate_top_jobs
             from apps.scoring.tasks import score_pending_jobs
 
             score_pending_jobs()
+            pretranslate_top_jobs()
         except Exception:
             log.exception("Background scoring after refresh failed")
         finally:
@@ -147,7 +149,7 @@ def refresh(request):
     from apps.jobs.tasks import collect_for_filter
 
     created, errors = 0, 0
-    for f in SavedFilter.objects.filter(is_active=True):
+    for f in SavedFilter.live():
         try:
             created += collect_for_filter(f)["created"]
         except Exception:

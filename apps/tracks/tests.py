@@ -155,7 +155,7 @@ class SettingsPageTests(TestCase):
 
     def test_create_track_parses_lines_and_json(self):
         r = self.client.post("/settings/tracks/new/", {
-            "name": "Landing", "scorer_role": "landing dev", "signoff": "Cheers,\nMax",
+            "name": "Landing", "mode": "manual", "scorer_role": "landing dev", "signoff": "Cheers,\nMax",
             "skills": "Webflow\nFramer\n", "min_hourly_rate": "25",
             "projects": '[{"repo": "landing-kit", "skills": ["Webflow"]}]',
             "red_flag_phrases": "logo only\n",
@@ -192,7 +192,7 @@ class SettingsPageTests(TestCase):
     def test_marking_default_clears_other_defaults(self):
         other = Track.objects.create(name="Landing")
         self.client.post(f"/settings/tracks/{other.pk}/", {
-            "name": "Landing", "is_default": "on", "scorer_role": "x", "signoff": "x",
+            "name": "Landing", "mode": "manual", "is_default": "on", "scorer_role": "x", "signoff": "x",
             "skills": "", "min_hourly_rate": "0", "projects": "[]",
             "red_flag_phrases": "", "job_analysis_prompt": "",
             "cover_letter_instructions": "", "screening_instructions": "",

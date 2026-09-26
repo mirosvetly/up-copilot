@@ -12,9 +12,24 @@ class Track(TimeStampedModel):
     persona's voice.
     """
 
+    class Mode(models.TextChoices):
+        OFF = "off", "Выключен: не собирает вакансии"
+        MANUAL = "manual", "Вручную: пинг в Telegram, письмо пишу сам"
+        AUTOPILOT = "autopilot", "Автопилот: готовое письмо сразу в Telegram"
+
     name = models.CharField(max_length=80, unique=True)
     is_default = models.BooleanField(
         default=False, help_text="Used for jobs whose saved search has no track."
+    )
+    mode = models.CharField(max_length=10, choices=Mode.choices, default=Mode.MANUAL)
+    newcomer_mode = models.BooleanField(
+        "Режим новичка", default=False,
+        help_text="Пока нет отзывов: предпочитать вакансии, которые реально выиграть. "
+                  "Снять после 3 отзывов",
+    )
+    telegram_chat_id = models.CharField(
+        max_length=32, blank=True,
+        help_text="Куда слать карточки трека (например, чат ассистента). Пусто: TELEGRAM_CHAT_ID",
     )
 
     # --- persona / prompts ---

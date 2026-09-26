@@ -91,7 +91,7 @@ def collect_jobs() -> dict:
     """Beat heartbeat: poll every active filter whose interval has elapsed."""
     now = timezone.now()
     totals = {"filters": 0, "created": 0, "seen": 0}
-    for f in SavedFilter.objects.filter(is_active=True):
+    for f in SavedFilter.live():
         if not _is_due(f, now):
             continue
         try:
@@ -111,3 +111,27 @@ def collect_jobs() -> dict:
         totals["created"] += r["created"]
         totals["seen"] += r["seen"]
     return totals
+
+
+def pretranslate_top_jobs(limit: int = 20) -> int:
+    """Translate the jobs you're likely to open, ahead of time, so the RU view is instant.
+
+    Local Ollama needs ~10s per job (more when scoring holds the model), too slow to
+    wait for on click. Same order as the feed (best score first), any age: the feed
+    keeps old jobs too. ensure_ru() is a no-op when done, so the backlog drains
+    `limit` jobs per run."""
+    jobs = (
+        JobPosting.objects.filter(
+            status__in=[JobPosting.Status.SCORED, JobPosting.Status.DRAFTED],
+            score__score__gte=settings.NOTIFY_MIN_SCORE,
+            description_ru="",
+        )
+        .select_related("score")
+        .order_by("-score__score", "-posted_at")[:limit]
+    )
+    done = 0
+    for job in jobs:
+        job.ensure_ru()
+        job.score.ensure_ru()
+        done += bool(job.description_ru)
+    return done

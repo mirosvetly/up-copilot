@@ -90,9 +90,9 @@ def generate_cover(job: JobPosting) -> CoverLetterDraft:
         # LLM call stays OUTSIDE the transaction — never hold a DB tx across a
         # multi-second API request. _mock_segments only needs a version for its
         # cosmetic A/B variety, so a provisional count() there is fine.
-        # max_tokens must cover claude-sonnet-5's extended thinking AND the letter
+        # max_tokens must cover claude-sonnet-5's adaptive thinking AND the letter (16000 is the non-streaming default)
         # — at 512 the thinking ate the whole budget and the text came back empty.
-        body = _dedash(llm.complete(_system(cfg), _prompt(job, repos, reasoning), max_tokens=2048))
+        body = _dedash(llm.complete(_system(cfg), _prompt(job, repos, reasoning), max_tokens=16000))
         segments = [{"t": body, "src": None}]
         model_name = "anthropic"
     else:
