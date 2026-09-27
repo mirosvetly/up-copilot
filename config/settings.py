@@ -21,7 +21,9 @@ env = environ.Env(
     DRAFT_MIN_SCORE=(int, 50),  # only auto-draft cover letters at/above this score
     NOTIFY_MIN_SCORE=(int, 70),  # Telegram-ping a scored job at/above this score
     AUTOPILOT_MIN_SCORE=(int, 60),  # autopilot tracks: draft + send the full letter at/above this
+    DAILY_PROPOSALS_GOAL=(int, 3),  # the daily target on the analytics streak calendar
     MAX_JOB_AGE_HOURS=(int, 24),  # ignore API jobs older than this (API window is ~7 days)
+    FEED_MAX_AGE_HOURS=(int, 24),  # unsent jobs older than this leave the feed as "expired"
     # Who I am for geo/language gating: jobs whose text demands a location or
     # language I can't meet (e.g. "US only", "native German") can't be applied
     # to, so the scorer kills them. Global, not per-track (single user).
@@ -157,6 +159,8 @@ OLLAMA_MODEL = env("OLLAMA_MODEL")
 OLLAMA_TIMEOUT = env("OLLAMA_TIMEOUT")
 OLLAMA_KEEP_ALIVE = env("OLLAMA_KEEP_ALIVE")
 MAX_JOB_AGE_HOURS = env("MAX_JOB_AGE_HOURS")
+FEED_MAX_AGE_HOURS = env("FEED_MAX_AGE_HOURS")
+DAILY_PROPOSALS_GOAL = env("DAILY_PROPOSALS_GOAL")
 NOTIFY_MIN_SCORE = env("NOTIFY_MIN_SCORE")
 AUTOPILOT_MIN_SCORE = env("AUTOPILOT_MIN_SCORE")
 FREELANCER_LOCATION = env("FREELANCER_LOCATION")

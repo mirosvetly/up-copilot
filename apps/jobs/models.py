@@ -133,6 +133,7 @@ class JobPosting(TimeStampedModel):
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.NEW)
     posted_at = models.DateTimeField(null=True, blank=True)
     # Outcomes past "applied" — set manually (admin / Telegram) for the funnel.
+    applied_at = models.DateTimeField(null=True, blank=True)  # set on -> APPLIED, drives the streak
     interviewed_at = models.DateTimeField(null=True, blank=True)
     hired_at = models.DateTimeField(null=True, blank=True)
     review_notified_at = models.DateTimeField(null=True, blank=True)  # Telegram card sent
@@ -172,6 +173,8 @@ class JobPosting(TimeStampedModel):
         if target not in self.ALLOWED_TRANSITIONS[current]:
             raise ValueError(f"Illegal transition {current} -> {target}")
         self.status = target
+        # The send date feeds the daily-proposals calendar; an undo takes it back out.
+        self.applied_at = timezone.now() if target == self.Status.APPLIED else None
         if save:
-            self.save(update_fields=["status", "updated_at"])
+            self.save(update_fields=["status", "applied_at", "updated_at"])
         return self

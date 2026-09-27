@@ -135,3 +135,13 @@ def pretranslate_top_jobs(limit: int = 20) -> int:
         job.score.ensure_ru()
         done += bool(job.description_ru)
     return done
+
+
+def expire_stale_jobs() -> int:
+    """Move unsent feed jobs past FEED_MAX_AGE_HOURS to EXPIRED: by then the posting
+    is buried under proposals. Approved (reviewed) and sent jobs are left alone."""
+    cutoff = timezone.now() - timedelta(hours=settings.FEED_MAX_AGE_HOURS)
+    return JobPosting.objects.filter(
+        status__in=[JobPosting.Status.NEW, JobPosting.Status.SCORED, JobPosting.Status.DRAFTED],
+        posted_at__lt=cutoff,
+    ).update(status=JobPosting.Status.EXPIRED, updated_at=timezone.now())

@@ -1,7 +1,10 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
+from django.conf import settings
+
 from . import metrics
+from .habit import habit
 
 
 def analytics(request):
@@ -13,6 +16,8 @@ def analytics(request):
             "funnel": metrics.funnel(),
             "keywords": metrics.keywords(),
             "heat": metrics.heatmap(),
+            "habit": habit(),
+            "TIME_ZONE_NAME": settings.TIME_ZONE,
             "is_analytics": True,
         },
     )

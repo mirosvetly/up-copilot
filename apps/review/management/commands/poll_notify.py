@@ -18,10 +18,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **opts):
         from apps.jobs.models import SavedFilter
-        from apps.jobs.tasks import collect_for_filter, pretranslate_top_jobs
+        from apps.jobs.tasks import collect_for_filter, expire_stale_jobs, pretranslate_top_jobs
         from apps.review.notify import notify_autopilot_jobs, notify_scored_jobs
         from apps.scoring.tasks import score_pending_jobs
 
+        expired = expire_stale_jobs()  # first, so nothing below spends time on stale jobs
         created = 0
         for f in SavedFilter.live():
             try:
@@ -35,7 +36,7 @@ class Command(BaseCommand):
         translated = pretranslate_top_jobs(limit=5)
         self.stdout.write(
             self.style.SUCCESS(
-                f"collected {created}, scored {scored}, autopilot {auto}, pinged {result.get('sent', 0)}, translated {translated}"
+                f"collected {created}, scored {scored}, autopilot {auto}, pinged {result.get('sent', 0)}, translated {translated}, expired {expired}"
                 + (f" ({result['skipped']})" if result.get("skipped") else "")
             )
         )

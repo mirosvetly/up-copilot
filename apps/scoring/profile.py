@@ -27,6 +27,9 @@ def freelancer_config(profile: dict[str, Any] | None = None) -> dict[str, str]:
         "display_name": str(person.get("display_name") or name),
         "initials": str(person.get("initials") or first_name[:2].upper()),
         "headline": headline,
+        "upwork_name": str(person.get("upwork_name") or name),
+        "upwork_title": str(person.get("upwork_title") or headline),
+        "rate": str(person.get("rate") or ""),
     }
 
 

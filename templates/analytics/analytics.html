@@ -19,11 +19,51 @@
     <span style="display:inline-flex">{% icon "bar-chart" 17 "#b6d086" %}</span>
     <div style="font-size:15px;font-weight:600">{% trans "Аналитика" %}</div>
     <div style="width:1px;height:18px;background:#404040"></div>
-    <div style="font-size:12px;color:#a3a3a3">{% trans "Живые данные · часовой пояс MSK ·" %} <a href="{% url 'analytics:metrics' %}" style="color:#b6d086">/metrics</a></div>
+    <div style="font-size:12px;color:#a3a3a3">{% blocktrans with tz=TIME_ZONE_NAME %}Живые данные · часовой пояс {{ tz }} ·{% endblocktrans %} <a href="{% url 'analytics:metrics' %}" style="color:#b6d086">/metrics</a></div>
   </div>
 
   <div style="flex:1;min-height:0;overflow:auto">
     <div style="padding:24px;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+
+      <!-- daily proposals habit -->
+      <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+        <div style="display:flex;align-items:flex-start;gap:28px;flex-wrap:wrap">
+          <div style="min-width:180px">
+            <div style="font-size:12px;color:#a3a3a3;margin-bottom:8px">{% trans "Сегодня" %}</div>
+            <div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:34px;font-weight:700;color:{% if habit.today_left %}#fafafa{% else %}#b6d086{% endif %}">{{ habit.today }}<span style="font-size:18px;color:#737373"> / {{ habit.goal }}</span></div>
+            <div style="height:6px;border-radius:20px;background:#262626;overflow:hidden;margin-top:10px;width:180px"><div style="height:100%;width:{% widthratio habit.today habit.goal 100 %}%;max-width:100%;background:#b6d086"></div></div>
+            <div style="font-size:12.5px;color:#a3a3a3;margin-top:8px">{% if habit.today_left %}{% blocktrans count n=habit.today_left %}ещё {{ n }} отклик до цели{% plural %}ещё {{ n }} отклика до цели{% endblocktrans %}{% else %}{% trans "Цель дня выполнена 🎯" %}{% endif %}</div>
+          </div>
+          <div style="min-width:150px">
+            <div style="font-size:12px;color:#a3a3a3;margin-bottom:8px">{% trans "Серия" %}</div>
+            <div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:34px;font-weight:700;color:{% if habit.streak %}#f59e0b{% else %}#525252{% endif %}">🔥 {{ habit.streak }}</div>
+            <div style="font-size:12.5px;color:#a3a3a3;margin-top:8px">{% blocktrans with b=habit.best %}рекорд: {{ b }} дн. подряд{% endblocktrans %}</div>
+          </div>
+          <!-- calendar: columns are weeks, rows Mon..Sun -->
+          <div style="flex:1;min-width:300px">
+            <div style="font-size:12px;color:#a3a3a3;margin-bottom:8px">{% blocktrans with t=habit.total %}Отклики по дням · всего {{ t }}{% endblocktrans %}</div>
+            <div style="display:flex;gap:4px">
+              {% for week in habit.weeks %}<div style="display:flex;flex-direction:column;gap:4px">
+                {% for d in week %}<span title="{{ d.date|date:'j E' }}: {{ d.n }}" style="width:14px;height:14px;border-radius:3px;{% if d.future %}background:transparent{% elif d.level == 3 %}background:#b6d086{% elif d.level == 2 %}background:rgba(182,208,134,0.6){% elif d.level == 1 %}background:rgba(182,208,134,0.3){% else %}background:#262626{% endif %};{% if d.today %}outline:1.5px solid #fafafa;outline-offset:1px{% endif %}"></span>{% endfor %}
+              </div>{% endfor %}
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#737373">{% trans "меньше" %}
+              <span style="width:11px;height:11px;border-radius:2px;background:#262626"></span><span style="width:11px;height:11px;border-radius:2px;background:rgba(182,208,134,0.3)"></span><span style="width:11px;height:11px;border-radius:2px;background:rgba(182,208,134,0.6)"></span><span style="width:11px;height:11px;border-radius:2px;background:#b6d086"></span>
+              {% blocktrans with g=habit.goal %}цель ({{ g }}+){% endblocktrans %}</div>
+          </div>
+        </div>
+        <!-- trophies -->
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid #262626">
+          <div style="font-size:12px;color:#a3a3a3;margin-bottom:10px">{% blocktrans with u=habit.unlocked n=habit.trophies|length %}Кубки · {{ u }} из {{ n }}{% endblocktrans %}{% if habit.next %} · {% trans "следующий:" %} <span style="color:#fafafa">{{ habit.next.emoji }} {{ habit.next.title }}</span>{% endif %}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            {% for t in habit.trophies %}
+            <div title="{{ t.title }}" style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:9px;font-size:12.5px;{% if t.unlocked %}background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#fafafa{% else %}background:#0a0a0a;border:1px solid #262626;color:#525252;filter:grayscale(1){% endif %}">
+              <span style="font-size:16px">{{ t.emoji }}</span>{{ t.title }}{% if not t.unlocked and t.kind == "total" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё {{ n }}{% endblocktrans %}</span>{% elif not t.unlocked and t.kind == "streak" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё {{ n }} дн.{% endblocktrans %}</span>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
 
       <!-- stat cards -->
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px">

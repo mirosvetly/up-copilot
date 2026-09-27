@@ -143,6 +143,7 @@ def job_card(job, *, my_skills_lc=None):
         "proposals": job.proposals_bucket,
         "connects": connects,
         "overheated": overheated,
+        "level": (job.raw or {}).get("experienceLevel") or "",
         "state": state,
         "card_border": "rgba(74,222,128,0.4)" if state == "approved"
         else "rgba(182,208,134,0.4)" if state == "sent" else "#404040",

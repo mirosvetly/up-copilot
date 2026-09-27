@@ -748,3 +748,24 @@ class MinBudgetTests(TestCase):
         with patch("apps.core.translate.translate_ru", side_effect=slow_translate):
             j.ensure_ru()  # must not raise
         self.assertFalse(JobPosting.objects.filter(pk=j.pk).exists())
+
+
+@override_settings(FEED_MAX_AGE_HOURS=24)
+class ExpireStaleTests(TestCase):
+    def test_old_unsent_jobs_expire_sent_and_approved_stay(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from .tasks import expire_stale_jobs
+
+        old = timezone.now() - timedelta(hours=30)
+        mk = lambda jid, st, when: JobPosting.objects.create(
+            job_id=jid, title="t", budget_type="fixed", status=st, posted_at=when)
+        stale = mk("s", JobPosting.Status.SCORED, old)
+        fresh = mk("f", JobPosting.Status.SCORED, timezone.now())
+        sent = mk("a", JobPosting.Status.APPLIED, old)
+        approved = mk("r", JobPosting.Status.REVIEWED, old)
+        self.assertEqual(expire_stale_jobs(), 1)
+        for j, st in [(stale, "expired"), (fresh, "scored"), (sent, "applied"), (approved, "reviewed")]:
+            j.refresh_from_db(); self.assertEqual(j.status, st)

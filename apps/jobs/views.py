@@ -9,6 +9,8 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
+from apps.analytics.habit import habit
+
 from .models import JobPosting
 from .presenters import job_card, job_detail
 
@@ -106,6 +108,7 @@ def feed(request, sent=False):
             "cards": cards,
             "visible_count": sum(1 for c in cards if c["state"] != "skipped"),
             "counts": counts,
+            "habit": habit(),
             "queue": queue,
             "q": q,
             "sort": sort,

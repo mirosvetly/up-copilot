@@ -1,4 +1,4 @@
-{% load icons i18n %}
+{% load icons i18n static %}
 <div id="cover" style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px;scroll-margin-top:76px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
     <span style="font-size:14px;font-weight:600">{% trans "Черновик cover letter" %}</span>
@@ -37,6 +37,28 @@
       <div style="font-size:11px;color:#737373;margin-top:7px">{% trans "Перевод для чтения · клиенту уходит английский оригинал (кнопка копирует его)" %}</div>
     {% else %}
       <div style="font-size:14px;line-height:1.7;color:#e5e5e5;white-space:pre-wrap;background:#0a0a0a;border:1px solid #262626;border-radius:10px;padding:16px">{% for seg in cover.segments %}<span style="background:{{ seg.bg }};border-bottom:{{ seg.border }};border-radius:{{ seg.radius }};padding:{{ seg.pad }};color:{{ seg.color }}" title="{{ seg.title }}">{{ seg.t }}</span>{% endfor %}</div>
+    {% endif %}
+
+    {% if not cover.edit %}
+    <!-- ponytail: approximation of the client's proposal list (real layout isn't visible to freelancers); the snippet is clamped to 3 lines -->
+    <details style="margin-top:14px" open>
+      <summary style="cursor:pointer;font-size:12px;color:#a3a3a3;margin-bottom:10px">{% trans "Как видит клиент в списке откликов (примерно)" %}</summary>
+      <div style="background:#fff;border:1px solid #e4ebe4;border-radius:12px;padding:18px 20px;max-width:680px;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;color:#001e00">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <img src="{% static 'core/me.jpg' %}" alt="" width="56" height="56" style="border-radius:50%;flex:none;object-fit:cover">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+              <span style="font-size:17px;font-weight:600;color:#108a00">{{ freelancer.upwork_name }}</span>
+              {% if freelancer.rate %}<span style="margin-left:auto;font-size:14px;font-weight:600">{{ freelancer.rate }}</span>{% endif %}
+            </div>
+            <div style="font-size:14px;font-weight:600;margin-top:2px">{{ freelancer.upwork_title }}</div>
+            <div style="font-size:13px;color:#5e6d55;margin-top:4px">{% trans "Новый исполнитель: 0 отзывов, $0 заработано" %}</div>
+            <div style="margin-top:12px;font-size:14px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ cover.body }}</div>
+            <div style="font-size:14px;font-weight:600;color:#108a00;margin-top:2px">more</div>
+          </div>
+        </div>
+      </div>
+    </details>
     {% endif %}
 
     {% if cover.legend %}
