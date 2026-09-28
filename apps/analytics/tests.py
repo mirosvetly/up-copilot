@@ -79,3 +79,38 @@ class HabitTests(TestCase):
         self.assertIsNotNone(j.applied_at)
         j.transition_to(JobPosting.Status.DRAFTED)
         self.assertIsNone(JobPosting.objects.get(pk=j.pk).applied_at)
+
+
+class MoneyTests(TestCase):
+    def test_totals_balance_and_costs(self):
+        from decimal import Decimal
+
+        from django.utils import timezone
+
+        from .models import MoneyEntry
+        from .money import money
+
+        MoneyEntry.objects.create(kind="connects", usd=0, connects=104, note="start")
+        MoneyEntry.objects.create(kind="connects", usd=Decimal("12.00"), connects=80)
+        MoneyEntry.objects.create(kind="subscription", usd=Decimal("20.00"))
+        MoneyEntry.objects.create(kind="income", usd=Decimal("90.00"))
+        now = timezone.now()
+        JobPosting.objects.create(job_id="a", title="t", budget_type="fixed", status="applied",
+                                  applied_at=now, connects_spent=90, interviewed_at=now)
+        JobPosting.objects.create(job_id="b", title="t", budget_type="fixed", status="applied",
+                                  applied_at=now, connects_spent=20)
+        m = money()
+        self.assertEqual((m["spent"], m["income"], m["net"]), (Decimal("32.00"), Decimal("90.00"), Decimal("58.00")))
+        self.assertEqual((m["bought"], m["used"], m["balance"]), (184, 110, 74))
+        self.assertEqual(m["price"], Decimal("0.15"))  # $12 / 80 paid connects; the $0 start line is ignored
+        self.assertEqual(m["per_proposal"], Decimal("8.25"))  # 55 connects avg x $0.15
+        self.assertEqual(m["per_interview"], Decimal("32.00"))
+        self.assertIsNone(m["per_hire"])
+
+    def test_bad_input_is_rejected(self):
+        from .models import MoneyEntry
+        self.client.post("/analytics/money/", {"kind": "income", "usd": "-5"})
+        self.client.post("/analytics/money/", {"kind": "nope", "usd": "5"})
+        self.assertEqual(MoneyEntry.objects.count(), 0)
+        self.client.post("/analytics/money/", {"kind": "income", "usd": "12.5"})
+        self.assertEqual(MoneyEntry.objects.get().usd, 12.5)

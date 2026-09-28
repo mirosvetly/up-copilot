@@ -1,0 +1,8 @@
+[Unit]
+Description=Upwork Copilot poll: collect, score, autopilot, notify
+
+[Service]
+Type=oneshot
+User=upcopilot
+WorkingDirectory=/srv/upcopilot/app
+ExecStart=/srv/upcopilot/venv/bin/python manage.py poll_notify

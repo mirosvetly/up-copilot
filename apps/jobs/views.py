@@ -338,3 +338,26 @@ def job_action(request, pk, action):
     if nxt.startswith("/") and not nxt.startswith("//"):  # local path, not //evil.com
         return redirect(nxt)
     return redirect("jobs:feed")
+
+
+@require_POST
+def job_tracking(request, pk):
+    """Money and outcome for a sent proposal: connects spent, client replied, hired."""
+    from django.utils import timezone
+
+    job = get_object_or_404(JobPosting, pk=pk)
+    raw = (request.POST.get("connects_spent") or "").strip()
+    try:
+        job.connects_spent = int(raw) if raw else None
+        if job.connects_spent is not None and not 0 <= job.connects_spent <= 32000:
+            raise ValueError
+    except ValueError:
+        messages.error(request, _("Коннекты: нужно целое число"))
+        return redirect("jobs:detail", pk=pk)
+    now = timezone.now()
+    # Keep the first timestamp when a box stays ticked; clear it when unticked.
+    job.interviewed_at = (job.interviewed_at or now) if request.POST.get("interviewed") else None
+    job.hired_at = (job.hired_at or now) if request.POST.get("hired") else None
+    job.save(update_fields=["connects_spent", "interviewed_at", "hired_at", "updated_at"])
+    messages.success(request, _("Сохранено"))
+    return redirect("jobs:detail", pk=pk)

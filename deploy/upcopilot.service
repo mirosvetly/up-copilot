@@ -1,0 +1,12 @@
+[Unit]
+Description=Upwork Copilot web (gunicorn)
+After=network.target
+
+[Service]
+User=upcopilot
+WorkingDirectory=/srv/upcopilot/app
+ExecStart=/srv/upcopilot/venv/bin/gunicorn config.wsgi:application --bind 127.0.0.1:8013 --workers 2 --timeout 180
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

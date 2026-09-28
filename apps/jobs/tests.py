@@ -769,3 +769,38 @@ class ExpireStaleTests(TestCase):
         self.assertEqual(expire_stale_jobs(), 1)
         for j, st in [(stale, "expired"), (fresh, "scored"), (sent, "applied"), (approved, "reviewed")]:
             j.refresh_from_db(); self.assertEqual(j.status, st)
+
+
+class JobTrackingTests(TestCase):
+    def test_connects_and_outcome_flags(self):
+        from django.utils import timezone
+        j = JobPosting.objects.create(job_id="tr", title="t", budget_type="fixed",
+                                      status=JobPosting.Status.APPLIED, applied_at=timezone.now())
+        self.client.post(f"/job/{j.pk}/tracking/", {"connects_spent": "90", "interviewed": "on"})
+        j.refresh_from_db()
+        first = j.interviewed_at
+        self.assertEqual(j.connects_spent, 90)
+        self.assertIsNotNone(first)
+        self.assertIsNone(j.hired_at)
+        self.client.post(f"/job/{j.pk}/tracking/", {"connects_spent": "90", "interviewed": "on", "hired": "on"})
+        j.refresh_from_db()
+        self.assertEqual(j.interviewed_at, first)  # a kept tick keeps its original date
+        self.assertIsNotNone(j.hired_at)
+        self.client.post(f"/job/{j.pk}/tracking/", {"connects_spent": "abc"})
+        j.refresh_from_db()
+        self.assertEqual(j.connects_spent, 90)  # bad input changes nothing
+
+
+class LoginRequiredTests(TestCase):
+    def test_pages_need_login_but_login_page_is_open(self):
+        from django.conf import settings
+        from django.contrib.auth.models import User
+
+        mw = settings.MIDDLEWARE + ["django.contrib.auth.middleware.LoginRequiredMiddleware"]
+        with self.settings(MIDDLEWARE=mw):
+            self.assertEqual(self.client.get("/").status_code, 302)
+            self.assertEqual(self.client.get("/metrics/").status_code, 302)
+            self.assertEqual(self.client.get("/login/").status_code, 200)
+            User.objects.create_user("max", password="pw")
+            self.client.login(username="max", password="pw")
+            self.assertEqual(self.client.get("/").status_code, 200)

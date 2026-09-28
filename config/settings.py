@@ -17,7 +17,7 @@ env = environ.Env(
     EMBEDDING_PROVIDER=(str, "mock"),  # mock | voyage
     JOB_SCORER=(str, "rule"),  # rule | llm
     TRANSLATE_PROVIDER=(str, "google"),  # google (free, no key) | mock (off)
-    TRANSLATE_ENGINE=(str, "ollama"),  # ollama (local, no quota) | mymemory | google
+    TRANSLATE_ENGINE=(str, "ollama"),  # ollama (local, no quota) | anthropic (Haiku) | mymemory | google
     DRAFT_MIN_SCORE=(int, 50),  # only auto-draft cover letters at/above this score
     NOTIFY_MIN_SCORE=(int, 70),  # Telegram-ping a scored job at/above this score
     AUTOPILOT_MIN_SCORE=(int, 60),  # autopilot tracks: draft + send the full letter at/above this
@@ -94,9 +94,20 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Every page needs a login: the app holds letters, prompts and API-spending
+    # buttons, and on the server it's reachable from the internet.
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "/"
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 90  # stay logged in on the phone for ~3 months
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+if not DEBUG:  # behind nginx + HTTPS on the server
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = True
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
@@ -198,4 +209,6 @@ if "test" in sys.argv:
     # that exercise these use @override_settings.
     MAX_JOB_AGE_HOURS = 24
     COLLECT_MAX_CONNECTS = 0
+    # Views are tested without a session; LoginRequiredTests puts the gate back.
+    MIDDLEWARE = [m for m in MIDDLEWARE if not m.endswith("LoginRequiredMiddleware")]
     EXCLUDE_KEYWORDS = []

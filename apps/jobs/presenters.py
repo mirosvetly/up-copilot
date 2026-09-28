@@ -220,6 +220,9 @@ def job_detail(job, lang="ru"):
         "status_color": tracker[1],
         "status_hint": tracker[2],
         "is_sent": job.status == JobPosting.Status.APPLIED,
+        "connects_spent": job.connects_spent,
+        "interviewed": job.interviewed_at is not None,
+        "hired": job.hired_at is not None,
         "client_card": None if not client else {
             "risk_label": risk[0], "risk_color": risk[1], "risk_bg": risk[2], "risk_icon": risk[3],
             "verified": client.verified_payment,

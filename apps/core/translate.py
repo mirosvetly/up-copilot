@@ -84,6 +84,23 @@ class _OllamaTranslator:
         return [self.translate(t) for t in items]
 
 
+class _AnthropicTranslator(_OllamaTranslator):
+    """Same prompt as the Ollama path, on Claude Haiku: for the server, where a
+    local model doesn't fit in RAM. Seconds per job, cents per day."""
+
+    def translate(self, text: str) -> str:
+        from apps.core.llm import get_llm
+
+        llm = get_llm(model=settings.ANTHROPIC_SCORER_MODEL, provider="anthropic")
+        if not llm:
+            return ""
+        return llm.complete(
+            "You are a translator. Translate the user's text from English to Russian. "
+            "Output ONLY the Russian translation, no notes, no preface.",
+            text, max_tokens=8000,  # Russian runs ~2x the tokens of English; a cut-off reply is discarded
+        ) or ""
+
+
 def _make_translator():
     """Return (translator, chunk_size). ollama is the default: local, no quota,
     works where Google is blocked and where MyMemory's tiny free cap runs out.
@@ -93,6 +110,8 @@ def _make_translator():
         from deep_translator import GoogleTranslator
         # auto source: reasons may already be Russian (rule scorer) — don't force EN
         return GoogleTranslator(source="auto", target="ru"), _GOOGLE_MAX
+    if eng == "anthropic":
+        return _AnthropicTranslator(), 100_000
     if eng == "mymemory":
         from deep_translator import MyMemoryTranslator
         return MyMemoryTranslator(source="en-GB", target="ru-RU"), _MYMEMORY_MAX

@@ -65,6 +65,46 @@
         </div>
       </div>
 
+      <!-- money -->
+      <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:14px">{% trans "Деньги" %}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+          <div><div style="font-size:12px;color:#a3a3a3">{% trans "Потрачено" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:#f87171">${{ money.spent|floatformat:2 }}</div></div>
+          <div><div style="font-size:12px;color:#a3a3a3">{% trans "Заработано" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:#4ade80">${{ money.income|floatformat:2 }}</div></div>
+          <div><div style="font-size:12px;color:#a3a3a3">{% trans "Итог" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:{% if money.net < 0 %}#f87171{% else %}#4ade80{% endif %}">{% if money.net < 0 %}−{% else %}+{% endif %}${{ money.net_abs|floatformat:2 }}</div></div>
+          <div><div style="font-size:12px;color:#a3a3a3">{% trans "Коннекты: осталось" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700">{{ money.balance }}</div><div style="font-size:11.5px;color:#737373">{% blocktrans with b=money.bought u=money.used %}куплено {{ b }}, потрачено {{ u }}{% endblocktrans %}</div></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:12.5px;color:#a3a3a3">
+          <span>{% trans "1 коннект" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#fafafa">${{ money.price|floatformat:2 }}</b></span>
+          <span>{% trans "1 отклик" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#fafafa">{% if money.per_proposal is not None %}${{ money.per_proposal|floatformat:2 }}{% else %}—{% endif %}</b> <span style="color:#737373">({% blocktrans with l=money.logged s=money.sent %}коннекты указаны у {{ l }} из {{ s }}{% endblocktrans %})</span></span>
+          <span>{% trans "1 собеседование" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#fafafa">{% if money.per_interview %}${{ money.per_interview|floatformat:2 }}{% else %}—{% endif %}</b></span>
+          <span>{% trans "1 заказ" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#fafafa">{% if money.per_hire %}${{ money.per_hire|floatformat:2 }}{% else %}—{% endif %}</b></span>
+        </div>
+        <form method="post" action="{% url 'analytics:money_add' %}" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid #262626">{% csrf_token %}
+          <select name="kind" style="height:32px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa;padding:0 8px">{% for v, l in money.kinds %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select>
+          <input name="usd" type="number" step="0.01" min="0" placeholder="$" style="width:90px;height:32px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa">
+          <input name="connects" type="number" min="0" placeholder="{% trans 'коннектов' %}" style="width:110px;height:32px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa">
+          <input name="date" type="date" style="height:32px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa;color-scheme:dark">
+          <input name="note" maxlength="120" placeholder="{% trans 'заметка' %}" style="flex:1;min-width:140px;height:32px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa">
+          <button style="height:32px;padding:0 14px;border:none;border-radius:8px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">{% trans "Добавить" %}</button>
+        </form>
+        <div style="font-size:11.5px;color:#737373;margin-top:6px">{% trans "Стартовый баланс или бесплатные ежемесячные коннекты: «Покупка коннектов» на $0. Доход: сколько пришло после комиссии Upwork" %}</div>
+        {% if money.entries %}
+        <div style="margin-top:12px;display:flex;flex-direction:column">
+          {% for e in money.entries %}
+          <div style="display:flex;align-items:center;gap:12px;padding:7px 0;border-top:1px solid #1f1f1f;font-size:12.5px">
+            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#737373;width:84px">{{ e.date|date:"d.m.Y" }}</span>
+            <span style="width:130px;color:#d4d4d4">{{ e.get_kind_display }}</span>
+            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:80px;color:{% if e.kind == 'income' %}#4ade80{% else %}#fafafa{% endif %}">{% if e.kind == 'income' %}+{% endif %}${{ e.usd|floatformat:2 }}</span>
+            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:90px;color:#a3a3a3">{% if e.connects %}{{ e.connects }} {% trans "кон." %}{% endif %}</span>
+            <span style="flex:1;color:#737373">{{ e.note }}</span>
+            <form method="post" action="{% url 'analytics:money_delete' e.id %}" onsubmit="return confirm('{% trans "Удалить запись?" %}')" style="margin:0">{% csrf_token %}<button style="border:none;background:none;color:#525252;cursor:pointer;font-size:12px">{% trans "удалить" %}</button></form>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
       <!-- stat cards -->
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px">
         {% for s in stats %}

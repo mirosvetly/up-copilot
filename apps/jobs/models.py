@@ -134,6 +134,7 @@ class JobPosting(TimeStampedModel):
     posted_at = models.DateTimeField(null=True, blank=True)
     # Outcomes past "applied" — set manually (admin / Telegram) for the funnel.
     applied_at = models.DateTimeField(null=True, blank=True)  # set on -> APPLIED, drives the streak
+    connects_spent = models.PositiveSmallIntegerField(null=True, blank=True)  # proposal + boost
     interviewed_at = models.DateTimeField(null=True, blank=True)
     hired_at = models.DateTimeField(null=True, blank=True)
     review_notified_at = models.DateTimeField(null=True, blank=True)  # Telegram card sent
