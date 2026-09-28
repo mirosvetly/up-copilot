@@ -153,3 +153,16 @@ class AutopilotTests(TestCase):
         with patch("apps.review.notify.send_telegram", return_value=True) as send:
             self.assertEqual(notify_autopilot_jobs()["sent"], 1)
         self.assertNotIn("<pre></pre>", send.call_args.args[0])
+
+
+class AgeLabelTests(TestCase):
+    def test_minutes_then_hours(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from .notify import _age
+        now = timezone.now()
+        self.assertEqual(_age(JobPosting(posted_at=now - timedelta(minutes=7))), " · ⏱ 7 мин назад")
+        self.assertEqual(_age(JobPosting(posted_at=now - timedelta(hours=5))), " · ⏱ 5 ч назад")
+        self.assertEqual(_age(JobPosting(posted_at=None)), "")

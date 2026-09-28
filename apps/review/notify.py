@@ -31,7 +31,7 @@ def _text(job: JobPosting) -> str:
     score = getattr(job, "score", None)
     c = job.client
     lines = [
-        f"🎯 Новая под тебя — score {score.score if score else '—'}/100",
+        f"🎯 Новая под тебя — score {score.score if score else '—'}/100{_age(job)}",
         "",
         escape(job.title),
         f"💵 {escape(_budget(job))}"
@@ -44,6 +44,14 @@ def _text(job: JobPosting) -> str:
     lines.append("")
     lines.append("Открой карточку, сгенерь письмо и отправь, пока не перебили.")
     return "\n".join(lines)
+
+
+def _age(job: JobPosting) -> str:
+    """How long ago the job was posted: fresh ones still have an empty boost top-4."""
+    if not job.posted_at:
+        return ""
+    m = int((timezone.now() - job.posted_at).total_seconds() // 60)
+    return f" · ⏱ {m} мин назад" if m < 120 else f" · ⏱ {m // 60} ч назад"
 
 
 def _card_url(job: JobPosting) -> str:
@@ -121,7 +129,7 @@ def _autopilot_text(job: JobPosting, letter: str) -> str:
 
     score = getattr(job, "score", None)
     return "\n".join([
-        f"🤖 Автопилот · score {score.score if score else '—'}/100 · {escape(_budget(job))}",
+        f"🤖 Автопилот · score {score.score if score else '—'}/100 · {escape(_budget(job))}{_age(job)}",
         "",
         f"<b>{escape(job.title)}</b>",
         "",
