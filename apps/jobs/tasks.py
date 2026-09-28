@@ -45,6 +45,9 @@ def collect_for_filter(saved_filter: SavedFilter, *, provider=None) -> dict:
     # already have a crowd of applicants — not worth importing or scoring.
     cutoff = timezone.now() - timedelta(hours=settings.MAX_JOB_AGE_HOURS)
     raw_jobs = [rj for rj in raw_jobs if not (rj.posted_at and rj.posted_at < cutoff)]
+    # Markets you've chosen to sit out (e.g. the US boost-auction crowd): dropped before scoring.
+    skip = settings.EXCLUDE_CLIENT_COUNTRIES
+    raw_jobs = [rj for rj in raw_jobs if (rj.client.country or "").strip().lower() not in skip]
     ids = [rj.job_id for rj in raw_jobs]
     already = set(SeenJob.objects.filter(job_id__in=ids).values_list("job_id", flat=True))
     created = 0

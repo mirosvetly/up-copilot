@@ -804,3 +804,25 @@ class LoginRequiredTests(TestCase):
             User.objects.create_user("max", password="pw")
             self.client.login(username="max", password="pw")
             self.assertEqual(self.client.get("/").status_code, 200)
+
+
+class ExcludeCountryTests(TestCase):
+    def test_excluded_client_countries_are_not_collected(self):
+        from django.utils import timezone
+
+        from .providers.base import RawClient, RawJob
+
+        def raw(jid, country):
+            return RawJob(job_id=jid, title="t", description="", skills=[], budget_type="fixed",
+                          budget_min=None, budget_max=None, currency="USD", proposals_bucket="",
+                          posted_at=timezone.now(), client=RawClient(upwork_client_id=jid, country=country))
+
+        class P:
+            def fetch_jobs(self, f):
+                return [raw("us", "United States"), raw("us2", "USA"), raw("uk", "United Kingdom")]
+
+        f = SavedFilter.objects.create(name="s")
+        with override_settings(EXCLUDE_CLIENT_COUNTRIES={"united states", "usa"}):
+            r = collect_for_filter(f, provider=P())
+        self.assertEqual(r["created"], 1)
+        self.assertEqual(list(JobPosting.objects.values_list("job_id", flat=True)), ["uk"])
