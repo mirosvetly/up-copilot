@@ -4,6 +4,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 H=${DEPLOY_HOST:-contabo}  # ssh alias; the Russian VDS is out: Anthropic returns 403 there
+# Pause the poll so it never runs against half-updated files ("readonly database" once).
+ssh "$H" 'systemctl stop upcopilot-poll.timer; while systemctl is-active -q upcopilot-poll.service; do sleep 2; done'
+trap 'ssh "$H" systemctl start upcopilot-poll.timer' EXIT
 rsync -az --delete --exclude-from=- ./ "$H:/srv/upcopilot/app/" <<'X'
 .git/
 .venv/
