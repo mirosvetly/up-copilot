@@ -174,7 +174,6 @@ def _autopilot_text(job: JobPosting, letter: str) -> str:
         "",
         # <pre> gets a one-tap Copy button in Telegram clients.
         f"<pre>{escape(letter)}</pre>",
-        "Скопируй письмо, открой вакансию, вставь и отправь.",
         *(["", "🐣 Режим новичка включён. Появились отзывы? Выключи его в настройках трека"]
           if job.matched_filter.track.newcomer_mode else []),
     ])
