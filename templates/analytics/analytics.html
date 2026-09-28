@@ -58,7 +58,7 @@
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             {% for t in habit.trophies %}
             <div title="{{ t.title }}" style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:9px;font-size:12.5px;{% if t.unlocked %}background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#fafafa{% else %}background:#0a0a0a;border:1px solid #262626;color:#525252;filter:grayscale(1){% endif %}">
-              <span style="font-size:16px">{{ t.emoji }}</span>{{ t.title }}{% if not t.unlocked and t.kind == "total" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё {{ n }}{% endblocktrans %}</span>{% elif not t.unlocked and t.kind == "streak" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё {{ n }} дн.{% endblocktrans %}</span>{% endif %}
+              <span style="font-size:16px">{{ t.emoji }}</span>{{ t.title }}{% if not t.unlocked and t.kind == "total" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё {{ n }}{% endblocktrans %}</span>{% elif not t.unlocked and t.kind == "income" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё ${{ n }}{% endblocktrans %}</span>{% elif not t.unlocked and t.kind == "streak" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё {{ n }} дн.{% endblocktrans %}</span>{% endif %}
             </div>
             {% endfor %}
           </div>

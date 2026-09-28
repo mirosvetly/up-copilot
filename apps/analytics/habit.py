@@ -8,13 +8,16 @@ from collections import Counter
 from datetime import date, timedelta
 
 from django.conf import settings
+from django.db.models import Sum
 from django.utils import timezone
 
 from apps.jobs.models import JobPosting
 
+from .models import MoneyEntry
+
 WEEKS = 16
 
-# (key, emoji, title, kind, threshold). kind: total | streak | goal_day | interview | hire
+# (key, emoji, title, kind, threshold). kind: total | streak | goal_day | interview | hire | income ($)
 TROPHIES = [
     ("first", "📨", "Первый отклик", "total", 1),
     ("goal", "🎯", "Цель дня выполнена", "goal_day", 1),
@@ -28,6 +31,10 @@ TROPHIES = [
     ("t100", "🏅", "100 откликов", "total", 100),
     ("interview", "💬", "Первое собеседование", "interview", 1),
     ("hire", "🏆", "Первый заказ", "hire", 1),
+    ("usd100", "💵", "Первые $100", "income", 100),
+    ("usd500", "💰", "Первые $500", "income", 500),
+    ("usd1000", "🤑", "Первая $1 000", "income", 1000),
+    ("usd5000", "🚀", "Первые $5 000", "income", 5000),
 ]
 
 
@@ -44,9 +51,9 @@ def _streaks(days: set[date], today: date) -> tuple[int, int]:
     return cur, best
 
 
-def _unlocked(kind, need, *, total, best, goal_days, interviews, hires) -> tuple[bool, int]:
+def _unlocked(kind, need, *, total, best, goal_days, interviews, hires, income) -> tuple[bool, int]:
     have = {"total": total, "streak": best, "goal_day": goal_days,
-            "interview": interviews, "hire": hires}[kind]
+            "interview": interviews, "hire": hires, "income": int(income)}[kind]
     return have >= need, max(0, need - have)
 
 
@@ -75,6 +82,7 @@ def habit(today: date | None = None, goal: int | None = None) -> dict:
         goal_days=sum(1 for n in per_day.values() if n >= goal),
         interviews=JobPosting.objects.filter(interviewed_at__isnull=False).count(),
         hires=JobPosting.objects.filter(hired_at__isnull=False).count(),
+        income=MoneyEntry.objects.filter(kind=MoneyEntry.Kind.INCOME).aggregate(v=Sum("usd"))["v"] or 0,
     )
     trophies = []
     for key, emoji, title, kind, need in TROPHIES:

@@ -114,3 +114,19 @@ class MoneyTests(TestCase):
         self.assertEqual(MoneyEntry.objects.count(), 0)
         self.client.post("/analytics/money/", {"kind": "income", "usd": "12.5"})
         self.assertEqual(MoneyEntry.objects.get().usd, 12.5)
+
+
+class IncomeTrophyTests(TestCase):
+    def test_income_trophies_unlock_by_received_money(self):
+        from decimal import Decimal
+
+        from .habit import habit
+        from .models import MoneyEntry
+
+        MoneyEntry.objects.create(kind="income", usd=Decimal("90.00"))
+        MoneyEntry.objects.create(kind="income", usd=Decimal("45.50"))
+        MoneyEntry.objects.create(kind="subscription", usd=Decimal("1000.00"))  # costs don't count
+        t = {x["key"]: x for x in habit()["trophies"]}
+        self.assertTrue(t["usd100"]["unlocked"])
+        self.assertFalse(t["usd500"]["unlocked"])
+        self.assertEqual(t["usd500"]["left"], 365)  # 500 - 135
