@@ -161,3 +161,21 @@ class NewcomerModeTests(TestCase):
         self.assertNotIn("NEWCOMER MODE", _system({"newcomer_mode": False}))
         job = JobPosting(job_id="x", title="t", raw={"experienceLevel": "Expert"})
         self.assertIn("experience level: Expert", _competition_line(job))
+
+
+class FeedMinScoreTests(TestCase):
+    def test_low_score_goes_straight_to_skipped(self):
+        from unittest.mock import patch
+
+        from apps.jobs.models import JobPosting
+
+        from .scorer import score_job
+
+        prof = {"skills": [], "min_hourly_rate": 0, "red_flag_phrases": [], "projects": []}
+        for score, expected in [(8, JobPosting.Status.SKIPPED), (55, JobPosting.Status.SCORED)]:
+            j = JobPosting.objects.create(job_id=f"m{score}", title="t", budget_type="fixed")
+            with patch("apps.scoring.scorer._compute", return_value={"score": score, "breakdown": [], "reasoning": ""}), \
+                 override_settings(FEED_MIN_SCORE=20):
+                score_job(j, profile=prof)
+            j.refresh_from_db()
+            self.assertEqual(j.status, expected)

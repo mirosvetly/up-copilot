@@ -187,4 +187,7 @@ def score_job(job: JobPosting, *, profile: dict | None = None, track=None) -> Jo
     )
     if job.status == JobPosting.Status.NEW:
         job.transition_to(JobPosting.Status.SCORED)
+        # A clear non-fit never reaches the feed; it stays in "skipped" if you want to look.
+        if result["score"] < settings.FEED_MIN_SCORE:
+            job.transition_to(JobPosting.Status.SKIPPED)
     return obj
