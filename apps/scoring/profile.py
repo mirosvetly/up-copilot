@@ -60,6 +60,7 @@ def track_config(track) -> dict[str, Any]:
         "min_hourly_rate": track.min_hourly_rate,
         "red_flag_phrases": track.red_flag_phrases or [],
         "projects": track.projects or [],
+        "testimonials": track.testimonials or "",
         "job_analysis_prompt": track.job_analysis_prompt or "Score fit 0-100 and justify it.",
         "scorer_role": track.scorer_role or "freelancer",
         "cover_letter_instructions": (

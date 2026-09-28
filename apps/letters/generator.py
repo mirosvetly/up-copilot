@@ -19,12 +19,19 @@ def _system(cfg: dict) -> str:
     return f"{cfg['cover_letter_instructions']} Sign off with:\n{cfg['signoff']}"
 
 
-def _prompt(job: JobPosting, repos: list[Repo], reasoning: str) -> str:
+def _prompt(job: JobPosting, repos: list[Repo], reasoning: str, testimonials: str = "") -> str:
     repo_lines = "\n".join(f"- {r.name}: {r.description} ({', '.join(r.skills)})" for r in repos)
+    reviews = [ln.strip() for ln in testimonials.splitlines() if ln.strip()]
+    review_block = (
+        "Real client reviews (quote at most one, verbatim, translated to English if needed):\n"
+        + "\n".join(f"- {r}" for r in reviews)
+        if reviews else "Client reviews: none available. Do not mention reviews or testimonials."
+    )
     return (
         f"Job title: {job.title}\n\nJob description:\n{job.description}\n\n"
         f"Why it fits (scorer): {reasoning}\n\n"
         f"My relevant GitHub projects:\n{repo_lines}\n\n"
+        f"{review_block}\n\n"
         "Write the cover letter."
     )
 
@@ -71,6 +78,7 @@ def _dedash(text: str) -> str:
     """Strip em/en dashes — Claude adds them despite the prompt, and they read
     as AI-written. Replace with a comma; collapse any doubled commas/spaces."""
     text = re.sub(r"\s*[—–]\s*", ", ", text)
+    text = re.sub(r"(?<=\S) - (?=\S)", ", ", text)  # a spaced hyphen is a dash too; hyphenated-words keep theirs
     text = re.sub(r",\s*,", ",", text)
     return re.sub(r"[ \t]{2,}", " ", text)
 
@@ -83,7 +91,9 @@ def _next_version(job) -> int:
 
 def generate_cover(job: JobPosting) -> CoverLetterDraft:
     cfg = track_config(resolve_track(job))
-    repos = get_github(projects=cfg["projects"]).relevant(job.skills)
+    # ponytail: a track has ~10 projects, so the model gets them all and picks the case that
+    # fits; skill-overlap picking missed e.g. sinhron.io (an app site) for an app landing page.
+    repos = get_github(projects=cfg["projects"]).repos()
     reasoning = job.score.reasoning if getattr(job, "score", None) else ""
     llm = get_llm()
     if llm:
@@ -92,7 +102,7 @@ def generate_cover(job: JobPosting) -> CoverLetterDraft:
         # cosmetic A/B variety, so a provisional count() there is fine.
         # max_tokens must cover claude-sonnet-5's adaptive thinking AND the letter (16000 is the non-streaming default)
         # — at 512 the thinking ate the whole budget and the text came back empty.
-        body = _dedash(llm.complete(_system(cfg), _prompt(job, repos, reasoning), max_tokens=16000))
+        body = _dedash(llm.complete(_system(cfg), _prompt(job, repos, reasoning, cfg.get("testimonials", "")), max_tokens=16000))
         segments = [{"t": body, "src": None}]
         model_name = "anthropic"
     else:

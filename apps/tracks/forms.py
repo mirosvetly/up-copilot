@@ -59,7 +59,7 @@ class TrackForm(forms.ModelForm):
         fields = [
             "name", "mode", "newcomer_mode", "telegram_chat_id", "is_default", "scorer_role", "job_analysis_prompt",
             "cover_letter_instructions", "screening_instructions", "signoff",
-            "skills", "min_hourly_rate", "projects", "red_flag_phrases",
+            "skills", "min_hourly_rate", "projects", "testimonials", "red_flag_phrases",
         ]
         widgets = {
             "job_analysis_prompt": forms.Textarea(attrs={"rows": 5}),

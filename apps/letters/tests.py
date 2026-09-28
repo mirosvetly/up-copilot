@@ -118,3 +118,22 @@ class GeneratorTests(TestCase):
                 generate_cover(job)
         first.refresh_from_db()
         self.assertTrue(first.is_active)  # survivor still active
+
+
+class TestimonialPromptTests(TestCase):
+    def test_reviews_listed_or_explicitly_absent(self):
+        from apps.jobs.models import JobPosting
+
+        from .generator import _prompt
+        j = JobPosting(title="t", description="d")
+        self.assertIn("none available. Do not mention reviews", _prompt(j, [], "", ""))
+        p = _prompt(j, [], "", "Сделал сайт за 3 дня | Иван, CEO, Acme\n\n")
+        self.assertIn("- Сделал сайт за 3 дня | Иван, CEO, Acme", p)
+        self.assertNotIn("none available", p)
+
+
+class DedashTests(TestCase):
+    def test_spaced_hyphen_becomes_comma_but_words_keep_hyphens(self):
+        from .generator import _dedash
+        self.assertEqual(_dedash('"Great work." - Vladimir, founder'), '"Great work.", Vladimir, founder')
+        self.assertEqual(_dedash("a mobile-first, 4-week build — done"), "a mobile-first, 4-week build, done")

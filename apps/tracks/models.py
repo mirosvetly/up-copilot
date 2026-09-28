@@ -53,6 +53,11 @@ class Track(TimeStampedModel):
     min_hourly_rate = models.PositiveSmallIntegerField(default=0)  # USD/hr floor
     projects = models.JSONField(default=list, blank=True)  # [{"repo": str, "skills": [str]}]
     red_flag_phrases = models.JSONField(default=list, blank=True)
+    testimonials = models.TextField(
+        "Отзывы", blank=True,
+        help_text="Настоящие отзывы клиентов, по одному на строку: текст | Имя, должность, компания. "
+                  "Письмо цитирует один подходящий. Пусто: письма отзывы не упоминают",
+    )
 
     class Meta:
         ordering = ("-is_default", "name")
