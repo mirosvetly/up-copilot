@@ -30,14 +30,12 @@ def _text(job: JobPosting) -> str:
 
     score = getattr(job, "score", None)
     c = job.client
-    lines = [
-        f"🎯 Новая под тебя — score {score.score if score else '—'}/100{_age(job)}",
-        "",
-        escape(job.title),
-        f"💵 {escape(_budget(job))}"
-        + (" · ✅ оплата подтверждена" if c and c.verified_payment else "")
-        + (f" · нанимает {c.hire_rate}%" if c and c.hire_rate is not None else ""),
-    ]
+    lines = _head(job)
+    extra = (["✅ оплата подтверждена"] if c and c.verified_payment else []) + (
+        [f"нанимает {c.hire_rate}%"] if c and c.hire_rate is not None else [])
+    if extra:
+        lines.append(" · ".join(extra))
+    lines += ["", f"<b>{escape(job.title)}</b>"]
     if score and score.reasoning:
         lines.append("")
         lines.append(escape(score.reasoning))
@@ -51,7 +49,49 @@ def _age(job: JobPosting) -> str:
     if not job.posted_at:
         return ""
     m = int((timezone.now() - job.posted_at).total_seconds() // 60)
-    return f" · ⏱ {m} мин назад" if m < 120 else f" · ⏱ {m // 60} ч назад"
+    return f"⏱ {m} мин назад" if m < 120 else f"⏱ {m // 60} ч назад"
+
+
+# ponytail: the client countries we actually see; anything else stays in English.
+_COUNTRY_RU = {
+    "United States": "США", "USA": "США", "United Kingdom": "Великобритания", "Canada": "Канада",
+    "Australia": "Австралия", "New Zealand": "Новая Зеландия", "Ireland": "Ирландия",
+    "United Arab Emirates": "ОАЭ", "Saudi Arabia": "Саудовская Аравия", "Qatar": "Катар",
+    "Kuwait": "Кувейт", "Israel": "Израиль", "Turkey": "Турция", "Singapore": "Сингапур",
+    "India": "Индия", "Pakistan": "Пакистан", "Philippines": "Филиппины", "Indonesia": "Индонезия",
+    "Malaysia": "Малайзия", "Japan": "Япония", "Hong Kong": "Гонконг", "China": "Китай",
+    "Nigeria": "Нигерия", "Kenya": "Кения", "Egypt": "Египет", "South Africa": "ЮАР",
+    "Germany": "Германия", "France": "Франция", "Italy": "Италия", "Spain": "Испания",
+    "Portugal": "Португалия", "Netherlands": "Нидерланды", "Belgium": "Бельгия",
+    "Switzerland": "Швейцария", "Austria": "Австрия", "Sweden": "Швеция", "Norway": "Норвегия",
+    "Denmark": "Дания", "Finland": "Финляндия", "Poland": "Польша", "Ukraine": "Украина",
+    "Georgia": "Грузия", "Montenegro": "Черногория", "Serbia": "Сербия", "Cyprus": "Кипр",
+    "Brazil": "Бразилия", "Mexico": "Мексика", "Argentina": "Аргентина",
+}
+
+
+def _points(n: int) -> str:
+    """62 балла, 55 баллов, 21 балл."""
+    if n % 10 == 1 and n % 100 != 11:
+        return f"{n} балл"
+    if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
+        return f"{n} балла"
+    return f"{n} баллов"
+
+
+def _head(job: JobPosting) -> list[str]:
+    """Top lines of every ping, in the order you decide by: price, score, country, age."""
+    from html import escape
+
+    score = getattr(job, "score", None)
+    c = job.client
+    country = c.country if c and c.country else ""
+    lines = [f"💵 {escape(_budget(job))}", f"🎯 {_points(score.score) if score else '—'}"]
+    if country:
+        lines.append(f"🌍 {escape(_COUNTRY_RU.get(country, country))}")
+    if _age(job):
+        lines.append(_age(job))
+    return lines
 
 
 def _card_url(job: JobPosting) -> str:
@@ -127,11 +167,10 @@ def notify_scored_jobs() -> dict:
 def _autopilot_text(job: JobPosting, letter: str) -> str:
     from html import escape
 
-    score = getattr(job, "score", None)
     return "\n".join([
-        f"🤖 Автопилот · score {score.score if score else '—'}/100 · {escape(_budget(job))}{_age(job)}",
+        *_head(job),
         "",
-        f"<b>{escape(job.title)}</b>",
+        f"🤖 <b>{escape(job.title)}</b>",
         "",
         # <pre> gets a one-tap Copy button in Telegram clients.
         f"<pre>{escape(letter)}</pre>",

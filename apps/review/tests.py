@@ -163,6 +163,21 @@ class AgeLabelTests(TestCase):
 
         from .notify import _age
         now = timezone.now()
-        self.assertEqual(_age(JobPosting(posted_at=now - timedelta(minutes=7))), " · ⏱ 7 мин назад")
-        self.assertEqual(_age(JobPosting(posted_at=now - timedelta(hours=5))), " · ⏱ 5 ч назад")
+        self.assertEqual(_age(JobPosting(posted_at=now - timedelta(minutes=7))), "⏱ 7 мин назад")
+        self.assertEqual(_age(JobPosting(posted_at=now - timedelta(hours=5))), "⏱ 5 ч назад")
         self.assertEqual(_age(JobPosting(posted_at=None)), "")
+
+    def test_head_order_and_russian_plurals(self):
+        from django.utils import timezone
+
+        from apps.scoring.models import JobScore
+
+        from .notify import _head, _points
+        self.assertEqual([_points(n) for n in (1, 21, 62, 11, 12, 55)],
+                         ["1 балл", "21 балл", "62 балла", "11 баллов", "12 баллов", "55 баллов"])
+        c = ClientProfile.objects.create(upwork_client_id="ng", country="Nigeria")
+        j = JobPosting.objects.create(job_id="h", title="t", budget_type="fixed", budget_min=100,
+                                      client=c, posted_at=timezone.now())
+        JobScore.objects.create(job=j, score=62, reasoning="r")
+        head = _head(JobPosting.objects.select_related("client", "score").get(pk=j.pk))
+        self.assertEqual(head[:3], ["💵 $100 fixed", "🎯 62 балла", "🌍 Нигерия"])
