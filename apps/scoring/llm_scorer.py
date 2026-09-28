@@ -12,8 +12,9 @@ def _system(profile: dict) -> str:
     newcomer = (
         "NEWCOMER MODE: I have zero Upwork reviews, so the goal right now is the first "
         "reviews, not the biggest jobs. Strongly prefer jobs I can realistically win: "
-        "Entry or Intermediate experience level, small bounded scope (about $100 to $800 "
-        "fixed, or a short hourly task), few connects required. Penalize hard: Expert "
+        "Entry or Intermediate experience level, small bounded scope (up to about $800 fixed, "
+        "and small jobs under $100 are fine when the work is quick: a first review is worth "
+        "more than the money right now, or a short hourly task), few connects required. Penalize hard: Expert "
         "experience level, budgets of $2,000+ that attract veterans with hundreds of jobs, "
         "high connects (crowded postings). "
         if profile.get("newcomer_mode") else ""
