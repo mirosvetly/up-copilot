@@ -1,8 +1,11 @@
-{% load icons i18n %}{% get_current_language as CUR_LANG %}{% get_available_languages as LANGUAGES %}<!DOCTYPE html>
+{% load icons i18n static %}{% get_current_language as CUR_LANG %}{% get_available_languages as LANGUAGES %}<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="{% static 'core/favicon.svg' %}" type="image/svg+xml">
+<link rel="icon" href="{% static 'core/favicon-64.png' %}" type="image/png" sizes="64x64">
+<link rel="apple-touch-icon" href="{% static 'core/apple-touch-icon.png' %}">
 <title>{% block title %}Upwork Copilot{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
