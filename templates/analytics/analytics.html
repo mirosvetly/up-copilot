@@ -15,7 +15,7 @@
 {% endblock %}
 {% block main %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
-  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line)">
+  <div class="uc-head" style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line)">
     <span style="display:inline-flex">{% icon "bar-chart" 17 "var(--accent)" %}</span>
     <div style="font-size:15px;font-weight:600">{% trans "Аналитика" %}</div>
     <div style="width:1px;height:18px;background:var(--line)"></div>
@@ -92,7 +92,7 @@
         {% if money.entries %}
         <div style="margin-top:12px;display:flex;flex-direction:column">
           {% for e in money.entries %}
-          <div style="display:flex;align-items:center;gap:12px;padding:7px 0;border-top:1px solid var(--bg2);font-size:12.5px">
+          <div class="uc-wrap-m" style="display:flex;align-items:center;gap:12px;padding:7px 0;border-top:1px solid var(--bg2);font-size:12.5px">
             <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:var(--muted2);width:84px">{{ e.date|date:"d.m.Y" }}</span>
             <span style="width:130px;color:var(--fg3)">{{ e.get_kind_display }}</span>
             <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:80px;color:{% if e.kind == 'income' %}var(--green){% else %}var(--fg){% endif %}">{% if e.kind == 'income' %}+{% endif %}${{ e.usd|floatformat:2 }}</span>

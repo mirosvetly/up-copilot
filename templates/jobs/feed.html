@@ -6,13 +6,13 @@
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
 
   <!-- header -->
-  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line)">
+  <div class="uc-head" style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line)">
     <span style="display:inline-flex">{% icon "briefcase" 17 "var(--accent)" %}</span>
     <div style="font-size:15px;font-weight:600">{% if is_sent %}{% trans "Отправленные" %}{% else %}{% trans "Лента вакансий" %}{% endif %}</div>
-    <div style="width:1px;height:18px;background:var(--line)"></div>
-    <div style="font-size:12px;color:var(--muted)">Upwork</div>
+    <div class="uc-hide-m" style="width:1px;height:18px;background:var(--line)"></div>
+    <div class="uc-hide-m" style="font-size:12px;color:var(--muted)">Upwork</div>
     <div style="flex:1"></div>
-    <form method="get" style="display:flex;align-items:center;gap:8px;height:34px;padding:0 11px;border-radius:9px;background:var(--bg0);border:1px solid var(--line);width:230px">
+    <form method="get" class="uc-search" style="display:flex;align-items:center;gap:8px;height:34px;padding:0 11px;border-radius:9px;background:var(--bg0);border:1px solid var(--line);width:230px">
       <span style="display:inline-flex">{% icon "search" 15 "var(--muted2)" %}</span>
       <input name="q" value="{{ q }}" placeholder="{% trans "Фильтр по навыку…" %}" style="flex:1;background:transparent;border:none;outline:none;color:var(--fg);font-size:13px;min-width:0"/>
       <input type="hidden" name="sort" value="{{ sort }}"/>
@@ -52,7 +52,7 @@
   </div>
 
   <div style="flex:1;min-height:0;overflow:auto">
-    <div style="display:flex;gap:24px;padding:20px 24px 40px;max-width:1240px;margin:0 auto;align-items:flex-start">
+    <div class="uc-cols" style="display:flex;gap:24px;padding:20px 24px 40px;max-width:1240px;margin:0 auto;align-items:flex-start">
 
       <!-- feed column -->
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
@@ -123,9 +123,9 @@
           <div style="height:4px;width:100%;background:var(--bg3)"><div style="height:100%;width:{{ job.bar_pct }}%;background:{{ job.fresh_color }}"></div></div>
           <div style="padding:15px 18px 16px">
 
-            <div style="display:flex;align-items:flex-start;gap:20px">
+            <div class="uc-card-row" style="display:flex;align-items:flex-start;gap:20px">
               <!-- left: money and client facts, one per line -->
-              <div style="flex:none;width:190px;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding-top:1px">
+              <div class="uc-card-left" style="flex:none;width:190px;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding-top:1px">
                 <span style="font-size:18px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:var(--fg);line-height:1.1">{{ job.budget }}</span>
                 {% if job.country %}<span style="font-size:14px;font-weight:500;color:var(--fg2)">{{ job.flag }} {{ job.country }}</span>{% endif %}
                 {% if not job.verified %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--red)">{% icon "alert-triangle" 13 "var(--red)" %}{% trans "Оплата не подтверждена" %}</span>{% endif %}
@@ -135,7 +135,7 @@
                 {% if job.level %}<span style="font-size:12px;color:{% if job.level == 'Expert' %}var(--red){% else %}var(--muted){% endif %}">{{ job.level }}</span>{% endif %}
               </div>
               <!-- middle: title, then actions -->
-              <div style="flex:1;min-width:0">
+              <div class="uc-card-mid" style="flex:1;min-width:0">
                 <a href="{% url 'jobs:detail' job.id %}" style="display:block;font-size:15.5px;font-weight:600;line-height:1.35;color:var(--fg)">{{ job.title }}</a>
             <!-- actions -->
             <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
@@ -164,7 +164,7 @@
             </div>
               </div>
               <!-- right: score, then the age timer under it -->
-              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:11px">
+              <div class="uc-card-right" style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:11px">
                 {% if job.scoring %}
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
                   <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:9px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.32)">
@@ -198,7 +198,7 @@
       </div>
 
       <!-- right rail -->
-      <div style="width:284px;flex:none;display:flex;flex-direction:column;gap:14px">
+      <div class="uc-rail" style="width:284px;flex:none;display:flex;flex-direction:column;gap:14px">
         <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:16px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
             <span style="display:inline-flex">{% icon "inbox" 15 "var(--accent)" %}</span>
