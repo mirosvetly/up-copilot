@@ -5,19 +5,19 @@
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
 
   <!-- header -->
-  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
-    <a href="{% url 'jobs:feed' %}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 8px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#d4d4d4;font-size:13px;font-weight:500">{% icon "chevron-left" 16 %}{% trans "Лента" %}</a>
-    <div style="width:1px;height:18px;background:#404040"></div>
-    <div style="font-size:12px;color:#a3a3a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px">{{ job.title }}</div>
+  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line)">
+    <a href="{% url 'jobs:feed' %}" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 8px;border:1px solid var(--line);border-radius:9px;background:var(--bg0);color:var(--fg3);font-size:13px;font-weight:500">{% icon "chevron-left" 16 %}{% trans "Лента" %}</a>
+    <div style="width:1px;height:18px;background:var(--line)"></div>
+    <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px">{{ job.title }}</div>
     <div style="flex:1"></div>
     {% with editqs=cover.edit|yesno:"&edit=1," %}
-    <div style="display:flex;background:#0a0a0a;border:1px solid #404040;border-radius:9px;padding:2px;gap:2px" title="{% trans 'Язык содержимого: вакансия, скоринг, письмо' %}">
-      <a href="?lang=ru{{ editqs }}" style="height:28px;display:inline-flex;align-items:center;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;background:{% if content_lang == 'ru' %}#b6d086{% else %}transparent{% endif %};color:{% if content_lang == 'ru' %}#171717{% else %}#a3a3a3{% endif %}">RU</a>
-      <a href="?lang=en{{ editqs }}" style="height:28px;display:inline-flex;align-items:center;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;background:{% if content_lang == 'en' %}#b6d086{% else %}transparent{% endif %};color:{% if content_lang == 'en' %}#171717{% else %}#a3a3a3{% endif %}">EN</a>
+    <div style="display:flex;background:var(--bg0);border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px" title="{% trans 'Язык содержимого: вакансия, скоринг, письмо' %}">
+      <a href="?lang=ru{{ editqs }}" style="height:28px;display:inline-flex;align-items:center;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;background:{% if content_lang == 'ru' %}var(--accent){% else %}transparent{% endif %};color:{% if content_lang == 'ru' %}var(--on-accent){% else %}var(--muted){% endif %}">RU</a>
+      <a href="?lang=en{{ editqs }}" style="height:28px;display:inline-flex;align-items:center;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;background:{% if content_lang == 'en' %}var(--accent){% else %}transparent{% endif %};color:{% if content_lang == 'en' %}var(--on-accent){% else %}var(--muted){% endif %}">EN</a>
     </div>
     {% endwith %}
     {% if translating %}
-    <span id="uc-trspin" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a3a3a3" title="{% trans 'Показан английский оригинал, русский перевод подтянется' %}"><span style="display:inline-flex;animation:ucSpin .8s linear infinite">{% icon "refresh" 13 "#a3a3a3" %}</span>{% trans "Перевод загружается…" %}</span>
+    <span id="uc-trspin" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)" title="{% trans 'Показан английский оригинал, русский перевод подтянется' %}"><span style="display:inline-flex;animation:ucSpin .8s linear infinite">{% icon "refresh" 13 "var(--muted)" %}</span>{% trans "Перевод загружается…" %}</span>
     <script>
     (function(){var n=0,t=setInterval(function(){
       if(++n>25){clearInterval(t);var s=document.getElementById('uc-trspin');if(s)s.style.display='none';return;}
@@ -25,12 +25,12 @@
         if(d.ready){clearInterval(t);location.reload();}}).catch(function(){});},1600);})();
     </script>
     {% endif %}
-    <a href="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% icon "arrow-up-right" 14 %}{% trans "Открыть на Upwork" %}</a>
+    <a href="{% if job.upwork_url %}{{ job.upwork_url }}{% else %}https://www.upwork.com/{% endif %}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:1px solid var(--line);border-radius:9px;background:var(--bg0);color:var(--fg);font-size:13px;font-weight:500">{% icon "arrow-up-right" 14 %}{% trans "Открыть на Upwork" %}</a>
     {% if job.is_sent %}
-      <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#b6d086;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#b6d086" %}{% trans "Отправлено вручную" %}</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:var(--accent);font-size:13px;font-weight:600">{% icon "circle-check" 15 "var(--accent)" %}{% trans "Отправлено вручную" %}</span>
     {% else %}
       <form method="post" action="{% url 'jobs:job_action' pk 'mark_sent' %}"><input type="hidden" name="next" value="/job/{{ pk }}/">{% csrf_token %}
-        <button style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">{% icon "send" 14 "#171717" %}{% trans "Отметить как отправлено" %}</button>
+        <button style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border:none;border-radius:9px;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:600;cursor:pointer">{% icon "send" 14 "var(--on-accent)" %}{% trans "Отметить как отправлено" %}</button>
       </form>
     {% endif %}
   </div>
@@ -47,27 +47,27 @@
             <div style="flex:1;min-width:0">
               <h1 style="font-size:23px;font-weight:700;line-height:1.25;letter-spacing:-0.01em">{{ job.title }}</h1>
               <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:12px">
-                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600">{% icon "dollar" 14 "#b6d086" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
-                <span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600">{% icon "dollar" 14 "var(--accent)" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
+                <span style="width:3px;height:3px;border-radius:20px;background:var(--dim)"></span>
                 <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:{{ job.fresh_color }}">{% icon "clock" 14 job.fresh_color %}{{ job.posted_text }}</span>
-                {% if job.proposals %}<span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
-                <span style="font-size:13px;color:#a3a3a3;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with n=job.proposals %}{{ n }} откликов{% endblocktrans %}</span>{% endif %}
-                {% if job.overheated %}<span style="width:3px;height:3px;border-radius:20px;background:#525252"></span>
-                <span title="{% blocktrans with c=job.connects %}Upwork требует {{ c }} коннектов за отклик, признак высокой конкуренции{% endblocktrans %}" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#f59e0b">{% icon "users" 14 "#f59e0b" %}{% trans "Перегрета откликами" %}</span>{% endif %}
+                {% if job.proposals %}<span style="width:3px;height:3px;border-radius:20px;background:var(--dim)"></span>
+                <span style="font-size:13px;color:var(--muted);font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with n=job.proposals %}{{ n }} откликов{% endblocktrans %}</span>{% endif %}
+                {% if job.overheated %}<span style="width:3px;height:3px;border-radius:20px;background:var(--dim)"></span>
+                <span title="{% blocktrans with c=job.connects %}Upwork требует {{ c }} коннектов за отклик, признак высокой конкуренции{% endblocktrans %}" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--amber)">{% icon "users" 14 "var(--amber)" %}{% trans "Перегрета откликами" %}</span>{% endif %}
               </div>
             </div>
-            <div style="flex:none;text-align:center;background:#171717;border:1px solid {{ job.score_border }};border-radius:11px;padding:8px 12px;min-width:74px">
+            <div style="flex:none;text-align:center;background:var(--bg1);border:1px solid {{ job.score_border }};border-radius:11px;padding:8px 12px;min-width:74px">
               <div style="font-size:24px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};line-height:1">{{ job.score_display }}</div>
-              <div style="font-size:9px;color:#737373;letter-spacing:.06em;text-transform:uppercase;margin-top:2px">{% trans "match score" %}</div>
+              <div style="font-size:9px;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase;margin-top:2px">{% trans "match score" %}</div>
             </div>
           </div>
-          <div style="font-size:11px;color:#737373;margin-top:16px;display:flex;align-items:center;gap:6px">{% icon "search" 12 "#737373" %}{% trans "Навыки вакансии — нажми, чтобы добавить в поиск (и цеплять такие вакансии)" %}</div>
+          <div style="font-size:11px;color:var(--muted2);margin-top:16px;display:flex;align-items:center;gap:6px">{% icon "search" 12 "var(--muted2)" %}{% trans "Навыки вакансии — нажми, чтобы добавить в поиск (и цеплять такие вакансии)" %}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
             {% for tag in job.tags %}
             <form method="post" action="{% url 'jobs:toggle_keyword' pk %}" style="display:inline;margin:0">{% csrf_token %}
               <input type="hidden" name="kw" value="{{ tag.label }}">
               <input type="hidden" name="next" value="{{ request.get_full_path }}">
-              <button type="submit" title="{% if tag.in_search %}{% trans 'В поиске — нажми, чтобы убрать' %}{% else %}{% trans 'Добавить в поиск' %}{% endif %}" style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:6px;cursor:pointer;{% if tag.in_search %}background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.42);color:#4ade80{% elif tag.mine %}background:rgba(182,208,134,0.1);border:1px solid rgba(182,208,134,0.28);color:#c5dc9f{% else %}background:#1f1f1f;border:1px solid #303030;color:#a3a3a3{% endif %}">{% if tag.in_search %}{% icon "check" 12 "#4ade80" %}{% else %}<span style="opacity:.5">+</span>{% endif %}{{ tag.label }}</button>
+              <button type="submit" title="{% if tag.in_search %}{% trans 'В поиске — нажми, чтобы убрать' %}{% else %}{% trans 'Добавить в поиск' %}{% endif %}" style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:6px;cursor:pointer;{% if tag.in_search %}background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.42);color:var(--green){% elif tag.mine %}background:rgba(182,208,134,0.1);border:1px solid rgba(182,208,134,0.28);color:var(--accent-t2){% else %}background:var(--bg2);border:1px solid var(--bg5);color:var(--muted){% endif %}">{% if tag.in_search %}{% icon "check" 12 "var(--green)" %}{% else %}<span style="opacity:.5">+</span>{% endif %}{{ tag.label }}</button>
             </form>
             {% endfor %}
           </div>
@@ -77,18 +77,18 @@
         {% if job.reasons %}
         <div style="background:rgba(182,208,134,0.05);border:1px solid rgba(182,208,134,0.22);border-radius:14px;padding:18px 20px">
           <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
-            <span style="display:inline-flex">{% icon "sparkles" 16 "#b6d086" %}</span>
+            <span style="display:inline-flex">{% icon "sparkles" 16 "var(--accent)" %}</span>
             <span style="font-size:14px;font-weight:600">{% trans "Почему подходит" %}</span>
-            <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with model_name=job.model_name %}скоринг · {{ model_name }}{% endblocktrans %}</span>
+            <span style="font-size:11px;color:var(--muted2);font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with model_name=job.model_name %}скоринг · {{ model_name }}{% endblocktrans %}</span>
             <div style="flex:1"></div>
-            <span style="font-size:12px;color:#a3a3a3">{% trans "итог" %} <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};font-weight:700">{{ job.score_display }}/100</span></span>
+            <span style="font-size:12px;color:var(--muted)">{% trans "итог" %} <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ job.score_color }};font-weight:700">{{ job.score_display }}/100</span></span>
           </div>
           <div style="display:flex;flex-direction:column;gap:9px">
             {% for r in job.reasons %}
             <div style="display:flex;align-items:flex-start;gap:11px">
-              <span style="flex:none;margin-top:1px">{% if r.neg %}{% icon "x" 15 "#f87171" %}{% else %}{% icon "check" 15 "#4ade80" %}{% endif %}</span>
-              <span style="flex:1;font-size:13px;line-height:1.5;color:#d4d4d4">{{ r.text }}</span>
-              <span style="flex:none;font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{% if r.neg %}#f87171{% else %}#4ade80{% endif %};background:{% if r.neg %}rgba(248,113,113,0.12){% else %}rgba(74,222,128,0.12){% endif %};padding:2px 8px;border-radius:6px">{{ r.w }}</span>
+              <span style="flex:none;margin-top:1px">{% if r.neg %}{% icon "x" 15 "var(--red)" %}{% else %}{% icon "check" 15 "var(--green)" %}{% endif %}</span>
+              <span style="flex:1;font-size:13px;line-height:1.5;color:var(--fg3)">{{ r.text }}</span>
+              <span style="flex:none;font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{% if r.neg %}var(--red){% else %}var(--green){% endif %};background:{% if r.neg %}rgba(248,113,113,0.12){% else %}rgba(74,222,128,0.12){% endif %};padding:2px 8px;border-radius:6px">{{ r.w }}</span>
             </div>
             {% endfor %}
           </div>
@@ -96,9 +96,9 @@
         {% endif %}
 
         <!-- description -->
-        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">{% trans "Описание вакансии" %}</div>
-          <p style="font-size:14px;line-height:1.65;color:#d4d4d4;white-space:pre-wrap;margin:0">{{ job.description }}</p>
+        <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:18px 20px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">{% trans "Описание вакансии" %}</div>
+          <p style="font-size:14px;line-height:1.65;color:var(--fg3);white-space:pre-wrap;margin:0">{{ job.description }}</p>
         </div>
 
         <!-- cover letter -->
@@ -111,77 +111,77 @@
       <!-- right column -->
       <div style="width:300px;flex:none;display:flex;flex-direction:column;gap:14px">
         {% if job.client_card %}{% with c=job.client_card %}
-        <div style="background:#171717;border:1px solid #404040;border-radius:14px;overflow:hidden">
-          <div style="padding:15px 18px;border-bottom:1px solid #262626;display:flex;align-items:center;gap:9px">
-            <span style="display:inline-flex">{% icon "users" 15 "#a3a3a3" %}</span>
+        <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;overflow:hidden">
+          <div style="padding:15px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:9px">
+            <span style="display:inline-flex">{% icon "users" 15 "var(--muted)" %}</span>
             <span style="font-size:13px;font-weight:600">{% trans "Карточка клиента" %}</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:{{ c.risk_bg }}">
             <span style="display:inline-flex">{% icon c.risk_icon 17 c.risk_color %}</span>
             <span style="font-size:14px;font-weight:700;color:{{ c.risk_color }}">{{ c.risk_label }}</span>
             <div style="flex:1"></div>
-            <span style="font-size:11px;color:#a3a3a3">{% trans "визитка риска" %}</span>
+            <span style="font-size:11px;color:var(--muted)">{% trans "визитка риска" %}</span>
           </div>
           <div style="padding:16px 18px">
-            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
-              <span style="display:inline-flex;flex:none">{% if c.verified %}{% icon "circle-check" 16 "#4ade80" %}{% else %}{% icon "alert-triangle" 16 "#f87171" %}{% endif %}</span>
-              <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Оплата" %}</span>
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--bg2)">
+              <span style="display:inline-flex;flex:none">{% if c.verified %}{% icon "circle-check" 16 "var(--green)" %}{% else %}{% icon "alert-triangle" 16 "var(--red)" %}{% endif %}</span>
+              <span style="flex:1;font-size:13px;color:var(--muted)">{% trans "Оплата" %}</span>
               <span style="font-size:13px;font-weight:600;color:{{ c.pay_color }}">{{ c.pay_text }}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
-              <span style="display:inline-flex;flex:none">{% icon "wallet" 15 "#737373" %}</span>
-              <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Всего потрачено" %}</span>
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--bg2)">
+              <span style="display:inline-flex;flex:none">{% icon "wallet" 15 "var(--muted2)" %}</span>
+              <span style="flex:1;font-size:13px;color:var(--muted)">{% trans "Всего потрачено" %}</span>
               <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.spent }}</span>
             </div>
-            <div style="padding:10px 0;border-bottom:1px solid #1f1f1f">
+            <div style="padding:10px 0;border-bottom:1px solid var(--bg2)">
               <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
-                <span style="display:inline-flex;flex:none">{% icon "trending-up" 15 "#737373" %}</span>
-                <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Hire rate" %}</span>
+                <span style="display:inline-flex;flex:none">{% icon "trending-up" 15 "var(--muted2)" %}</span>
+                <span style="flex:1;font-size:13px;color:var(--muted)">{% trans "Hire rate" %}</span>
                 <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ c.hire_color }}">{{ c.hire_rate }}%</span>
               </div>
-              <div style="height:5px;border-radius:20px;background:#262626;overflow:hidden"><div style="height:100%;width:{{ c.hire_rate }}%;background:{{ c.hire_color }}"></div></div>
+              <div style="height:5px;border-radius:20px;background:var(--line2);overflow:hidden"><div style="height:100%;width:{{ c.hire_rate }}%;background:{{ c.hire_color }}"></div></div>
             </div>
-            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
-              <span style="display:inline-flex;flex:none">{% icon "map-pin" 15 "#737373" %}</span>
-              <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Страна" %}</span>
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--bg2)">
+              <span style="display:inline-flex;flex:none">{% icon "map-pin" 15 "var(--muted2)" %}</span>
+              <span style="flex:1;font-size:13px;color:var(--muted)">{% trans "Страна" %}</span>
               <span style="font-size:13px;font-weight:500">{{ c.country }}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #1f1f1f">
-              <span style="display:inline-flex;flex:none">{% icon "star" 15 "#facc15" %}</span>
-              <span style="flex:1;font-size:13px;color:#a3a3a3">{% trans "Рейтинг" %}</span>
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--bg2)">
+              <span style="display:inline-flex;flex:none">{% icon "star" 15 "var(--yellow)" %}</span>
+              <span style="flex:1;font-size:13px;color:var(--muted)">{% trans "Рейтинг" %}</span>
               <span style="font-size:13px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.rating_text }}</span>
             </div>
             <div style="display:flex;gap:10px;padding:12px 0 2px">
-              <div style="flex:1;background:#0a0a0a;border:1px solid #262626;border-radius:9px;padding:9px 11px">
+              <div style="flex:1;background:var(--bg0);border:1px solid var(--line2);border-radius:9px;padding:9px 11px">
                 <div style="font-size:16px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.jobs }}</div>
-                <div style="font-size:10.5px;color:#737373;margin-top:1px">{% trans "вакансий" %}</div>
+                <div style="font-size:10.5px;color:var(--muted2);margin-top:1px">{% trans "вакансий" %}</div>
               </div>
-              <div style="flex:1;background:#0a0a0a;border:1px solid #262626;border-radius:9px;padding:9px 11px">
+              <div style="flex:1;background:var(--bg0);border:1px solid var(--line2);border-radius:9px;padding:9px 11px">
                 <div style="font-size:16px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ c.hires }}</div>
-                <div style="font-size:10.5px;color:#737373;margin-top:1px">{% trans "наймов" %}</div>
+                <div style="font-size:10.5px;color:var(--muted2);margin-top:1px">{% trans "наймов" %}</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;padding-top:12px;font-size:11px;color:#737373">{% icon "clock" 12 "#525252" %}{% blocktrans with member_since=c.member_since %}На Upwork с {{ member_since }}{% endblocktrans %}</div>
+            <div style="display:flex;align-items:center;gap:6px;padding-top:12px;font-size:11px;color:var(--muted2)">{% icon "clock" 12 "var(--dim)" %}{% blocktrans with member_since=c.member_since %}На Upwork с {{ member_since }}{% endblocktrans %}</div>
           </div>
         </div>
         {% endwith %}{% endif %}
 
-        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px 18px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#a3a3a3;margin-bottom:12px">{% trans "Статус в трекере" %}</div>
+        <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:16px 18px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">{% trans "Статус в трекере" %}</div>
           <div style="display:flex;align-items:center;gap:10px">
             <span style="width:9px;height:9px;border-radius:20px;background:{{ job.status_color }};flex:none"></span>
             <span style="font-size:14px;font-weight:600;color:{{ job.status_color }}">{{ job.status_label }}</span>
           </div>
-          <div style="font-size:12px;color:#737373;line-height:1.5;margin-top:8px">{{ job.status_hint }}</div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.5;margin-top:8px">{{ job.status_hint }}</div>
           {% if job.is_sent %}
-          <form method="post" action="{% url 'jobs:job_tracking' job.id %}" style="margin-top:14px;padding-top:14px;border-top:1px solid #262626;display:flex;flex-direction:column;gap:10px">{% csrf_token %}
-            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#d4d4d4">{% trans "Потрачено коннектов" %}
-              <input type="number" name="connects_spent" min="0" max="32000" value="{{ job.connects_spent|default_if_none:'' }}" placeholder="{{ job.connects|default_if_none:'21' }}" style="margin-left:auto;width:80px;height:30px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa;font-family:'Geist Mono',ui-monospace,Menlo,monospace">
+          <form method="post" action="{% url 'jobs:job_tracking' job.id %}" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line2);display:flex;flex-direction:column;gap:10px">{% csrf_token %}
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--fg3)">{% trans "Потрачено коннектов" %}
+              <input type="number" name="connects_spent" min="0" max="32000" value="{{ job.connects_spent|default_if_none:'' }}" placeholder="{{ job.connects|default_if_none:'21' }}" style="margin-left:auto;width:80px;height:30px;padding:0 8px;background:var(--bg0);border:1px solid var(--line);border-radius:7px;color:var(--fg);font-family:'Geist Mono',ui-monospace,Menlo,monospace">
             </label>
-            <div style="font-size:11.5px;color:#737373;margin-top:-4px">{% trans "Отклик плюс буст, например 21 + 69 = 90" %}</div>
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#d4d4d4"><input type="checkbox" name="interviewed" {% if job.interviewed %}checked{% endif %}>{% trans "Клиент ответил или позвал на собеседование" %}</label>
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#d4d4d4"><input type="checkbox" name="hired" {% if job.hired %}checked{% endif %}>{% trans "Нанял" %}</label>
-            <button style="align-self:flex-start;height:32px;padding:0 14px;border:none;border-radius:8px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">{% trans "Сохранить" %}</button>
+            <div style="font-size:11.5px;color:var(--muted2);margin-top:-4px">{% trans "Отклик плюс буст, например 21 + 69 = 90" %}</div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg3)"><input type="checkbox" name="interviewed" {% if job.interviewed %}checked{% endif %}>{% trans "Клиент ответил или позвал на собеседование" %}</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg3)"><input type="checkbox" name="hired" {% if job.hired %}checked{% endif %}>{% trans "Нанял" %}</label>
+            <button style="align-self:flex-start;height:32px;padding:0 14px;border:none;border-radius:8px;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:600;cursor:pointer">{% trans "Сохранить" %}</button>
           </form>
           {% endif %}
         </div>

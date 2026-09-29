@@ -48,6 +48,7 @@ def icon(name, size=16, color="currentColor"):
     body = ICONS.get(name, "")
     return mark_safe(
         f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" '
-        f'stroke="{color}" stroke-width="2" stroke-linecap="round" '
-        f'stroke-linejoin="round" style="flex:none;display:block">{body}</svg>'
+        f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" '
+        # stroke via style, not the attribute: SVG attributes don't resolve var(--theme) colors
+        f'style="stroke:{color};flex:none;display:block">{body}</svg>'
     )

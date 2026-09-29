@@ -52,27 +52,27 @@ def _age_parts(m):
 
 def _fresh_meta(m):
     if m is None:
-        return "—", "#737373", "rgba(115,115,115,0.16)"
+        return "—", "var(--muted2)", "rgba(115,115,115,0.16)"
     if m <= 15:
-        return _("Свежая"), "#b6d086", "rgba(182,208,134,0.14)"
+        return _("Свежая"), "var(--accent)", "rgba(182,208,134,0.14)"
     if m <= 45:
-        return _("Стареет"), "#f59e0b", "rgba(245,158,11,0.14)"
-    return _("Устарела"), "#737373", "rgba(115,115,115,0.16)"
+        return _("Стареет"), "var(--amber)", "rgba(245,158,11,0.14)"
+    return _("Устарела"), "var(--muted2)", "rgba(115,115,115,0.16)"
 
 
 def _score_meta(s):
     if s is None:
-        return "#8a8a8a", "rgba(138,138,138,0.1)", "rgba(138,138,138,0.28)"
+        return "var(--muted3)", "rgba(138,138,138,0.1)", "rgba(138,138,138,0.28)"
     if s > 75:
-        return "#4ade80", "rgba(74,222,128,0.1)", "rgba(74,222,128,0.3)"
+        return "var(--green)", "rgba(74,222,128,0.1)", "rgba(74,222,128,0.3)"
     if s >= 50:
-        return "#facc15", "rgba(250,204,21,0.1)", "rgba(250,204,21,0.3)"
-    return "#8a8a8a", "rgba(138,138,138,0.1)", "rgba(138,138,138,0.28)"
+        return "var(--yellow)", "rgba(250,204,21,0.1)", "rgba(250,204,21,0.3)"
+    return "var(--muted3)", "rgba(138,138,138,0.1)", "rgba(138,138,138,0.28)"
 
 
 def _hire_color(h):
     h = h or 0
-    return "#4ade80" if h >= 70 else "#f59e0b" if h >= 40 else "#f87171"
+    return "var(--green)" if h >= 70 else "var(--amber)" if h >= 40 else "var(--red)"
 
 
 def _budget(job):
@@ -152,7 +152,7 @@ def job_card(job, *, my_skills_lc=None):
         "new_client": bool(client) and client.total_spent is not None and client.total_spent == 0,
         "state": state,
         "card_border": "rgba(74,222,128,0.4)" if state == "approved"
-        else "rgba(182,208,134,0.4)" if state == "sent" else "#404040",
+        else "rgba(182,208,134,0.4)" if state == "sent" else "var(--line)",
         "card_opacity": "0.42" if state == "skipped" else "1",
     }
 
@@ -161,19 +161,19 @@ _RU_MONTHS = ["", "января", "февраля", "марта", "апреля"
               "августа", "сентября", "октября", "ноября", "декабря"]
 
 _RISK_META = {
-    "low": (_("Низкий риск"), "#4ade80", "rgba(74,222,128,0.08)", "circle-check"),
-    "med": (_("Средний риск"), "#f59e0b", "rgba(245,158,11,0.08)", "alert-triangle"),
-    "high": (_("Высокий риск"), "#f87171", "rgba(248,113,113,0.08)", "alert-triangle"),
+    "low": (_("Низкий риск"), "var(--green)", "rgba(74,222,128,0.08)", "circle-check"),
+    "med": (_("Средний риск"), "var(--amber)", "rgba(245,158,11,0.08)", "alert-triangle"),
+    "high": (_("Высокий риск"), "var(--red)", "rgba(248,113,113,0.08)", "alert-triangle"),
 }
 
 _STATUS_TRACKER = {
-    JobPosting.Status.NEW: (_("Новая — на ревью"), "#a3a3a3", _("Ещё не оценена.")),
-    JobPosting.Status.SCORED: (_("Оценена — на ревью"), "#a3a3a3", _("Просмотри и одобри или пропусти.")),
-    JobPosting.Status.DRAFTED: (_("Черновик готов"), "#facc15", _("Письмо сгенерировано, ждёт одобрения.")),
-    JobPosting.Status.REVIEWED: (_("Одобрено"), "#4ade80", _("В очереди на ручную отправку. Открой на Upwork и отправь.")),
-    JobPosting.Status.APPLIED: (_("Отправлено вручную"), "#b6d086", _("Отмечено как отправленное. Жди ответа клиента.")),
-    JobPosting.Status.SKIPPED: (_("Пропущено"), "#737373", _("Исключена из ленты. Можно вернуть.")),
-    JobPosting.Status.EXPIRED: (_("Устарела"), "#737373", _("Публикация устарела.")),
+    JobPosting.Status.NEW: (_("Новая — на ревью"), "var(--muted)", _("Ещё не оценена.")),
+    JobPosting.Status.SCORED: (_("Оценена — на ревью"), "var(--muted)", _("Просмотри и одобри или пропусти.")),
+    JobPosting.Status.DRAFTED: (_("Черновик готов"), "var(--yellow)", _("Письмо сгенерировано, ждёт одобрения.")),
+    JobPosting.Status.REVIEWED: (_("Одобрено"), "var(--green)", _("В очереди на ручную отправку. Открой на Upwork и отправь.")),
+    JobPosting.Status.APPLIED: (_("Отправлено вручную"), "var(--accent)", _("Отмечено как отправленное. Жди ответа клиента.")),
+    JobPosting.Status.SKIPPED: (_("Пропущено"), "var(--muted2)", _("Исключена из ленты. Можно вернуть.")),
+    JobPosting.Status.EXPIRED: (_("Устарела"), "var(--muted2)", _("Публикация устарела.")),
 }
 
 
@@ -233,7 +233,7 @@ def job_detail(job, lang="ru"):
             "risk_label": risk[0], "risk_color": risk[1], "risk_bg": risk[2], "risk_icon": risk[3],
             "verified": client.verified_payment,
             "pay_text": _("Подтверждена") if client.verified_payment else _("Не подтверждена"),
-            "pay_color": "#4ade80" if client.verified_payment else "#f87171",
+            "pay_color": "var(--green)" if client.verified_payment else "var(--red)",
             "spent": _fmt_spent(client.total_spent),
             "hire_rate": client.hire_rate or 0,
             "hire_color": _hire_color(client.hire_rate),

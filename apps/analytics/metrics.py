@@ -67,7 +67,7 @@ def keywords(limit: int = 7) -> list[dict]:
     mx = max((r["conv"] for r in rows), default=1) or 1
     for r in rows:
         r["bar_w"] = round(r["conv"] / mx * 100)
-        r["color"] = "#4ade80" if r["conv"] >= 30 else "#facc15" if r["conv"] >= 15 else "#8a8a8a"
+        r["color"] = "var(--green)" if r["conv"] >= 30 else "var(--yellow)" if r["conv"] >= 15 else "var(--muted3)"
     return rows
 
 
@@ -88,7 +88,7 @@ def heatmap() -> dict:
                 "text": v if v else "",
                 "bg": f"rgba(182,208,134,{alpha:.3f})",
                 "border": "1px solid rgba(182,208,134,0.5)" if v >= max(2, mx * 0.7) else "1px solid transparent",
-                "text_color": "#171717" if v >= max(2, mx * 0.7) else "#c5dc9f",
+                "text_color": "#171717" if v >= max(2, mx * 0.7) else "var(--accent-t2)",
             })
         rows.append({"day": day, "cells": cells})
     return {"buckets": _BUCKETS, "rows": rows}

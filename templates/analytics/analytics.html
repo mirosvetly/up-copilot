@@ -15,49 +15,49 @@
 {% endblock %}
 {% block main %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
-  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
-    <span style="display:inline-flex">{% icon "bar-chart" 17 "#b6d086" %}</span>
+  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line)">
+    <span style="display:inline-flex">{% icon "bar-chart" 17 "var(--accent)" %}</span>
     <div style="font-size:15px;font-weight:600">{% trans "Аналитика" %}</div>
-    <div style="width:1px;height:18px;background:#404040"></div>
-    <div style="font-size:12px;color:#a3a3a3">{% blocktrans with tz=TIME_ZONE_NAME %}Живые данные · часовой пояс {{ tz }} ·{% endblocktrans %} <a href="{% url 'analytics:metrics' %}" style="color:#b6d086">/metrics</a></div>
+    <div style="width:1px;height:18px;background:var(--line)"></div>
+    <div style="font-size:12px;color:var(--muted)">{% blocktrans with tz=TIME_ZONE_NAME %}Живые данные · часовой пояс {{ tz }} ·{% endblocktrans %} <a href="{% url 'analytics:metrics' %}" style="color:var(--accent)">/metrics</a></div>
   </div>
 
   <div style="flex:1;min-height:0;overflow:auto">
     <div style="padding:24px;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:20px">
 
       <!-- daily proposals habit -->
-      <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+      <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:20px">
         <div style="display:flex;align-items:flex-start;gap:28px;flex-wrap:wrap">
           <div style="min-width:180px">
-            <div style="font-size:12px;color:#a3a3a3;margin-bottom:8px">{% trans "Сегодня" %}</div>
-            <div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:34px;font-weight:700;color:{% if habit.today_left %}#fafafa{% else %}#b6d086{% endif %}">{{ habit.today }}<span style="font-size:18px;color:#737373"> / {{ habit.goal }}</span></div>
-            <div style="height:6px;border-radius:20px;background:#262626;overflow:hidden;margin-top:10px;width:180px"><div style="height:100%;width:{% widthratio habit.today habit.goal 100 %}%;max-width:100%;background:#b6d086"></div></div>
-            <div style="font-size:12.5px;color:#a3a3a3;margin-top:8px">{% if habit.today_left %}{% blocktrans count n=habit.today_left %}ещё {{ n }} отклик до цели{% plural %}ещё {{ n }} отклика до цели{% endblocktrans %}{% else %}{% trans "Цель дня выполнена 🎯" %}{% endif %}</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">{% trans "Сегодня" %}</div>
+            <div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:34px;font-weight:700;color:{% if habit.today_left %}var(--fg){% else %}var(--accent){% endif %}">{{ habit.today }}<span style="font-size:18px;color:var(--muted2)"> / {{ habit.goal }}</span></div>
+            <div style="height:6px;border-radius:20px;background:var(--line2);overflow:hidden;margin-top:10px;width:180px"><div style="height:100%;width:{% widthratio habit.today habit.goal 100 %}%;max-width:100%;background:var(--accent)"></div></div>
+            <div style="font-size:12.5px;color:var(--muted);margin-top:8px">{% if habit.today_left %}{% blocktrans count n=habit.today_left %}ещё {{ n }} отклик до цели{% plural %}ещё {{ n }} отклика до цели{% endblocktrans %}{% else %}{% trans "Цель дня выполнена 🎯" %}{% endif %}</div>
           </div>
           <div style="min-width:150px">
-            <div style="font-size:12px;color:#a3a3a3;margin-bottom:8px">{% trans "Серия" %}</div>
-            <div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:34px;font-weight:700;color:{% if habit.streak %}#f59e0b{% else %}#525252{% endif %}">🔥 {{ habit.streak }}</div>
-            <div style="font-size:12.5px;color:#a3a3a3;margin-top:8px">{% blocktrans with b=habit.best %}рекорд: {{ b }} дн. подряд{% endblocktrans %}</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">{% trans "Серия" %}</div>
+            <div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:34px;font-weight:700;color:{% if habit.streak %}var(--amber){% else %}var(--dim){% endif %}">🔥 {{ habit.streak }}</div>
+            <div style="font-size:12.5px;color:var(--muted);margin-top:8px">{% blocktrans with b=habit.best %}рекорд: {{ b }} дн. подряд{% endblocktrans %}</div>
           </div>
           <!-- calendar: columns are weeks, rows Mon..Sun -->
           <div style="flex:1;min-width:300px">
-            <div style="font-size:12px;color:#a3a3a3;margin-bottom:8px">{% blocktrans with t=habit.total %}Отклики по дням · всего {{ t }}{% endblocktrans %}</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">{% blocktrans with t=habit.total %}Отклики по дням · всего {{ t }}{% endblocktrans %}</div>
             <div style="display:flex;gap:4px">
               {% for week in habit.weeks %}<div style="display:flex;flex-direction:column;gap:4px">
-                {% for d in week %}<span title="{{ d.date|date:'j E' }}: {{ d.n }}" style="width:14px;height:14px;border-radius:3px;{% if d.future %}background:transparent{% elif d.level == 3 %}background:#b6d086{% elif d.level == 2 %}background:rgba(182,208,134,0.6){% elif d.level == 1 %}background:rgba(182,208,134,0.3){% else %}background:#262626{% endif %};{% if d.today %}outline:1.5px solid #fafafa;outline-offset:1px{% endif %}"></span>{% endfor %}
+                {% for d in week %}<span title="{{ d.date|date:'j E' }}: {{ d.n }}" style="width:14px;height:14px;border-radius:3px;{% if d.future %}background:transparent{% elif d.level == 3 %}background:var(--accent){% elif d.level == 2 %}background:rgba(182,208,134,0.6){% elif d.level == 1 %}background:rgba(182,208,134,0.3){% else %}background:var(--line2){% endif %};{% if d.today %}outline:1.5px solid var(--fg);outline-offset:1px{% endif %}"></span>{% endfor %}
               </div>{% endfor %}
             </div>
-            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#737373">{% trans "меньше" %}
-              <span style="width:11px;height:11px;border-radius:2px;background:#262626"></span><span style="width:11px;height:11px;border-radius:2px;background:rgba(182,208,134,0.3)"></span><span style="width:11px;height:11px;border-radius:2px;background:rgba(182,208,134,0.6)"></span><span style="width:11px;height:11px;border-radius:2px;background:#b6d086"></span>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:var(--muted2)">{% trans "меньше" %}
+              <span style="width:11px;height:11px;border-radius:2px;background:var(--line2)"></span><span style="width:11px;height:11px;border-radius:2px;background:rgba(182,208,134,0.3)"></span><span style="width:11px;height:11px;border-radius:2px;background:rgba(182,208,134,0.6)"></span><span style="width:11px;height:11px;border-radius:2px;background:var(--accent)"></span>
               {% blocktrans with g=habit.goal %}цель ({{ g }}+){% endblocktrans %}</div>
           </div>
         </div>
         <!-- trophies -->
-        <div style="margin-top:18px;padding-top:16px;border-top:1px solid #262626">
-          <div style="font-size:12px;color:#a3a3a3;margin-bottom:10px">{% blocktrans with u=habit.unlocked n=habit.trophies|length %}Кубки · {{ u }} из {{ n }}{% endblocktrans %}{% if habit.next %} · {% trans "следующий:" %} <span style="color:#fafafa">{{ habit.next.emoji }} {{ habit.next.title }}</span>{% endif %}</div>
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line2)">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">{% blocktrans with u=habit.unlocked n=habit.trophies|length %}Кубки · {{ u }} из {{ n }}{% endblocktrans %}{% if habit.next %} · {% trans "следующий:" %} <span style="color:var(--fg)">{{ habit.next.emoji }} {{ habit.next.title }}</span>{% endif %}</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             {% for t in habit.trophies %}
-            <div title="{{ t.title }}" style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:9px;font-size:12.5px;{% if t.unlocked %}background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:#fafafa{% else %}background:#0a0a0a;border:1px solid #262626;color:#525252;filter:grayscale(1){% endif %}">
+            <div title="{{ t.title }}" style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:9px;font-size:12.5px;{% if t.unlocked %}background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.35);color:var(--fg){% else %}background:var(--bg0);border:1px solid var(--line2);color:var(--dim);filter:grayscale(1){% endif %}">
               <span style="font-size:16px">{{ t.emoji }}</span>{{ t.title }}{% if not t.unlocked and t.kind == "total" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё {{ n }}{% endblocktrans %}</span>{% elif not t.unlocked and t.kind == "income" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё ${{ n }}{% endblocktrans %}</span>{% elif not t.unlocked and t.kind == "streak" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:11px">· {% blocktrans with n=t.left %}ещё {{ n }} дн.{% endblocktrans %}</span>{% endif %}
             </div>
             {% endfor %}
@@ -66,39 +66,39 @@
       </div>
 
       <!-- money -->
-      <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+      <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:20px">
         <div style="font-size:14px;font-weight:600;margin-bottom:14px">{% trans "Деньги" %}</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
-          <div><div style="font-size:12px;color:#a3a3a3">{% trans "Потрачено" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:#f87171">${{ money.spent|floatformat:2 }}</div></div>
-          <div><div style="font-size:12px;color:#a3a3a3">{% trans "Заработано" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:#4ade80">${{ money.income|floatformat:2 }}</div></div>
-          <div><div style="font-size:12px;color:#a3a3a3">{% trans "Итог" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:{% if money.net < 0 %}#f87171{% else %}#4ade80{% endif %}">{% if money.net < 0 %}−{% else %}+{% endif %}${{ money.net_abs|floatformat:2 }}</div></div>
-          <div><div style="font-size:12px;color:#a3a3a3">{% trans "Коннекты: осталось" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700">{{ money.balance }}</div><div style="font-size:11.5px;color:#737373">{% blocktrans with b=money.bought u=money.used %}куплено {{ b }}, потрачено {{ u }}{% endblocktrans %}</div></div>
+          <div><div style="font-size:12px;color:var(--muted)">{% trans "Потрачено" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:var(--red)">${{ money.spent|floatformat:2 }}</div></div>
+          <div><div style="font-size:12px;color:var(--muted)">{% trans "Заработано" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:var(--green)">${{ money.income|floatformat:2 }}</div></div>
+          <div><div style="font-size:12px;color:var(--muted)">{% trans "Итог" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700;color:{% if money.net < 0 %}var(--red){% else %}var(--green){% endif %}">{% if money.net < 0 %}−{% else %}+{% endif %}${{ money.net_abs|floatformat:2 }}</div></div>
+          <div><div style="font-size:12px;color:var(--muted)">{% trans "Коннекты: осталось" %}</div><div style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:24px;font-weight:700">{{ money.balance }}</div><div style="font-size:11.5px;color:var(--muted2)">{% blocktrans with b=money.bought u=money.used %}куплено {{ b }}, потрачено {{ u }}{% endblocktrans %}</div></div>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:12.5px;color:#a3a3a3">
-          <span>{% trans "1 коннект" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#fafafa">${{ money.price|floatformat:2 }}</b></span>
-          <span>{% trans "1 отклик" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#fafafa">{% if money.per_proposal is not None %}${{ money.per_proposal|floatformat:2 }}{% else %}—{% endif %}</b> <span style="color:#737373">({% blocktrans with l=money.logged s=money.sent %}коннекты указаны у {{ l }} из {{ s }}{% endblocktrans %})</span></span>
-          <span>{% trans "1 собеседование" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#fafafa">{% if money.per_interview %}${{ money.per_interview|floatformat:2 }}{% else %}—{% endif %}</b></span>
-          <span>{% trans "1 заказ" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#fafafa">{% if money.per_hire %}${{ money.per_hire|floatformat:2 }}{% else %}—{% endif %}</b></span>
+        <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:12.5px;color:var(--muted)">
+          <span>{% trans "1 коннект" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:var(--fg)">${{ money.price|floatformat:2 }}</b></span>
+          <span>{% trans "1 отклик" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:var(--fg)">{% if money.per_proposal is not None %}${{ money.per_proposal|floatformat:2 }}{% else %}—{% endif %}</b> <span style="color:var(--muted2)">({% blocktrans with l=money.logged s=money.sent %}коннекты указаны у {{ l }} из {{ s }}{% endblocktrans %})</span></span>
+          <span>{% trans "1 собеседование" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:var(--fg)">{% if money.per_interview %}${{ money.per_interview|floatformat:2 }}{% else %}—{% endif %}</b></span>
+          <span>{% trans "1 заказ" %} ≈ <b style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:var(--fg)">{% if money.per_hire %}${{ money.per_hire|floatformat:2 }}{% else %}—{% endif %}</b></span>
         </div>
-        <form method="post" action="{% url 'analytics:money_add' %}" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid #262626">{% csrf_token %}
-          <select name="kind" style="height:32px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa;padding:0 8px">{% for v, l in money.kinds %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select>
-          <input name="usd" type="number" step="0.01" min="0" placeholder="$" style="width:90px;height:32px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa">
-          <input name="connects" type="number" min="0" placeholder="{% trans 'коннектов' %}" style="width:110px;height:32px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa">
-          <input name="date" type="date" style="height:32px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa;color-scheme:dark">
-          <input name="note" maxlength="120" placeholder="{% trans 'заметка' %}" style="flex:1;min-width:140px;height:32px;padding:0 8px;background:#0a0a0a;border:1px solid #404040;border-radius:7px;color:#fafafa">
-          <button style="height:32px;padding:0 14px;border:none;border-radius:8px;background:#b6d086;color:#171717;font-size:13px;font-weight:600;cursor:pointer">{% trans "Добавить" %}</button>
+        <form method="post" action="{% url 'analytics:money_add' %}" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--line2)">{% csrf_token %}
+          <select name="kind" style="height:32px;background:var(--bg0);border:1px solid var(--line);border-radius:7px;color:var(--fg);padding:0 8px">{% for v, l in money.kinds %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select>
+          <input name="usd" type="number" step="0.01" min="0" placeholder="$" style="width:90px;height:32px;padding:0 8px;background:var(--bg0);border:1px solid var(--line);border-radius:7px;color:var(--fg)">
+          <input name="connects" type="number" min="0" placeholder="{% trans 'коннектов' %}" style="width:110px;height:32px;padding:0 8px;background:var(--bg0);border:1px solid var(--line);border-radius:7px;color:var(--fg)">
+          <input name="date" type="date" style="height:32px;padding:0 8px;background:var(--bg0);border:1px solid var(--line);border-radius:7px;color:var(--fg);color-scheme:dark">
+          <input name="note" maxlength="120" placeholder="{% trans 'заметка' %}" style="flex:1;min-width:140px;height:32px;padding:0 8px;background:var(--bg0);border:1px solid var(--line);border-radius:7px;color:var(--fg)">
+          <button style="height:32px;padding:0 14px;border:none;border-radius:8px;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:600;cursor:pointer">{% trans "Добавить" %}</button>
         </form>
-        <div style="font-size:11.5px;color:#737373;margin-top:6px">{% trans "Стартовый баланс или бесплатные ежемесячные коннекты: «Покупка коннектов» на $0. Доход: сколько пришло после комиссии Upwork" %}</div>
+        <div style="font-size:11.5px;color:var(--muted2);margin-top:6px">{% trans "Стартовый баланс или бесплатные ежемесячные коннекты: «Покупка коннектов» на $0. Доход: сколько пришло после комиссии Upwork" %}</div>
         {% if money.entries %}
         <div style="margin-top:12px;display:flex;flex-direction:column">
           {% for e in money.entries %}
-          <div style="display:flex;align-items:center;gap:12px;padding:7px 0;border-top:1px solid #1f1f1f;font-size:12.5px">
-            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#737373;width:84px">{{ e.date|date:"d.m.Y" }}</span>
-            <span style="width:130px;color:#d4d4d4">{{ e.get_kind_display }}</span>
-            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:80px;color:{% if e.kind == 'income' %}#4ade80{% else %}#fafafa{% endif %}">{% if e.kind == 'income' %}+{% endif %}${{ e.usd|floatformat:2 }}</span>
-            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:90px;color:#a3a3a3">{% if e.connects %}{{ e.connects }} {% trans "кон." %}{% endif %}</span>
-            <span style="flex:1;color:#737373">{{ e.note }}</span>
-            <form method="post" action="{% url 'analytics:money_delete' e.id %}" onsubmit="return confirm('{% trans "Удалить запись?" %}')" style="margin:0">{% csrf_token %}<button style="border:none;background:none;color:#525252;cursor:pointer;font-size:12px">{% trans "удалить" %}</button></form>
+          <div style="display:flex;align-items:center;gap:12px;padding:7px 0;border-top:1px solid var(--bg2);font-size:12.5px">
+            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:var(--muted2);width:84px">{{ e.date|date:"d.m.Y" }}</span>
+            <span style="width:130px;color:var(--fg3)">{{ e.get_kind_display }}</span>
+            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:80px;color:{% if e.kind == 'income' %}var(--green){% else %}var(--fg){% endif %}">{% if e.kind == 'income' %}+{% endif %}${{ e.usd|floatformat:2 }}</span>
+            <span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:90px;color:var(--muted)">{% if e.connects %}{{ e.connects }} {% trans "кон." %}{% endif %}</span>
+            <span style="flex:1;color:var(--muted2)">{{ e.note }}</span>
+            <form method="post" action="{% url 'analytics:money_delete' e.id %}" onsubmit="return confirm('{% trans "Удалить запись?" %}')" style="margin:0">{% csrf_token %}<button style="border:none;background:none;color:var(--dim);cursor:pointer;font-size:12px">{% trans "удалить" %}</button></form>
           </div>
           {% endfor %}
         </div>
@@ -108,8 +108,8 @@
       <!-- stat cards -->
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px">
         {% for s in stats %}
-        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:16px 18px">
-          <div style="font-size:12px;color:#a3a3a3;margin-bottom:10px">{{ s.label }}</div>
+        <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:16px 18px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">{{ s.label }}</div>
           <span style="font-size:26px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ s.value }}</span>
         </div>
         {% endfor %}
@@ -117,67 +117,67 @@
 
       <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:20px;align-items:start">
         <!-- funnel -->
-        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+        <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:20px">
           <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
-            <span style="display:inline-flex">{% icon "filter" 16 "#b6d086" %}</span>
+            <span style="display:inline-flex">{% icon "filter" 16 "var(--accent)" %}</span>
             <span style="font-size:14px;font-weight:600">{% trans "Воронка" %}</span>
           </div>
-          <div style="font-size:12px;color:#737373;margin-bottom:18px">{% trans "найдено → скоринг → черновик → одобрено → отправлено → интервью → найм" %}</div>
+          <div style="font-size:12px;color:var(--muted2);margin-bottom:18px">{% trans "найдено → скоринг → черновик → одобрено → отправлено → интервью → найм" %}</div>
           <div style="display:flex;flex-direction:column;gap:9px">
             {% for f in funnel %}
             <div style="display:flex;align-items:center;gap:14px">
-              <span style="width:104px;flex:none;font-size:12.5px;color:#d4d4d4">{{ f.label }}</span>
-              <div style="flex:1;height:30px;background:#0a0a0a;border-radius:7px;overflow:hidden">
+              <span style="width:104px;flex:none;font-size:12.5px;color:var(--fg3)">{{ f.label }}</span>
+              <div style="flex:1;height:30px;background:var(--bg0);border-radius:7px;overflow:hidden">
                 <div style="height:100%;width:{{ f.pct }}%;background:{{ f.color }};border-radius:7px;display:flex;align-items:center;padding-left:11px">
                   <span style="font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ f.text_color }}">{{ f.count }}</span>
                 </div>
               </div>
-              <span style="width:52px;flex:none;text-align:right;font-size:11.5px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:#737373">{{ f.conv }}</span>
+              <span style="width:52px;flex:none;text-align:right;font-size:11.5px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:var(--muted2)">{{ f.conv }}</span>
             </div>
             {% endfor %}
           </div>
         </div>
 
         <!-- keywords -->
-        <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+        <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:20px">
           <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
-            <span style="display:inline-flex">{% icon "zap" 16 "#b6d086" %}</span>
+            <span style="display:inline-flex">{% icon "zap" 16 "var(--accent)" %}</span>
             <span style="font-size:14px;font-weight:600">{% trans "Конверсия по ключевым словам" %}</span>
           </div>
-          <div style="font-size:12px;color:#737373;margin-bottom:18px">{% trans "доля откликов, дошедших до отправки" %}</div>
+          <div style="font-size:12px;color:var(--muted2);margin-bottom:18px">{% trans "доля откликов, дошедших до отправки" %}</div>
           <div style="display:flex;flex-direction:column;gap:12px">
             {% for k in keywords %}
             <div>
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
                 <span style="flex:1;font-size:12.5px;font-weight:500;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ k.kw }}</span>
                 <span style="font-size:12px;font-weight:700;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ k.color }}">{{ k.conv }}%</span>
-                <span style="font-size:11px;color:#737373;font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:52px;text-align:right">n={{ k.n }}</span>
+                <span style="font-size:11px;color:var(--muted2);font-family:'Geist Mono',ui-monospace,Menlo,monospace;width:52px;text-align:right">n={{ k.n }}</span>
               </div>
-              <div style="height:8px;background:#0a0a0a;border-radius:20px;overflow:hidden"><div style="height:100%;width:{{ k.bar_w }}%;background:{{ k.color }};border-radius:20px"></div></div>
+              <div style="height:8px;background:var(--bg0);border-radius:20px;overflow:hidden"><div style="height:100%;width:{{ k.bar_w }}%;background:{{ k.color }};border-radius:20px"></div></div>
             </div>
             {% empty %}
-            <div style="font-size:12px;color:#737373">{% trans "Пока нет данных." %}</div>
+            <div style="font-size:12px;color:var(--muted2)">{% trans "Пока нет данных." %}</div>
             {% endfor %}
           </div>
         </div>
       </div>
 
       <!-- heatmap -->
-      <div style="background:#171717;border:1px solid #404040;border-radius:14px;padding:20px">
+      <div style="background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:20px">
         <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px">
-          <span style="display:inline-flex">{% icon "activity" 16 "#b6d086" %}</span>
+          <span style="display:inline-flex">{% icon "activity" 16 "var(--accent)" %}</span>
           <span style="font-size:14px;font-weight:600">{% trans "Когда публикуются лучшие вакансии" %}</span>
           <div style="flex:1"></div>
-          <span style="font-size:11.5px;color:#737373">{% trans "кол-во вакансий score &gt; 75, по 3-часовым окнам" %}</span>
+          <span style="font-size:11.5px;color:var(--muted2)">{% trans "кол-во вакансий score &gt; 75, по 3-часовым окнам" %}</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:5px">
           <div style="display:grid;grid-template-columns:38px repeat(8,1fr);gap:5px;align-items:center">
             <span></span>
-            {% for b in heat.buckets %}<span style="font-size:10.5px;color:#737373;text-align:center;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ b }}</span>{% endfor %}
+            {% for b in heat.buckets %}<span style="font-size:10.5px;color:var(--muted2);text-align:center;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ b }}</span>{% endfor %}
           </div>
           {% for row in heat.rows %}
           <div style="display:grid;grid-template-columns:38px repeat(8,1fr);gap:5px;align-items:center">
-            <span style="font-size:11.5px;color:#a3a3a3;font-weight:500">{{ row.day }}</span>
+            <span style="font-size:11.5px;color:var(--muted);font-weight:500">{{ row.day }}</span>
             {% for c in row.cells %}
             <div style="height:30px;border-radius:6px;background:{{ c.bg }};border:{{ c.border }};display:flex;align-items:center;justify-content:center">
               <span style="font-size:11px;font-weight:600;font-family:'Geist Mono',ui-monospace,Menlo,monospace;color:{{ c.text_color }}">{{ c.text }}</span>

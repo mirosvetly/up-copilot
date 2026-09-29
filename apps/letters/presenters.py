@@ -17,15 +17,15 @@ def cover_context(draft, *, edit=False) -> dict:
             c = cmap[src]
             segments.append({
                 "t": s["t"], "bg": c + "22", "border": f"1.5px solid {c}",
-                "radius": "3px", "pad": "1px 2px", "color": "#f0f0f0",
+                "radius": "3px", "pad": "1px 2px", "color": "var(--fg2)",
                 "title": gettext("Взято из %(src)s") % {"src": src},
             })
         else:
             segments.append({
                 "t": s["t"], "bg": "transparent", "border": "none",
-                "radius": "0", "pad": "0", "color": "#e5e5e5", "title": "",
+                "radius": "0", "pad": "0", "color": "var(--fg2)", "title": "",
             })
-    legend = [{"label": name, "color": cmap.get(name, "#b6d086")} for name in draft.sources]
+    legend = [{"label": name, "color": cmap.get(name, "var(--accent)")} for name in draft.sources]
     return {
         "id": draft.id,
         "version": draft.version,

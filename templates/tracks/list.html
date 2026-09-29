@@ -3,41 +3,41 @@
 {% block title %}{% trans "Настройки · Треки · Upwork Copilot" %}{% endblock %}
 {% block main %}
 <div style="display:flex;flex-direction:column;height:100%;min-height:0">
-  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #404040">
-    <span style="display:inline-flex">{% icon "sliders" 17 "#b6d086" %}</span>
+  <div style="height:60px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line)">
+    <span style="display:inline-flex">{% icon "sliders" 17 "var(--accent)" %}</span>
     <div style="font-size:15px;font-weight:600">{% trans "Треки — персоны для откликов" %}</div>
     <div style="flex:1"></div>
-    <a href="{% url 'tracks:create' %}" style="display:inline-flex;align-items:center;gap:7px;background:#b6d086;color:#141414;font-size:13px;font-weight:600;padding:8px 14px;border-radius:9px">
-      {% icon "plus" 15 "#141414" %} {% trans "Новый трек" %}
+    <a href="{% url 'tracks:create' %}" style="display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:600;padding:8px 14px;border-radius:9px">
+      {% icon "plus" 15 "var(--on-accent)" %} {% trans "Новый трек" %}
     </a>
   </div>
 
   <div style="flex:1;min-height:0;overflow:auto">
     <div style="padding:24px;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
       {% for m in messages %}
-      <div style="background:rgba(182,208,134,0.12);border:1px solid #b6d086;border-radius:10px;padding:11px 15px;font-size:13px;color:#d9ecc0">{{ m }}</div>
+      <div style="background:rgba(182,208,134,0.12);border:1px solid var(--accent);border-radius:10px;padding:11px 15px;font-size:13px;color:var(--accent-t1)">{{ m }}</div>
       {% endfor %}
 
-      <div style="font-size:13px;color:#a3a3a3;line-height:1.5">
+      <div style="font-size:13px;color:var(--muted);line-height:1.5">
         {% trans "Каждый сохранённый поиск привязан к треку — вакансии из него скорятся и получают черновик под этой персоной. Привяжите поиск к треку в разделе поисков (или в /admin)." %}
       </div>
 
       {% for t in tracks %}
-      <a href="{% url 'tracks:edit' t.pk %}" style="display:flex;align-items:center;gap:14px;background:#171717;border:1px solid #404040;border-radius:14px;padding:18px 20px">
-        <span style="width:36px;height:36px;border-radius:9px;background:rgba(182,208,134,0.14);display:flex;align-items:center;justify-content:center;flex:none">{% icon "user" 18 "#b6d086" %}</span>
+      <a href="{% url 'tracks:edit' t.pk %}" style="display:flex;align-items:center;gap:14px;background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:18px 20px">
+        <span style="width:36px;height:36px;border-radius:9px;background:rgba(182,208,134,0.14);display:flex;align-items:center;justify-content:center;flex:none">{% icon "user" 18 "var(--accent)" %}</span>
         <div style="flex:1;min-width:0">
           <div style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:9px">
             {{ t.name }}
-            {% if t.is_default %}<span style="font-size:11px;font-weight:500;color:#b6d086;background:rgba(182,208,134,0.12);padding:2px 8px;border-radius:6px">{% trans "по умолчанию" %}</span>{% endif %}
-            {% if t.mode == "autopilot" %}<span style="font-size:11px;font-weight:500;color:#fbbf24;background:rgba(251,191,36,0.12);padding:2px 8px;border-radius:6px">{% trans "автопилот" %}</span>{% elif t.mode == "off" %}<span style="font-size:11px;font-weight:500;color:#737373;background:rgba(115,115,115,0.15);padding:2px 8px;border-radius:6px">{% trans "выключен" %}</span>{% endif %}
-            {% if t.newcomer_mode %}<span style="font-size:11px;font-weight:500;color:#6cc4ff;background:rgba(108,196,255,0.12);padding:2px 8px;border-radius:6px">{% trans "режим новичка" %}</span>{% endif %}
+            {% if t.is_default %}<span style="font-size:11px;font-weight:500;color:var(--accent);background:rgba(182,208,134,0.12);padding:2px 8px;border-radius:6px">{% trans "по умолчанию" %}</span>{% endif %}
+            {% if t.mode == "autopilot" %}<span style="font-size:11px;font-weight:500;color:var(--amber2);background:rgba(251,191,36,0.12);padding:2px 8px;border-radius:6px">{% trans "автопилот" %}</span>{% elif t.mode == "off" %}<span style="font-size:11px;font-weight:500;color:var(--muted2);background:rgba(115,115,115,0.15);padding:2px 8px;border-radius:6px">{% trans "выключен" %}</span>{% endif %}
+            {% if t.newcomer_mode %}<span style="font-size:11px;font-weight:500;color:var(--blue);background:rgba(108,196,255,0.12);padding:2px 8px;border-radius:6px">{% trans "режим новичка" %}</span>{% endif %}
           </div>
-          <div style="font-size:12.5px;color:#a3a3a3;margin-top:3px;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with role=t.scorer_role rate=t.min_hourly_rate n_skills=t.skills|length n_filters=t.filters.count %}{{ role }} · ${{ rate }}/час · {{ n_skills }} навык(ов) · {{ n_filters }} поиск(ов){% endblocktrans %}</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:3px;font-family:'Geist Mono',ui-monospace,Menlo,monospace">{% blocktrans with role=t.scorer_role rate=t.min_hourly_rate n_skills=t.skills|length n_filters=t.filters.count %}{{ role }} · ${{ rate }}/час · {{ n_skills }} навык(ов) · {{ n_filters }} поиск(ов){% endblocktrans %}</div>
         </div>
-        <span style="display:inline-flex;color:#525252">{% icon "chevron-right" 18 "#525252" %}</span>
+        <span style="display:inline-flex;color:var(--dim)">{% icon "chevron-right" 18 "var(--dim)" %}</span>
       </a>
       {% empty %}
-      <div style="color:#a3a3a3;font-size:14px;padding:20px 0">{% trans "Пока нет ни одного трека. Создайте первый." %}</div>
+      <div style="color:var(--muted);font-size:14px;padding:20px 0">{% trans "Пока нет ни одного трека. Создайте первый." %}</div>
       {% endfor %}
     </div>
   </div>

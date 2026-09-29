@@ -3,13 +3,15 @@
 <link rel="icon" href="{% static 'core/favicon.svg' %}?v=2" type="image/svg+xml">
 <link rel="icon" href="{% static 'core/favicon-64.png' %}?v=2" type="image/png" sizes="64x64">
 <link rel="apple-touch-icon" href="{% static 'core/apple-touch-icon.png' %}?v=2">
+<link rel="stylesheet" href="{% static 'core/theme.css' %}?v=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('uc-theme')||'auto'}catch(e){document.documentElement.dataset.theme='auto'}</script>
 <title>{% trans "Вход · Upwork Copilot" %}</title>
 <style>
-  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;color:#fafafa;font-family:-apple-system,system-ui,sans-serif}
-  form{width:min(340px,100% - 32px);background:#171717;border:1px solid #404040;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px}
-  input{height:40px;padding:0 12px;background:#0a0a0a;border:1px solid #404040;border-radius:9px;color:#fafafa;font-size:15px}
-  button{height:40px;border:none;border-radius:9px;background:#b6d086;color:#171717;font-weight:600;font-size:15px;cursor:pointer}
-  .err{color:#fca5a5;font-size:13px}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg0);color:var(--fg);font-family:-apple-system,system-ui,sans-serif}
+  form{width:min(340px,100% - 32px);background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px}
+  input{height:40px;padding:0 12px;background:var(--bg0);border:1px solid var(--line);border-radius:9px;color:var(--fg);font-size:15px}
+  button{height:40px;border:none;border-radius:9px;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:15px;cursor:pointer}
+  .err{color:var(--red2);font-size:13px}
 </style></head>
 <body>
 <form method="post">{% csrf_token %}
