@@ -140,7 +140,7 @@
             <!-- actions -->
             <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
               {% if job.state == "new" %}
-                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 18px;border-radius:9px;background:var(--accent);color:var(--on-accent);font-size:13.5px;font-weight:600">{% trans "Открыть вакансию" %} {% icon "arrow-up-right" 15 "var(--on-accent)" %}</a>
+                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 18px;border-radius:9px;background:var(--accent);color:var(--on-accent);font-size:13.5px;font-weight:600">{% trans "Открыть" %} {% icon "arrow-up-right" 15 "var(--on-accent)" %}</a>
                 <form method="post" action="{% url 'jobs:job_action' job.id 'skip' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
                   <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 16px;border:1px solid var(--line);border-radius:9px;background:var(--bg0);color:var(--muted);font-size:13.5px;font-weight:500;cursor:pointer">{% icon "x" 15 %}{% trans "Пропустить" %}</button>
                 </form>
