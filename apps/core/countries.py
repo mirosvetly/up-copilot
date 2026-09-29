@@ -14,6 +14,10 @@ COUNTRY_RU = {
     "Switzerland": "Швейцария", "Austria": "Австрия", "Sweden": "Швеция", "Norway": "Норвегия",
     "Denmark": "Дания", "Finland": "Финляндия", "Poland": "Польша", "Ukraine": "Украина",
     "Georgia": "Грузия", "Montenegro": "Черногория", "Serbia": "Сербия", "Cyprus": "Кипр",
+    "Greece": "Греция", "Romania": "Румыния", "Bulgaria": "Болгария", "Czech Republic": "Чехия",
+    "Hungary": "Венгрия", "Lithuania": "Литва", "Latvia": "Латвия", "Estonia": "Эстония",
+    "LBR": "Либерия", "Liberia": "Либерия", "Ghana": "Гана", "Morocco": "Марокко",
+    "Thailand": "Таиланд", "Vietnam": "Вьетнам", "South Korea": "Южная Корея", "Taiwan": "Тайвань",
     "Brazil": "Бразилия", "Mexico": "Мексика", "Argentina": "Аргентина",
 }
 
