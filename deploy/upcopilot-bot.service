@@ -1,0 +1,13 @@
+[Unit]
+Description=Upwork Copilot Telegram bot (button taps: sent / approve / skip)
+After=network.target
+
+[Service]
+User=upcopilot
+WorkingDirectory=/srv/upcopilot/app
+ExecStart=/srv/upcopilot/venv/bin/python manage.py run_bot
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

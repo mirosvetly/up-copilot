@@ -181,3 +181,18 @@ class AgeLabelTests(TestCase):
         JobScore.objects.create(job=j, score=62, reasoning="r")
         head = _head(JobPosting.objects.select_related("client", "score").get(pk=j.pk))
         self.assertEqual(head[:3], ["💵 $100 fixed", "🎯 62 балла", "🇳🇬 Нигерия"])
+
+
+class SentButtonTests(TestCase):
+    def test_sent_button_marks_once_and_is_in_every_ping(self):
+        from asgiref.sync import async_to_sync
+
+        from .bot import _mark_sent
+        from .notify import _buttons
+        j = JobPosting.objects.create(job_id="sb", title="t", budget_type="fixed", status=JobPosting.Status.SCORED)
+        self.assertEqual(_buttons(j)[1], [{"text": "✅ Отправил", "callback_data": f"sent:{j.pk}"}])
+        self.assertTrue(async_to_sync(_mark_sent)(j.pk))
+        j.refresh_from_db()
+        self.assertEqual(j.status, JobPosting.Status.APPLIED)
+        self.assertIsNotNone(j.applied_at)  # counts toward the streak
+        self.assertFalse(async_to_sync(_mark_sent)(j.pk))  # a second tap changes nothing

@@ -25,4 +25,5 @@ sudo -u upcopilot /srv/upcopilot/venv/bin/pip install -q -r requirements.txt
 sudo -u upcopilot /srv/upcopilot/venv/bin/python manage.py migrate --noinput
 sudo -u upcopilot /srv/upcopilot/venv/bin/python manage.py collectstatic --noinput -v 0
 systemctl restart upcopilot
+systemctl restart upcopilot-bot 2>/dev/null || true
 systemctl is-active upcopilot'

@@ -34,6 +34,16 @@ def _transition(pk, target):
     JobPosting.objects.get(pk=pk).transition_to(target)
 
 
+@sync_to_async
+def _mark_sent(pk) -> bool:
+    """True when this tap moved the job to "applied"; False if it already was (or is gone)."""
+    job = JobPosting.objects.filter(pk=pk).first()
+    if not job or job.status == JobPosting.Status.APPLIED:
+        return False
+    job.transition_to(JobPosting.Status.APPLIED)
+    return True
+
+
 def build_dispatcher():
     from aiogram import Dispatcher, F
     from aiogram.types import CallbackQuery
@@ -49,6 +59,18 @@ def build_dispatcher():
     async def skip(cb: "CallbackQuery"):
         await _transition(int(cb.data.split(":")[1]), JobPosting.Status.SKIPPED)
         await cb.answer("Пропущено")
+
+    @dp.callback_query(F.data.startswith("sent:"))
+    async def sent(cb: "CallbackQuery"):
+        # Sent straight from Telegram to Upwork: one tap here counts it (streak, stats).
+        try:
+            fresh = await _mark_sent(int(cb.data.split(":")[1]))
+        except ValueError:
+            fresh = False
+        await cb.answer("✅ Отмечено как отправлено" if fresh else "Уже отмечено")
+        from aiogram.types import InlineKeyboardMarkup
+        rows = [[b for b in row if not b.callback_data] for row in cb.message.reply_markup.inline_keyboard]
+        await cb.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[r for r in rows if r]))
 
     return dp
 

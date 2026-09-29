@@ -88,7 +88,8 @@ def _buttons(job: JobPosting) -> list[list[dict]] | None:
     upwork = _safe_url((job.raw or {}).get("url", ""))
     if upwork:
         row.append({"text": "🔗 Открыть на Upwork", "url": upwork})
-    return [row]
+    # Tapped after sending on Upwork; handled by the run_bot service (callback, not a URL).
+    return [row, [{"text": "✅ Отправил", "callback_data": f"sent:{job.pk}"}]]
 
 
 def send_telegram(text: str, buttons: list | None = None, *, chat_id: str = "", html: bool = False) -> bool:
