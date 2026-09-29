@@ -12,6 +12,7 @@ import logging
 from django.conf import settings
 from django.utils import timezone
 
+from apps.core.countries import ru_country
 from apps.jobs.models import JobPosting
 from apps.jobs.presenters import _budget, _safe_url
 
@@ -52,24 +53,6 @@ def _age(job: JobPosting) -> str:
     return f"⏱ {m} мин назад" if m < 120 else f"⏱ {m // 60} ч назад"
 
 
-# ponytail: the client countries we actually see; anything else stays in English.
-_COUNTRY_RU = {
-    "United States": "США", "USA": "США", "United Kingdom": "Великобритания", "Canada": "Канада",
-    "Australia": "Австралия", "New Zealand": "Новая Зеландия", "Ireland": "Ирландия",
-    "United Arab Emirates": "ОАЭ", "Saudi Arabia": "Саудовская Аравия", "Qatar": "Катар",
-    "Kuwait": "Кувейт", "Israel": "Израиль", "Turkey": "Турция", "Singapore": "Сингапур",
-    "India": "Индия", "Pakistan": "Пакистан", "Philippines": "Филиппины", "Indonesia": "Индонезия",
-    "Malaysia": "Малайзия", "Japan": "Япония", "Hong Kong": "Гонконг", "China": "Китай",
-    "Nigeria": "Нигерия", "Kenya": "Кения", "Egypt": "Египет", "South Africa": "ЮАР",
-    "Germany": "Германия", "France": "Франция", "Italy": "Италия", "Spain": "Испания",
-    "Portugal": "Португалия", "Netherlands": "Нидерланды", "Belgium": "Бельгия",
-    "Switzerland": "Швейцария", "Austria": "Австрия", "Sweden": "Швеция", "Norway": "Норвегия",
-    "Denmark": "Дания", "Finland": "Финляндия", "Poland": "Польша", "Ukraine": "Украина",
-    "Georgia": "Грузия", "Montenegro": "Черногория", "Serbia": "Сербия", "Cyprus": "Кипр",
-    "Brazil": "Бразилия", "Mexico": "Мексика", "Argentina": "Аргентина",
-}
-
-
 def _points(n: int) -> str:
     """62 балла, 55 баллов, 21 балл."""
     if n % 10 == 1 and n % 100 != 11:
@@ -88,7 +71,7 @@ def _head(job: JobPosting) -> list[str]:
     country = c.country if c and c.country else ""
     lines = [f"💵 {escape(_budget(job))}", f"🎯 {_points(score.score) if score else '—'}"]
     if country:
-        lines.append(f"🌍 {escape(_COUNTRY_RU.get(country, country))}")
+        lines.append(f"🌍 {escape(ru_country(country))}")
     if _age(job):
         lines.append(_age(job))
     return lines

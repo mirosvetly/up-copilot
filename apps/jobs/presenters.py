@@ -11,6 +11,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from apps.core.countries import ru_country
 from apps.scoring.profile import resolve_track, track_config
 
 from .models import JobPosting
@@ -144,6 +145,7 @@ def job_card(job, *, my_skills_lc=None):
         "connects": connects,
         "overheated": overheated,
         "level": (job.raw or {}).get("experienceLevel") or "",
+        "country": ru_country(client.country if client else ""),
         "state": state,
         "card_border": "rgba(74,222,128,0.4)" if state == "approved"
         else "rgba(182,208,134,0.4)" if state == "sent" else "#404040",
