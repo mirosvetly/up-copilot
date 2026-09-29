@@ -123,11 +123,9 @@
           <div style="height:4px;width:100%;background:#232323"><div style="height:100%;width:{{ job.bar_pct }}%;background:{{ job.fresh_color }}"></div></div>
           <div style="padding:15px 18px 16px">
 
-            <div style="display:flex;align-items:flex-start;gap:16px">
-              <!-- left: title + budget/verified/hire meta -->
-              <div style="flex:1;min-width:0">
-                <a href="{% url 'jobs:detail' job.id %}" style="display:block;font-size:15.5px;font-weight:600;line-height:1.35;color:#fafafa">{{ job.title }}</a>
-                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:11px">
+            <div style="display:flex;align-items:flex-start;gap:20px">
+              <!-- left: money and client facts, one per line -->
+              <div style="flex:none;width:190px;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding-top:2px">
                   <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#fafafa">{% icon "dollar" 14 "#b6d086" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.budget }}</span></span>
                   {% if job.verified %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#4ade80">{% icon "circle-check" 13 "#4ade80" %}{% trans "Оплата подтверждена" %}</span>
                   {% else %}<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#f87171">{% icon "alert-triangle" 13 "#f87171" %}{% trans "Оплата не подтверждена" %}</span>{% endif %}
@@ -135,7 +133,35 @@
                   {% if job.connects is not None %}<span title="{% blocktrans with c=job.connects %}Upwork требует {{ c }} коннектов за отклик. Чем больше, тем выше конкуренция{% endblocktrans %}" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;{% if job.overheated %}font-weight:600;color:#f59e0b{% else %}color:#a3a3a3{% endif %}">{% icon "users" 13 job.overheated|yesno:"#f59e0b,#737373" %}<span style="font-family:'Geist Mono',ui-monospace,Menlo,monospace">{{ job.connects }}</span> {% trans "коннектов" %}{% if job.overheated %} · {% trans "перегрета" %}{% endif %}</span>{% endif %}
                   {% if job.country %}<span style="font-size:12px;color:#a3a3a3">🌍 {{ job.country }}</span>{% endif %}
                   {% if job.level %}<span style="font-size:12px;color:{% if job.level == 'Expert' %}#f87171{% else %}#a3a3a3{% endif %}">{{ job.level }}</span>{% endif %}
-                </div>
+              </div>
+              <!-- middle: title, then actions -->
+              <div style="flex:1;min-width:0">
+                <a href="{% url 'jobs:detail' job.id %}" style="display:block;font-size:15.5px;font-weight:600;line-height:1.35;color:#fafafa">{{ job.title }}</a>
+            <!-- actions -->
+            <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
+              {% if job.state == "new" %}
+                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 18px;border-radius:9px;background:#b6d086;color:#171717;font-size:13.5px;font-weight:600">{% trans "Открыть вакансию" %} {% icon "arrow-up-right" 15 "#171717" %}</a>
+                <form method="post" action="{% url 'jobs:job_action' job.id 'skip' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
+                  <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:13.5px;font-weight:500;cursor:pointer">{% icon "x" 15 %}{% trans "Пропустить" %}</button>
+                </form>
+              {% elif job.state == "approved" %}
+                <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#4ade80" %}{% trans "В очереди на отправку" %}</span>
+                <form method="post" action="{% url 'jobs:job_action' job.id 'undo' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
+                  <button style="height:36px;padding:0 12px;border:none;border-radius:9px;background:transparent;color:#737373;font-size:12.5px;cursor:pointer">{% trans "Отменить" %}</button>
+                </form>
+                <div style="flex:1"></div>
+                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% trans "Открыть детально" %} {% icon "arrow-up-right" 14 %}</a>
+              {% elif job.state == "sent" %}
+                <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.3);color:#b6d086;font-size:13px;font-weight:600">{% icon "send" 14 "#b6d086" %}{% trans "Отправлено вручную" %}</span>
+                <div style="flex:1"></div>
+                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% trans "Открыть детально" %} {% icon "arrow-up-right" 14 %}</a>
+              {% elif job.state == "skipped" %}
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#737373">{% icon "x" 15 %}{% trans "Пропущено" %}</span>
+                <form method="post" action="{% url 'jobs:job_action' job.id 'undo' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
+                  <button style="height:34px;padding:0 12px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:12.5px;cursor:pointer">{% trans "Вернуть в ленту" %}</button>
+                </form>
+              {% endif %}
+            </div>
               </div>
               <!-- right: score, then the age timer under it -->
               <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:11px">
@@ -163,32 +189,6 @@
                   <span style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:20px;color:{{ job.fresh_color }};background:{{ job.fresh_soft }}">{{ job.fresh_label }}</span>
                 </div>
               </div>
-            </div>
-
-            <!-- actions -->
-            <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
-              {% if job.state == "new" %}
-                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 18px;border-radius:9px;background:#b6d086;color:#171717;font-size:13.5px;font-weight:600">{% trans "Открыть вакансию" %} {% icon "arrow-up-right" 15 "#171717" %}</a>
-                <form method="post" action="{% url 'jobs:job_action' job.id 'skip' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
-                  <button style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:13.5px;font-weight:500;cursor:pointer">{% icon "x" 15 %}{% trans "Пропустить" %}</button>
-                </form>
-              {% elif job.state == "approved" %}
-                <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;font-size:13px;font-weight:600">{% icon "circle-check" 15 "#4ade80" %}{% trans "В очереди на отправку" %}</span>
-                <form method="post" action="{% url 'jobs:job_action' job.id 'undo' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
-                  <button style="height:36px;padding:0 12px;border:none;border-radius:9px;background:transparent;color:#737373;font-size:12.5px;cursor:pointer">{% trans "Отменить" %}</button>
-                </form>
-                <div style="flex:1"></div>
-                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% trans "Открыть детально" %} {% icon "arrow-up-right" 14 %}</a>
-              {% elif job.state == "sent" %}
-                <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:rgba(182,208,134,0.12);border:1px solid rgba(182,208,134,0.3);color:#b6d086;font-size:13px;font-weight:600">{% icon "send" 14 "#b6d086" %}{% trans "Отправлено вручную" %}</span>
-                <div style="flex:1"></div>
-                <a href="{% url 'jobs:detail' job.id %}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#fafafa;font-size:13px;font-weight:500">{% trans "Открыть детально" %} {% icon "arrow-up-right" 14 %}</a>
-              {% elif job.state == "skipped" %}
-                <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#737373">{% icon "x" 15 %}{% trans "Пропущено" %}</span>
-                <form method="post" action="{% url 'jobs:job_action' job.id 'undo' %}"><input type="hidden" name="next" value="{{ nextqs }}">{% csrf_token %}
-                  <button style="height:34px;padding:0 12px;border:1px solid #404040;border-radius:9px;background:#0a0a0a;color:#a3a3a3;font-size:12.5px;cursor:pointer">{% trans "Вернуть в ленту" %}</button>
-                </form>
-              {% endif %}
             </div>
           </div>
         </div>
