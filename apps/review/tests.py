@@ -180,4 +180,4 @@ class AgeLabelTests(TestCase):
                                       client=c, posted_at=timezone.now())
         JobScore.objects.create(job=j, score=62, reasoning="r")
         head = _head(JobPosting.objects.select_related("client", "score").get(pk=j.pk))
-        self.assertEqual(head[:3], ["💵 $100 fixed", "🎯 62 балла", "🌍 Нигерия"])
+        self.assertEqual(head[:3], ["💵 $100 fixed", "🎯 62 балла", "🇳🇬 Нигерия"])

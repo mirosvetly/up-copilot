@@ -12,7 +12,7 @@ import logging
 from django.conf import settings
 from django.utils import timezone
 
-from apps.core.countries import ru_country
+from apps.core.countries import flag, ru_country
 from apps.jobs.models import JobPosting
 from apps.jobs.presenters import _budget, _safe_url
 
@@ -71,7 +71,7 @@ def _head(job: JobPosting) -> list[str]:
     country = c.country if c and c.country else ""
     lines = [f"💵 {escape(_budget(job))}", f"🎯 {_points(score.score) if score else '—'}"]
     if country:
-        lines.append(f"🌍 {escape(ru_country(country))}")
+        lines.append(f"{flag(country)} {escape(ru_country(country))}")
     if _age(job):
         lines.append(_age(job))
     return lines

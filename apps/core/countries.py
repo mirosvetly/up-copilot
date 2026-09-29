@@ -25,3 +25,27 @@ COUNTRY_RU = {
 def ru_country(name: str) -> str:
     name = (name or "").strip()
     return COUNTRY_RU.get(name, name)
+
+
+# ISO 3166 alpha-2 codes, for the flag emoji. Same keys as COUNTRY_RU.
+_ISO = {
+    "United States": "US", "USA": "US", "United Kingdom": "GB", "Canada": "CA", "Australia": "AU",
+    "New Zealand": "NZ", "Ireland": "IE", "United Arab Emirates": "AE", "Saudi Arabia": "SA",
+    "Qatar": "QA", "Kuwait": "KW", "Israel": "IL", "Turkey": "TR", "Singapore": "SG", "India": "IN",
+    "Pakistan": "PK", "Philippines": "PH", "Indonesia": "ID", "Malaysia": "MY", "Japan": "JP",
+    "Hong Kong": "HK", "China": "CN", "Nigeria": "NG", "Kenya": "KE", "Egypt": "EG",
+    "South Africa": "ZA", "Germany": "DE", "France": "FR", "Italy": "IT", "Spain": "ES",
+    "Portugal": "PT", "Netherlands": "NL", "Belgium": "BE", "Switzerland": "CH", "Austria": "AT",
+    "Sweden": "SE", "Norway": "NO", "Denmark": "DK", "Finland": "FI", "Poland": "PL",
+    "Ukraine": "UA", "Georgia": "GE", "Montenegro": "ME", "Serbia": "RS", "Cyprus": "CY",
+    "Greece": "GR", "Romania": "RO", "Bulgaria": "BG", "Czech Republic": "CZ", "Hungary": "HU",
+    "Lithuania": "LT", "Latvia": "LV", "Estonia": "EE", "LBR": "LR", "Liberia": "LR", "Ghana": "GH",
+    "Morocco": "MA", "Thailand": "TH", "Vietnam": "VN", "South Korea": "KR", "Taiwan": "TW",
+    "Brazil": "BR", "Mexico": "MX", "Argentina": "AR",
+}
+
+
+def flag(name: str) -> str:
+    """🇳🇬 for "Nigeria"; the globe when the country isn't in the table."""
+    code = _ISO.get((name or "").strip())
+    return "".join(chr(0x1F1E6 + ord(c) - 65) for c in code) if code else "🌍"
