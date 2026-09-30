@@ -134,6 +134,7 @@ class JobPosting(TimeStampedModel):
     posted_at = models.DateTimeField(null=True, blank=True)
     # Outcomes past "applied" — set manually (admin / Telegram) for the funnel.
     applied_at = models.DateTimeField(null=True, blank=True)  # set on -> APPLIED, drives the streak
+    viewed_at = models.DateTimeField(null=True, blank=True)  # client opened the proposal (from Vollna)
     connects_spent = models.PositiveSmallIntegerField(null=True, blank=True)  # proposal + boost
     interviewed_at = models.DateTimeField(null=True, blank=True)
     hired_at = models.DateTimeField(null=True, blank=True)
@@ -179,3 +180,17 @@ class JobPosting(TimeStampedModel):
         if save:
             self.save(update_fields=["status", "applied_at", "updated_at"])
         return self
+
+
+class VollnaEvent(models.Model):
+    """Raw Vollna webhook delivery, kept as-is (their payload isn't fully documented)
+    and deduped by its id, so a redelivery never double-counts."""
+
+    event_id = models.CharField(max_length=80, unique=True)
+    event = models.CharField(max_length=60)
+    payload = models.JSONField()
+    job = models.ForeignKey(JobPosting, null=True, blank=True, on_delete=models.SET_NULL)
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.event} {self.event_id}"

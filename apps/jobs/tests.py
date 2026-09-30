@@ -826,3 +826,46 @@ class ExcludeCountryTests(TestCase):
             r = collect_for_filter(f, provider=P())
         self.assertEqual(r["created"], 1)
         self.assertEqual(list(JobPosting.objects.values_list("job_id", flat=True)), ["uk"])
+
+
+@override_settings(VOLLNA_WEBHOOK_TOKEN="s3cret")
+class VollnaWebhookTests(TestCase):
+    URL = "/webhooks/vollna/"
+
+    def post(self, body, token="s3cret"):
+        import json
+        return self.client.post(self.URL, data=json.dumps(body), content_type="application/json",
+                                HTTP_AUTHORIZATION=f"Bearer {token}")
+
+    def test_rejects_bad_token_and_bad_payload(self):
+        self.assertEqual(self.post({"id": "evt_1", "event": "x", "data": {}}, token="nope").status_code, 401)
+        self.assertEqual(self.client.post(self.URL, data="{", content_type="application/json",
+                                          HTTP_AUTHORIZATION="Bearer s3cret").status_code, 400)
+
+    def test_proposal_events_mark_sent_then_viewed_once(self):
+        from .models import VollnaEvent
+        existing = JobPosting.objects.create(job_id="021234567890abcd", title="t", budget_type="fixed",
+                                             status=JobPosting.Status.SCORED)
+        created = {"id": "evt_a", "event": "upwork_proposal.created", "data": {
+            "connects": 37, "isViewed": False,
+            "jobDetails": {"title": "Landing page", "url": "https://www.upwork.com/jobs/~021234567890abcd"}}}
+        self.assertEqual(self.post(created).status_code, 200)
+        existing.refresh_from_db()
+        self.assertEqual((existing.status, existing.connects_spent), (JobPosting.Status.APPLIED, 37))
+        self.assertIsNotNone(existing.applied_at)
+        viewed = {"id": "evt_b", "event": "upwork_proposal.status_changed", "data": {
+            "isViewed": True, "isInterviewed": True, "jobDetails": {"url": "https://www.upwork.com/jobs/~021234567890abcd"}}}
+        self.post(viewed); self.post(viewed)  # redelivery is a no-op
+        existing.refresh_from_db()
+        self.assertIsNotNone(existing.viewed_at); self.assertIsNotNone(existing.interviewed_at)
+        self.assertEqual(VollnaEvent.objects.count(), 2)
+
+    def test_unknown_job_is_created_as_sent(self):
+        self.post({"id": "evt_c", "event": "upwork_proposal.created", "data": {
+            "jobDetails": {"title": "Found it myself", "url": "https://www.upwork.com/jobs/~0299887766554433"}}})
+        j = JobPosting.objects.get(job_id="0299887766554433")
+        self.assertEqual((j.title, j.status), ("Found it myself", JobPosting.Status.APPLIED))
+
+    @override_settings(VOLLNA_WEBHOOK_TOKEN="")
+    def test_closed_without_token(self):
+        self.assertEqual(self.post({"id": "evt_d", "event": "x", "data": {}}, token="").status_code, 401)

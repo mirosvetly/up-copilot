@@ -25,7 +25,8 @@ env = environ.Env(
     MAX_JOB_AGE_HOURS=(int, 24),  # ignore API jobs older than this (API window is ~7 days)
     FEED_MAX_AGE_HOURS=(int, 24),
     FEED_MIN_SCORE=(int, 20),
-    EXCLUDE_CLIENT_COUNTRIES=(list, []),  # client countries to skip at collect time, e.g. United States,USA  # jobs scored below this skip the feed right after scoring  # unsent jobs older than this leave the feed as "expired"
+    EXCLUDE_CLIENT_COUNTRIES=(list, []),
+    VOLLNA_WEBHOOK_TOKEN=(str, ""),  # Bearer token Vollna sends to /webhooks/vollna/; empty = endpoint closed  # client countries to skip at collect time, e.g. United States,USA  # jobs scored below this skip the feed right after scoring  # unsent jobs older than this leave the feed as "expired"
     # Who I am for geo/language gating: jobs whose text demands a location or
     # language I can't meet (e.g. "US only", "native German") can't be applied
     # to, so the scorer kills them. Global, not per-track (single user).
@@ -174,6 +175,7 @@ OLLAMA_KEEP_ALIVE = env("OLLAMA_KEEP_ALIVE")
 MAX_JOB_AGE_HOURS = env("MAX_JOB_AGE_HOURS")
 FEED_MAX_AGE_HOURS = env("FEED_MAX_AGE_HOURS")
 FEED_MIN_SCORE = env("FEED_MIN_SCORE")
+VOLLNA_WEBHOOK_TOKEN = env("VOLLNA_WEBHOOK_TOKEN")
 EXCLUDE_CLIENT_COUNTRIES = {c.strip().lower() for c in env("EXCLUDE_CLIENT_COUNTRIES") if c.strip()}
 DAILY_PROPOSALS_GOAL = env("DAILY_PROPOSALS_GOAL")
 NOTIFY_MIN_SCORE = env("NOTIFY_MIN_SCORE")

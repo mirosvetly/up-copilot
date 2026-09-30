@@ -49,6 +49,7 @@ def money() -> dict:
         "per_proposal": per_proposal,
         "logged": logged.count(),
         "sent": sent.count(),
+        "viewed": sent.filter(viewed_at__isnull=False).count(),  # from the Vollna webhook
         "interviews": interviews,
         "hires": hires,
         "per_interview": per(interviews),

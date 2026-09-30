@@ -3,10 +3,12 @@ from __future__ import annotations
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_not_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from apps.analytics.habit import habit
@@ -338,6 +340,21 @@ def job_action(request, pk, action):
     if nxt.startswith("/") and not nxt.startswith("//"):  # local path, not //evil.com
         return redirect(nxt)
     return redirect("jobs:feed")
+
+
+@csrf_exempt
+@login_not_required
+@require_POST
+def vollna_webhook(request):
+    """Vollna pushes proposal events here (Bearer token), see apps/jobs/vollna.py."""
+    from django.http import HttpResponse
+
+    from . import vollna
+
+    if not vollna.authorized(request.headers.get("Authorization", "")):
+        return HttpResponse("unauthorized", status=401)
+    status, msg = vollna.handle(request.body)
+    return HttpResponse(msg, status=status)
 
 
 @require_POST
