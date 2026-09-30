@@ -20,6 +20,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{background:var(--bg);color:var(--fg);font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
   *{box-sizing:border-box}
   a{color:inherit;text-decoration:none}
@@ -46,7 +47,11 @@
     .uc-head{height:auto!important;min-height:52px;flex-wrap:wrap;padding:10px 14px!important;gap:8px!important}
     .uc-hide-m{display:none!important}
     .uc-search{width:100%!important;order:10}
-    .uc-cols{flex-direction:column!important;padding:14px!important;gap:14px!important}
+    .uc-cols{flex-direction:column!important;align-items:stretch!important;padding:14px!important;gap:14px!important}
+    .uc-cols>*{min-width:0;max-width:100%}
+    .uc-main [style*="overflow:auto"]{overflow-x:hidden!important}
+    /* iOS zooms into any field under 16px on focus and stays zoomed: looks like cut-off cards + sideways scroll */
+    .uc-shell input:not([type=hidden]):not([type=checkbox]),.uc-shell textarea,.uc-shell select{font-size:16px!important}
     .uc-rail{width:100%!important}
     .uc-card-row{display:grid!important;grid-template-columns:1fr auto;gap:10px 12px!important}
     .uc-card-left{width:auto!important;grid-column:1;grid-row:1;flex-direction:row!important;flex-wrap:wrap;align-items:baseline!important;gap:4px 10px!important}
