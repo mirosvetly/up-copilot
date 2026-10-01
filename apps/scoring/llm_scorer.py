@@ -3,6 +3,8 @@
 Kept separate from the rule scorer so the mock/rule path has zero LLM imports."""
 from __future__ import annotations
 
+from django.conf import settings
+
 from apps.jobs.models import JobPosting
 
 
@@ -14,7 +16,9 @@ def _system(profile: dict) -> str:
         "reviews, not the biggest jobs. Strongly prefer jobs I can realistically win: "
         "Entry or Intermediate experience level, small bounded scope (up to about $800 fixed, "
         "and small jobs under $100 are fine when the work is quick: a first review is worth "
-        "more than the money right now, or a short hourly task), few connects required. Penalize hard: Expert "
+        "more than the money right now, or a short hourly task), few connects required. "
+        "Do NOT penalize a low budget or a low implied hourly rate in this mode: judge the fit "
+        "and the chance to win, not the money. Penalize hard: Expert "
         "experience level, budgets of $2,000+ that attract veterans with hundreds of jobs, "
         "high connects (crowded postings). "
         if profile.get("newcomer_mode") else ""
@@ -70,12 +74,14 @@ def _competition_line(job: JobPosting) -> str:
 
 
 def _prompt(job: JobPosting, profile: dict, similarity: float) -> str:
+    # Mock embeddings give a meaningless number the model then penalizes; only show a real one.
+    sim = f"Profile↔job embedding cosine: {similarity:.2f}\n" if settings.EMBEDDING_PROVIDER != "mock" else ""
     return (
         f"My stack: {', '.join(profile.get('skills', []))}. "
         f"Min rate: ${profile.get('min_hourly_rate')}/hr.\n"
         f"My location: {profile.get('freelancer_location') or 'unspecified'}. "
         f"My languages: {profile.get('freelancer_languages') or 'unspecified'}.\n"
-        f"Profile↔job embedding cosine: {similarity:.2f}\n"
+        f"{sim}"
         f"{_client_line(job)}\n"
         f"{_competition_line(job)}\n\n"
         f"Job: {job.title}\nSkills: {', '.join(job.skills)}\n"
