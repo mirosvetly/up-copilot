@@ -53,7 +53,7 @@ def _streaks(days: set[date], today: date, quiet: set[date] = frozenset(),
             run += 1
         elif d == today or d in quiet:
             pass
-        elif last_freeze is None or (d - last_freeze).days >= freeze_every:
+        elif run and (last_freeze is None or (d - last_freeze).days >= freeze_every):  # only to save a live streak
             frozen.add(d); last_freeze = d
         else:
             run = 0
