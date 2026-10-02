@@ -130,3 +130,21 @@ class IncomeTrophyTests(TestCase):
         self.assertTrue(t["usd100"]["unlocked"])
         self.assertFalse(t["usd500"]["unlocked"])
         self.assertEqual(t["usd500"]["left"], 365)  # 500 - 135
+
+
+class StreakRulesTests(TestCase):
+    def test_quiet_days_and_one_weekly_freeze(self):
+        from datetime import date, timedelta
+
+        from .habit import _streaks
+        t = date(2026, 10, 2)
+        d = lambda n: t - timedelta(days=n)
+        # sent 5 days in a row, missed yesterday (freeze), today pending
+        cur, best, frozen = _streaks({d(6), d(5), d(4), d(3), d(2)}, t)
+        self.assertEqual((cur, best, frozen), (5, 5, {d(1)}))
+        # a second miss inside the same week breaks it
+        cur, _, _ = _streaks({d(6), d(4), d(2)}, t)
+        self.assertEqual(cur, 0)
+        # a quiet day costs nothing and leaves the freeze unused
+        cur, _, frozen = _streaks({d(3), d(1)}, t, quiet={d(2)})
+        self.assertEqual((cur, frozen), (2, set()))

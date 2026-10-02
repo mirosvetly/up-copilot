@@ -38,17 +38,28 @@ TROPHIES = [
 ]
 
 
-def _streaks(days: set[date], today: date) -> tuple[int, int]:
-    """(current, best). Today with nothing sent yet doesn't break the streak."""
-    cur, d = 0, today if today in days else today - timedelta(days=1)
-    while d in days:
-        cur, d = cur + 1, d - timedelta(days=1)
-    best = run = 0
-    prev = None
-    for d in sorted(days):
-        run = run + 1 if prev and d - prev == timedelta(days=1) else 1
-        best, prev = max(best, run), d
-    return cur, best
+def _streaks(days: set[date], today: date, quiet: set[date] = frozenset(),
+             freeze_every: int = 7) -> tuple[int, int, set[date]]:
+    """(current, best, frozen days). A day with a proposal extends the streak; a quiet day
+    (no job worth sending) and one missed day per `freeze_every` days (a freeze) keep it
+    without extending it; today with nothing sent yet is still pending."""
+    if not days:
+        return 0, 0, set()
+    run = best = 0
+    last_freeze, frozen = None, set()
+    d = min(days)
+    while d <= today:
+        if d in days:
+            run += 1
+        elif d == today or d in quiet:
+            pass
+        elif last_freeze is None or (d - last_freeze).days >= freeze_every:
+            frozen.add(d); last_freeze = d
+        else:
+            run = 0
+        best = max(best, run)
+        d += timedelta(days=1)
+    return run, best, frozen
 
 
 def _unlocked(kind, need, *, total, best, goal_days, interviews, hires, income) -> tuple[bool, int]:
@@ -63,7 +74,16 @@ def habit(today: date | None = None, goal: int | None = None) -> dict:
     sent = JobPosting.objects.filter(applied_at__isnull=False).values_list("applied_at", flat=True)
     per_day = Counter(timezone.localtime(t).date() for t in sent)
     days = set(per_day)
-    current, best = _streaks(days, today)
+    # Quiet day: jobs were collected but none worth a ping. The market was empty, not you.
+    collected, good = set(), set()
+    for created, score in JobPosting.objects.filter(created_at__date__gte=min(days, default=today)).values_list(
+            "created_at", "score__score"):
+        day = timezone.localtime(created).date()
+        collected.add(day)
+        if score is not None and score >= settings.NOTIFY_MIN_SCORE:
+            good.add(day)
+    quiet = collected - good
+    current, best, frozen = _streaks(days, today, quiet)
 
     # Calendar: WEEKS columns of Mon..Sun, ending with the current week.
     start = today - timedelta(days=today.weekday() + 7 * (WEEKS - 1))
@@ -74,7 +94,8 @@ def habit(today: date | None = None, goal: int | None = None) -> dict:
             d = start + timedelta(days=7 * w + i)
             n = per_day.get(d, 0)
             level = 0 if not n else 3 if n >= goal else 1 if n == 1 else 2
-            col.append({"date": d, "n": n, "level": level, "future": d > today, "today": d == today})
+            col.append({"date": d, "n": n, "level": level, "future": d > today, "today": d == today,
+                        "frozen": d in frozen, "quiet": not n and d in quiet and d < today})
         weeks.append(col)
 
     counts = dict(
@@ -95,6 +116,7 @@ def habit(today: date | None = None, goal: int | None = None) -> dict:
         "today": per_day.get(today, 0),
         "today_left": max(0, goal - per_day.get(today, 0)),
         "streak": current,
+        "frozen_recent": max((d for d in frozen if (today - d).days < 7), default=None),
         "best": best,
         "total": counts["total"],
         "weeks": weeks,
